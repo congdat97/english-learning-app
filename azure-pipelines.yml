@@ -1,27 +1,157 @@
+# ============================================================================
+#  English Learning App - Angular
+#  Azure DevOps Pipeline
+#  Flow: Build (CI)  ->  Mirror to GitHub (CD)
+# ============================================================================
+
+name: $(Date:yyyyMMdd).$(Rev:r)
+
 trigger:
-- main
+  branches:
+    include:
+      - main
+
+# ============================================================================
+# GLOBAL POOL
+# ============================================================================
 
 pool:
-  vmImage: ubuntu-latest
+  name: Default
 
-steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '20.x'
-  displayName: 'Install Node.js'
+# ============================================================================
+# GLOBAL VARIABLES
+# ============================================================================
 
-- script: npm ci
-  workingDirectory: .
-  displayName: 'Install dependencies'
+variables:
+  - group: github-deploy
+  - name: nodeVersion
+    value: '20.x'
+  - name: githubOrg
+    value: 'congdat97'
+  - name: githubRepo
+    value: 'english-learning-app'
+  - name: githubBranch
+    value: 'main'
 
-- script: npm run build
-  displayName: 'Build Angular app'
+# ============================================================================
+# STAGES
+# ============================================================================
 
-- script: npm test -- --watch=false
-  displayName: 'Run tests'
+stages:
 
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: 'dist'
-    ArtifactName: 'angular-app'
-  displayName: 'Publish build artifacts'
+  # --------------------------------------------------------------------------
+  # STAGE 1 - BUILD  (Continuous Integration)
+  # --------------------------------------------------------------------------
+
+  - stage: Build
+    displayName: 'Stage 1 · Build'
+    jobs:
+
+      - job: BuildAngular
+        displayName: 'Build Angular application'
+
+        steps:
+
+          - checkout: self
+            displayName: 'Checkout source'
+            fetchDepth: 0
+
+          - script: |
+              node --version
+              npm --version
+            displayName: 'Check Node.js / npm toolchain'
+
+          - script: |
+              npm ci
+            displayName: 'Install dependencies (npm ci)'
+
+          - script: |
+              npm run build
+            displayName: 'Build production bundle'
+
+          - script: |
+              npm test -- --watch=false
+            displayName: 'Run tests'
+
+          - publish: dist
+            artifact: angular-dist
+            displayName: 'Publish build artifact (dist)'
+
+
+  # --------------------------------------------------------------------------
+  # STAGE 2 - MIRROR  (Continuous Deployment)
+  # --------------------------------------------------------------------------
+
+  - stage: Mirror
+    displayName: 'Stage 2 · Mirror to GitHub'
+    dependsOn: Build
+    condition: succeeded()
+    jobs:
+
+      - job: PushToGitHub
+        displayName: 'Push source to GitHub'
+
+        steps:
+
+          - checkout: self
+            displayName: 'Checkout source'
+            fetchDepth: 0
+
+          - powershell: |
+              $ErrorActionPreference = "Stop"
+
+              Write-Host "========================================"
+              Write-Host " Azure DevOps  ->  GitHub"
+              Write-Host " Angular Application"
+              Write-Host "========================================"
+              Write-Host ""
+
+              git config user.name  "Azure DevOps CI"
+              git config user.email "azure-devops-ci@local"
+
+              Write-Host "Current commit:"
+              git rev-parse HEAD
+              Write-Host ""
+
+              Write-Host "Current Git remotes:"
+              $remotes = @(git remote)
+
+              foreach ($remote in $remotes) {
+                  Write-Host " - $remote"
+              }
+              Write-Host ""
+
+              if ($remotes -contains "github") {
+                  Write-Host "GitHub remote exists. Removing..."
+
+                  git remote remove github
+
+                  if ($LASTEXITCODE -ne 0) {
+                      throw "Failed to remove GitHub remote."
+                  }
+              }
+
+              $githubUrl = "https://$(GITHUB_USERNAME):$(GITHUB_TOKEN)@github.com/$(githubOrg)/$(githubRepo).git"
+
+              Write-Host "Adding GitHub remote..."
+
+              git remote add github $githubUrl
+
+              if ($LASTEXITCODE -ne 0) {
+                  throw "Failed to add GitHub remote."
+              }
+              Write-Host ""
+
+              Write-Host "Pushing Azure DevOps -> GitHub $(githubBranch)..."
+
+              git push github "HEAD:refs/heads/$(githubBranch)" --force
+
+              if ($LASTEXITCODE -ne 0) {
+                  throw "Git push to GitHub failed."
+              }
+              Write-Host ""
+
+              Write-Host "========================================"
+              Write-Host " Push to GitHub SUCCESS"
+              Write-Host "========================================"
+            displayName: 'Mirror repository to GitHub'
