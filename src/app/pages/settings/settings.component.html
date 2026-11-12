@@ -1,0 +1,9 @@
+<div class="panel">
+  <h2>Cài đặt học tập</h2>
+  <label>Daily minutes: <input type="number" [(ngModel)]="dailyMinutes" /></label>
+  <label>Audio speed: <input type="number" step="0.25" [(ngModel)]="audioSpeed" /></label>
+  <label>Show translation: <input type="checkbox" [(ngModel)]="showTranslation" /></label>
+  <label>Font size: <input type="number" [(ngModel)]="fontSize" /></label>
+  <button class="primary" (click)="save()">Save</button>
+</div>
+<a routerLink="/dashboard" class="text-btn">← Quay lại</a>

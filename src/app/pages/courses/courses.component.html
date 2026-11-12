@@ -1,0 +1,9 @@
+<div class="section-head"><div><h2>Tất cả khóa học</h2><p>Lộ trình từ nền tảng đến giao tiếp tự tin</p></div></div>
+<p *ngIf="loading">Loading...</p>
+<div class="course-grid" *ngIf="!loading">
+  <a *ngFor="let course of courses" [routerLink]="['/courses', course.id]" class="course">
+    <div class="course-top"><div class="course-emoji">📘</div><span class="level">{{ course.level }}</span></div>
+    <h3>{{ course.title }}</h3>
+    <p>{{ course.description }}</p>
+  </a>
+</div>

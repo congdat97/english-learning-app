@@ -1,0 +1,20 @@
+<div *ngIf="course" class="lesson-intro">
+  <div>
+    <div class="eyebrow">{{ course.level }}</div>
+    <h2>{{ course.title }}</h2>
+    <p>{{ course.description }}</p>
+  </div>
+  <div class="lesson-emoji">📚</div>
+</div>
+<p *ngIf="loading">Loading...</p>
+<div class="panel" *ngIf="!loading">
+  <div class="lesson-row" *ngFor="let lesson of lessons">
+    <div class="lesson-number">{{ lesson.sort_order }}</div>
+    <div class="lesson-info">
+      <strong>{{ lesson.title }}</strong>
+      <small>{{ lesson.topic }}</small>
+    </div>
+    <a class="tiny-btn" [routerLink]="['/lessons', lesson.id]">Học</a>
+  </div>
+</div>
+<a routerLink="/courses" class="text-btn">← Quay lại</a>

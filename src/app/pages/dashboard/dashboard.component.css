@@ -1,0 +1,2 @@
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+.grid a { display: block; padding: 16px; border: 1px solid #ddd; border-radius: 8px; text-decoration: none; color: inherit; }

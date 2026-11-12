@@ -1,0 +1,23 @@
+<section class="hero">
+  <div class="hero-copy">
+    <div class="tag">BẮT ĐẦU HÀNH TRÌNH CỦA BẠN</div>
+    <h2>Learn English,<br>one step at a time.</h2>
+    <p>Học tiếng Anh giao tiếp từ những điều cơ bản nhất. Chậm rãi, dễ hiểu và vui mỗi ngày.</p>
+    <a class="primary-light" routerLink="/courses">Tiếp tục học →</a>
+  </div>
+  <div class="hero-art">📚</div>
+</section>
+<div class="stats">
+  <div class="stat"><div class="stat-icon">🎯</div><div><strong>0</strong><small>Bài đã hoàn thành</small></div></div>
+  <div class="stat"><div class="stat-icon">🔤</div><div><strong>0</strong><small>Từ đã lưu</small></div></div>
+  <div class="stat"><div class="stat-icon">🔥</div><div><strong>1 ngày</strong><small>Hãy duy trì thói quen</small></div></div>
+</div>
+<div class="section-head"><div><h2>Khóa học của bạn</h2><p>Chọn chủ đề phù hợp để bắt đầu</p></div><a class="text-btn" routerLink="/courses">Xem tất cả →</a></div>
+<div class="course-grid" *ngIf="!loading">
+  <a *ngFor="let course of courses" [routerLink]="['/courses', course.id]" class="course">
+    <div class="course-top"><div class="course-emoji" [style.background]="course.level === 'Beginner' ? '#fff0dc' : '#e8f7ef'">📘</div><span class="level">{{ course.level }}</span></div>
+    <h3>{{ course.title }}</h3>
+    <p>{{ course.description }}</p>
+  </a>
+</div>
+<p *ngIf="loading">Loading...</p>

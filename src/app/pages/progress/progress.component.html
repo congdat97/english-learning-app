@@ -1,0 +1,14 @@
+<div class="section-head"><div><h2>Tiến độ học tập</h2><p>Mỗi bước nhỏ đều đáng tự hào</p></div></div>
+<p *ngIf="loading">Loading...</p>
+<div *ngIf="!loading">
+  <div class="stats">
+    <div class="stat"><div class="stat-icon">🎯</div><div><strong>{{ totalCompleted }}/{{ totalLessons }}</strong><small>Bài học hoàn thành</small></div></div>
+    <div class="stat"><div class="stat-icon">⭐</div><div><strong>{{ totalCompleted }}</strong><small>Điểm gần nhất</small></div></div>
+  </div>
+  <div *ngFor="let item of items" class="panel" style="margin-bottom:1rem">
+    <h3>{{ item.course.title }}</h3>
+    <div class="course-meta"><span>Tiến độ</span><b>{{ item.completed }}/{{ item.lessons.length }}</b></div>
+    <div class="bar"><span [style.width.%]="item.lessons.length ? (item.completed / item.lessons.length * 100) : 0"></span></div>
+  </div>
+</div>
+<a routerLink="/dashboard" class="text-btn">← Quay lại</a>

@@ -1,0 +1,16 @@
+<div class="section-head"><div><h2>Sổ từ vựng cá nhân</h2><p>Những từ bạn đã đánh dấu để ôn tập</p></div></div>
+<input placeholder="Tìm từ vựng..." style="width:100%;padding:12px;border:1px solid var(--line);border-radius:11px;margin-bottom:14px" [(ngModel)]="search" (ngModelChange)="applyFilter()" />
+<p *ngIf="loading">Loading...</p>
+<div class="vocab-grid" *ngIf="!loading">
+  <article *ngFor="let v of filtered" class="word-card">
+    <div class="word-head"><h3>{{ v.word }}</h3><span class="ipa">{{ v.ipa }}</span></div>
+    <small>{{ v.part_of_speech }}</small>
+    <p><b>{{ v.meaning_vi }}</b></p>
+    <div class="word-actions">
+      <button class="tiny-btn" (click)="speak(v.word)">🔊 Nghe từ</button>
+      <button class="tiny-btn saved" (click)="unbookmark(v)">✕ Xóa</button>
+    </div>
+  </article>
+</div>
+<p *ngIf="!loading && filtered.length === 0" class="muted">Chưa có từ nào được lưu.</p>
+<a routerLink="/courses" class="text-btn">← Quay lại</a>

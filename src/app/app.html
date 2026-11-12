@@ -1,0 +1,30 @@
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="logo">✦</div> English Step by Step</div>
+    <div>
+      <div class="nav-label">MENU CHÍNH</div>
+      <nav class="nav">
+        <a routerLink="/dashboard" routerLinkActive="active"><span class="nav-icon">⌂</span>Trang chủ</a>
+        <a routerLink="/courses" routerLinkActive="active"><span class="nav-icon">▤</span>Khóa học</a>
+        <a routerLink="/bookmarks" routerLinkActive="active"><span class="nav-icon">◇</span>Sổ từ vựng</a>
+        <a routerLink="/progress" routerLinkActive="active"><span class="nav-icon">◷</span>Tiến độ</a>
+        <a routerLink="/settings" routerLinkActive="active"><span class="nav-icon">⚙</span>Cài đặt</a>
+      </nav>
+    </div>
+    <div class="sidebar-bottom">
+      <strong>🌱 Mỗi ngày một chút</strong>
+      <p>Học đều đặn để tiến bộ từng bước.</p>
+      <div class="mini-progress"><span style="width:12%"></span></div>
+    </div>
+  </aside>
+  <main>
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">THỨ TỐT ĐẸP BẮT ĐẦU TỪ NHỮNG ĐIỀU NHỎ</div>
+        <h1>Chào mừng bạn trở lại! 👋</h1>
+      </div>
+      <div class="profile"><span>Người học mới</span><div class="avatar">A</div></div>
+    </header>
+    <router-outlet />
+  </main>
+</div>

@@ -1,0 +1,83 @@
+<div *ngIf="lesson; else loadingTpl">
+  <div class="lesson-intro">
+    <div>
+      <div class="eyebrow">LESSON {{ lesson.sort_order }}</div>
+      <h2>{{ lesson.title }}</h2>
+      <p>{{ lesson.topic }}</p>
+      <p style="margin-top:9px">⏱ {{ lesson.duration_minutes }} phút</p>
+    </div>
+    <div class="lesson-emoji">👋</div>
+  </div>
+
+  <div class="subnav">
+    <button [class.active]="section === 'intro'" (click)="setSection('intro')">1. Giới thiệu</button>
+    <button [class.active]="section === 'vocabulary'" (click)="setSection('vocabulary')">2. Từ vựng</button>
+    <button [class.active]="section === 'listening'" (click)="setSection('listening')">3. Luyện nghe</button>
+    <button [class.active]="section === 'review'" (click)="setSection('review')">4. Ôn tập</button>
+  </div>
+
+  <section *ngIf="section === 'intro'" class="panel">
+    <h3>🎯 Mục tiêu bài học</h3>
+    <ul><li *ngFor="let o of lesson.objectives">{{ o }}</li></ul>
+  </section>
+
+  <section *ngIf="section === 'vocabulary'">
+    <div class="section-head"><div><h2>Vocabulary · Từ vựng</h2><p>Nghe phát âm, đọc ví dụ và lưu từ cần ôn</p></div></div>
+    <div class="vocab-grid">
+      <article *ngFor="let v of vocabulary" class="word-card">
+        <div class="word-head"><h3>{{ v.word }}</h3><span class="ipa">{{ v.ipa }}</span></div>
+        <small>{{ v.part_of_speech }}</small>
+        <p><b>{{ v.meaning_vi }}</b></p>
+        <div *ngFor="let e of v.examples">
+          <small>Ví dụ: {{ e.sentence }}<br>{{ e.translation_vi }}</small>
+        </div>
+        <div class="word-actions">
+          <button class="tiny-btn" (click)="speak(v.word)">🔊 Nghe từ</button>
+          <button class="tiny-btn" *ngFor="let e of v.examples" (click)="speak(e.sentence)">▶ Nghe câu</button>
+          <button class="tiny-btn" [class.saved]="v.is_favorite" (click)="toggleFavorite(v)">{{ v.is_favorite ? '★ Đã lưu' : '☆ Lưu từ' }}</button>
+        </div>
+      </article>
+    </div>
+    <p *ngIf="vocabulary.length === 0">No vocabulary.</p>
+  </section>
+
+  <section *ngIf="section === 'listening'">
+    <div class="section-head"><div><h2>Listening</h2><p>Nghe đoạn hội thoại và trả lời</p></div></div>
+    <div *ngFor="let l of listening" class="listen-box">
+      <b>🎧 {{ l.title }}</b>
+      <div class="audio-controls">
+        <button class="play" (click)="speak(l.transcript.map(x => x.text).join(' '))">▶</button>
+        <span class="muted">Sẵn sàng nghe</span>
+      </div>
+      <div class="transcript">
+        <div *ngFor="let line of l.transcript" class="line">
+          <b>{{ line.speaker }}:</b> {{ line.text }}
+          <span class="translation">{{ line.translation_vi }}</span>
+          <button class="tiny-btn" (click)="speak(line.text)">Nghe</button>
+        </div>
+      </div>
+      <div *ngFor="let q of l.questions" class="question">
+        <b>{{ q.question }}</b>
+        <button *ngFor="let opt of q.options" class="option" [class.selected]="answers[q.id] === opt" (click)="answers[q.id]=opt">{{ opt }}</button>
+      </div>
+    </div>
+    <p *ngIf="listening.length === 0">No listening.</p>
+  </section>
+
+  <section *ngIf="section === 'review'" class="panel">
+    <h2>✍️ Ôn tập nhanh</h2>
+    <p class="muted">Chọn đáp án đúng để hoàn thành bài học.</p>
+    <div *ngFor="let q of review" style="margin:18px 0">
+      <b>{{ q.question }}</b>
+      <button *ngFor="let opt of q.options" class="option" [class.selected]="answers[q.id] === opt" (click)="selectAnswer(q, opt)">{{ opt }}</button>
+      <p *ngIf="submitted && answers[q.id] !== q.answer" class="feedback">Correct: {{ q.answer }}. {{ q.explanation_vi }}</p>
+    </div>
+    <p *ngIf="review.length === 0">No review questions.</p>
+    <div *ngIf="review.length > 0">
+      <button class="primary" (click)="submitReview()" *ngIf="!submitted">Kiểm tra kết quả</button>
+      <button class="primary" (click)="resetReview()" *ngIf="submitted">Làm lại</button>
+      <p *ngIf="submitted" class="feedback">Score: {{ score }} / {{ review.length }}</p>
+    </div>
+  </section>
+</div>
+<ng-template #loadingTpl><p>Loading...</p></ng-template>
