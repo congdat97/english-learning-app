@@ -1,0 +1,27 @@
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '20.x'
+  displayName: 'Install Node.js'
+
+- script: npm ci
+  workingDirectory: .
+  displayName: 'Install dependencies'
+
+- script: npm run build
+  displayName: 'Build Angular app'
+
+- script: npm test -- --watch=false
+  displayName: 'Run tests'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: 'dist'
+    ArtifactName: 'angular-app'
+  displayName: 'Publish build artifacts'
