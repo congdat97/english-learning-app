@@ -67,8 +67,14 @@ export class SettingsComponent implements OnInit {
       theme: this.theme
     };
     this.learning.saveSettings(payload).subscribe({
-      next: () => this.persistLocal(),
-      error: () => this.persistLocal()
+      next: () => {
+        this.persistLocal();
+        window.alert('✅ Đã lưu cài đặt lên server.');
+      },
+      error: () => {
+        this.persistLocal();
+        window.alert('⚠️ Không lưu được lên server (API chưa hoạt động) — cài đặt chỉ được lưu tạm trên máy này.');
+      }
     });
   }
 

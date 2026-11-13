@@ -54,7 +54,10 @@ export class LessonComponent implements OnInit {
   }
 
   toggleFavorite(v: Vocabulary): void {
-    this.learning.toggleFavorite(v.id).subscribe({ next: (r) => v.is_favorite = r.data.is_favorite });
+    this.learning.toggleFavorite(v.id).subscribe({
+      next: (r) => v.is_favorite = r.data.is_favorite,
+      error: () => window.alert('⚠️ Không lưu được trạng thái từ vựng (API chưa hoạt động) — thử lại sau.')
+    });
   }
 
   get showTranslation(): boolean {
@@ -79,7 +82,10 @@ export class LessonComponent implements OnInit {
     this.submitted = true;
     this.score = this.review.filter(q => this.answers[q.id] === q.answer).length;
     if (this.lesson) {
-      this.learning.saveProgress(this.lesson.id, 'completed', this.score, this.review.length).subscribe();
+      this.learning.saveProgress(this.lesson.id, 'completed', this.score, this.review.length).subscribe({
+        next: () => window.alert(`✅ Hoàn thành bài học! Điểm: ${this.score}/${this.review.length} (đã lưu tiến độ).`),
+        error: () => window.alert(`⚠️ Không lưu được tiến độ lên server (API chưa hoạt động) — điểm ${this.score}/${this.review.length} chỉ hiển thị tạm thời.`)
+      });
     }
   }
 
