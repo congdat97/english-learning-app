@@ -52,6 +52,14 @@ export class LearningService {
     return this.http.get<{ success: boolean; data: Vocabulary[] }>(`${this.base}/vocabulary/bookmarks`);
   }
 
+  getSettings(): Observable<{ success: boolean; data: any }> {
+    return this.http.get<{ success: boolean; data: any }>(`${this.base}/settings`);
+  }
+
+  saveSettings(settings: any): Observable<{ success: boolean; data: any }> {
+    return this.http.put<{ success: boolean; data: any }>(`${this.base}/settings`, settings);
+  }
+
   toggleFavorite(vocabularyId: number): Observable<{ success: boolean; data: Vocabulary }> {
     return this.http.post<{ success: boolean; data: Vocabulary }>(`${this.base}/vocabulary/${vocabularyId}/favorite`, {});
   }
