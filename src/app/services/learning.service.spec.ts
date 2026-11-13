@@ -123,25 +123,26 @@ describe('LearningService', () => {
       localStorage.setItem(`api-cache:${url}`, JSON.stringify({ ts, body }));
     }
 
-    it('emits cached data immediately, then fresh API data, and updates cache', () => {
+    it('emits cached data immediately without waiting for API, refreshes cache in background', () => {
       const url = `${base}/courses`;
       seedCache(url, { success: true, data: [{ id: 9, title: 'cached' }] });
       const emissions: any[] = [];
       let completed = false;
       service.getCourses().subscribe({ next: e => emissions.push(e), complete: () => (completed = true) });
 
-      const req = http.expectOne(url);
-      req.flush({ success: true, data: [{ id: 9, title: 'fresh' }] });
-
-      expect(emissions.length).toBe(2);
+      // cache trả ngay, complete ngay -> forkJoin không phải chờ
+      expect(emissions.length).toBe(1);
       expect(emissions[0].data[0].title).toBe('cached');
-      expect(emissions[1].data[0].title).toBe('fresh');
       expect(completed).toBe(true);
+
+      // refresh nền: khi API trả, chỉ cache được cập nhật (không emit lại)
+      http.expectOne(url).flush({ success: true, data: [{ id: 9, title: 'fresh' }] });
       const saved = JSON.parse(localStorage.getItem(`api-cache:${url}`) || '{}');
       expect(saved.body.data[0].title).toBe('fresh');
+      expect(emissions.length).toBe(1);
     });
 
-    it('falls back to cache without erroring when the API fails', () => {
+    it('does not error when API background refresh fails with cache present', () => {
       const url = `${base}/courses`;
       seedCache(url, { success: true, data: [{ id: 9, title: 'cached' }] });
       const emissions: any[] = [];

@@ -11,6 +11,7 @@
       <select name="voice" [(ngModel)]="voice" (ngModelChange)="onVoiceChange()">
         <option value="">Mặc định</option>
         <option *ngFor="let v of voices" [value]="v.name">{{ v.name }} ({{ v.lang }})</option>
+        <option value="" disabled *ngIf="voices.length === 0">Chưa có giọng đọc nào trên máy</option>
       </select>
       <button type="button" class="text-btn" style="margin-top:.5rem" (click)="testVoice()">🔊 Thử giọng</button>
     </div>

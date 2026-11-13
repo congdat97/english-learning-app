@@ -66,8 +66,20 @@
       </div>
       <div *ngFor="let q of l.questions" class="question">
         <b>{{ q.question }}</b>
-        <button *ngFor="let opt of q.options" class="option" [class.selected]="answers[q.id] === opt" (click)="pickListening(q, opt)">{{ opt }}</button>
+        <button *ngFor="let opt of q.options" class="option"
+                [class.selected]="listeningAnswers[q.id] === opt && !listeningSubmitted"
+                [class.correct]="listeningSubmitted && opt === q.answer"
+                [class.wrong]="listeningSubmitted && listeningAnswers[q.id] === opt && opt !== q.answer"
+                (click)="pickListening(q, opt)">{{ opt }}</button>
+        <p *ngIf="listeningSubmitted && listeningAnswers[q.id] !== q.answer" class="feedback">
+          Đáp án đúng: <b>{{ q.answer }}</b>. {{ q.explanation_vi }}
+        </p>
       </div>
+    </div>
+    <div class="result-actions" *ngIf="listening.length > 0 && allListeningQuestions.length > 0">
+      <button class="primary" (click)="submitListening()" *ngIf="!listeningSubmitted">Kiểm tra đáp án nghe</button>
+      <button class="primary" (click)="resetListening()" *ngIf="listeningSubmitted">Làm lại</button>
+      <p *ngIf="listeningSubmitted" class="feedback">Score: {{ listeningScore }} / {{ allListeningQuestions.length }}</p>
     </div>
     <p *ngIf="listening.length === 0">No listening.</p>
   </section>

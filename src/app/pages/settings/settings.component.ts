@@ -46,10 +46,15 @@ export class SettingsComponent implements OnInit {
   private loadVoices(): void {
     if (typeof speechSynthesis === 'undefined') return;
     const refresh = () => {
+      // Hiện TẤT CẢ giọng (máy có thể không cài giọng en),
+      // giọng tiếng Anh xếp lên trước.
       this.voices = speechSynthesis
         .getVoices()
-        .filter(v => v.lang.toLowerCase().startsWith('en'))
-        .sort((a, b) => a.name.localeCompare(b.name));
+        .sort((a, b) => {
+          const ae = a.lang.toLowerCase().startsWith('en') ? 0 : 1;
+          const be = b.lang.toLowerCase().startsWith('en') ? 0 : 1;
+          return ae - be || a.name.localeCompare(b.name);
+        });
     };
     refresh();
     speechSynthesis.addEventListener('voiceschanged', refresh);

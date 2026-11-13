@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+﻿import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { LearningService } from '../../services/learning.service';
@@ -21,27 +21,29 @@ export class LessonComponent implements OnInit, OnDestroy {
   answers: Record<number, string> = {};
   submitted = false;
   score = 0;
+  listeningAnswers: Record<number, string> = {};
+  listeningSubmitted = false;
+  listeningScore = 0;
 
-  /** Tốc độ đọc — chỉnh ngay trong bài học. */
+  /** Tá»‘c Ä‘á»™ Ä‘á»c â€” chá»‰nh ngay trong bÃ i há»c. */
   speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
   speed = 1;
 
-  /** Key của mục đang đọc (đổi icon/màu nút tương ứng). */
+  /** Key cá»§a má»¥c Ä‘ang Ä‘á»c (Ä‘á»•i icon/mÃ u nÃºt tÆ°Æ¡ng á»©ng). */
   speakingKey: string | number | null = null;
-  /** Id của đoạn hội thoại đang đọc cả nhóm (đổi nút ▶ thành ⏸). */
+  /** Id cá»§a Ä‘oáº¡n há»™i thoáº¡i Ä‘ang Ä‘á»c cáº£ nhÃ³m (Ä‘á»•i nÃºt â–¶ thÃ nh â¸). */
   playingGroup: string | number | null = null;
 
   private gapTimer: ReturnType<typeof setTimeout> | null = null;
   private speakToken = 0;
 
-  /** Chỉ alert 1 lần mỗi phiên để không spam. */
-  private listeningAlertShown = false;
+  /** Chá»‰ alert 1 láº§n má»—i phiÃªn Ä‘á»ƒ khÃ´ng spam. */
 
   constructor(private route: ActivatedRoute, private learning: LearningService, private settings: SettingsService) {}
 
   ngOnInit(): void {
     this.speed = this.settings.audioSpeed;
-    // Giá trị lưu lạ (không nằm trong danh sách chip) -> trả về mặc định 1x
+    // GiÃ¡ trá»‹ lÆ°u láº¡ (khÃ´ng náº±m trong danh sÃ¡ch chip) -> tráº£ vá» máº·c Ä‘á»‹nh 1x
     if (!this.speeds.includes(this.speed)) {
       this.speed = 1;
       this.settings.save({ ...this.settings.load(), audioSpeed: 1 });
@@ -67,13 +69,25 @@ export class LessonComponent implements OnInit, OnDestroy {
     this.answers[q.id] = option;
   }
 
-  /** Luyện nghe: lưu lựa chọn + cảnh báo tính năng chưa chấm điểm. */
+  /** Luyá»‡n nghe: chá»n Ä‘Ã¡p Ã¡n trÆ°á»›c khi ná»™p. */
   pickListening(q: { id: number }, option: string): void {
-    this.answers[q.id] = option;
-    if (!this.listeningAlertShown) {
-      this.listeningAlertShown = true;
-      window.alert('⚠️ Tính năng chấm điểm Luyện nghe chưa hoàn thiện — lựa chọn của bạn chưa được tính điểm.');
-    }
+    if (this.listeningSubmitted) return;
+    this.listeningAnswers[q.id] = option;
+  }
+
+  get allListeningQuestions(): { id: number; answer: string; explanation_vi: string | null }[] {
+    return this.listening.flatMap(l => l.questions);
+  }
+
+  submitListening(): void {
+    this.listeningSubmitted = true;
+    this.listeningScore = this.allListeningQuestions.filter(q => this.listeningAnswers[q.id] === q.answer).length;
+  }
+
+  resetListening(): void {
+    this.listeningAnswers = {};
+    this.listeningSubmitted = false;
+    this.listeningScore = 0;
   }
 
   toggleFavorite(v: Vocabulary): void {
@@ -86,7 +100,7 @@ export class LessonComponent implements OnInit, OnDestroy {
         v.is_favorite = v.is_bookmarked;
         this.learning.syncBookmarkCache(v, v.is_bookmarked);
       },
-      error: () => window.alert('⚠️ Không lưu được trạng thái từ vựng (API chưa hoạt động) — thử lại sau.')
+      error: () => window.alert('âš ï¸ KhÃ´ng lÆ°u Ä‘Æ°á»£c tráº¡ng thÃ¡i tá»« vá»±ng (API chÆ°a hoáº¡t Ä‘á»™ng) â€” thá»­ láº¡i sau.')
     });
   }
 
@@ -94,13 +108,13 @@ export class LessonComponent implements OnInit, OnDestroy {
     return this.settings.showTranslation;
   }
 
-  /** Đổi tốc độ đọc — áp dụng cho lần phát tiếp theo. */
+  /** Äá»•i tá»‘c Ä‘á»™ Ä‘á»c â€” Ã¡p dá»¥ng cho láº§n phÃ¡t tiáº¿p theo. */
   setSpeed(rate: number): void {
     this.speed = rate;
     this.settings.setAudioSpeed(rate);
   }
 
-  /** Đọc 1 mục (từ/câu) — bấm lại thì ngừng. */
+  /** Äá»c 1 má»¥c (tá»«/cÃ¢u) â€” báº¥m láº¡i thÃ¬ ngá»«ng. */
   speakOnce(key: string | number, text: string): void {
     if (this.speakingKey === key) {
       this.stopSpeaking();
@@ -111,7 +125,7 @@ export class LessonComponent implements OnInit, OnDestroy {
     this.speakText(text, () => { this.speakingKey = null; });
   }
 
-  /** Đọc cả đoạn hội thoại, có khoảng nghỉ giữa các câu. Bấm lại thì ngừng. */
+  /** Äá»c cáº£ Ä‘oáº¡n há»™i thoáº¡i, cÃ³ khoáº£ng nghá»‰ giá»¯a cÃ¡c cÃ¢u. Báº¥m láº¡i thÃ¬ ngá»«ng. */
   playGroup(groupId: string | number, texts: string[]): void {
     if (this.playingGroup === groupId) {
       this.stopSpeaking();
@@ -132,7 +146,7 @@ export class LessonComponent implements OnInit, OnDestroy {
     this.speakingKey = key;
     this.speakText(texts[index], () => {
       if (this.playingGroup !== groupId) return;
-      // Khoảng nghỉ giữa các câu trước khi đọc câu tiếp theo
+      // Khoáº£ng nghá»‰ giá»¯a cÃ¡c cÃ¢u trÆ°á»›c khi Ä‘á»c cÃ¢u tiáº¿p theo
       this.gapTimer = setTimeout(() => this.playQueue(groupId, texts, index + 1), 700);
     });
   }
@@ -175,8 +189,8 @@ export class LessonComponent implements OnInit, OnDestroy {
     this.score = this.review.filter(q => this.answers[q.id] === q.answer).length;
     if (this.lesson) {
       this.learning.saveProgress(this.lesson.id, 'completed', this.score, this.review.length).subscribe({
-        next: () => { this.learning.invalidateProgressCache(); window.alert(`✅ Hoàn thành bài học! Điểm: ${this.score}/${this.review.length} (đã lưu tiến độ).`); },
-        error: () => window.alert(`⚠️ Không lưu được tiến độ lên server (API chưa hoạt động) — điểm ${this.score}/${this.review.length} chỉ hiển thị tạm thời.`)
+        next: () => { this.learning.invalidateProgressCache(); window.alert(`âœ… HoÃ n thÃ nh bÃ i há»c! Äiá»ƒm: ${this.score}/${this.review.length} (Ä‘Ã£ lÆ°u tiáº¿n Ä‘á»™).`); },
+        error: () => window.alert(`âš ï¸ KhÃ´ng lÆ°u Ä‘Æ°á»£c tiáº¿n Ä‘á»™ lÃªn server (API chÆ°a hoáº¡t Ä‘á»™ng) â€” Ä‘iá»ƒm ${this.score}/${this.review.length} chá»‰ hiá»ƒn thá»‹ táº¡m thá»i.`)
       });
     }
   }
@@ -187,3 +201,4 @@ export class LessonComponent implements OnInit, OnDestroy {
     this.score = 0;
   }
 }
+

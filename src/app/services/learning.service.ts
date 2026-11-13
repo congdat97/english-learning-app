@@ -40,7 +40,19 @@ export class LearningService {
         }
       } catch {}
 
-      if (cached) observer.next(cached.body);
+      // Có cache hợp lệ -> trả ngay lập tức (không chờ API),
+      // refresh nền âm thầm để lần sau có data mới.
+      if (cached) {
+        observer.next(cached.body);
+        observer.complete();
+        this.http.get<ApiResult<T>>(url, { headers: this.headers }).subscribe({
+          next: body => {
+            try { localStorage.setItem(key, JSON.stringify({ ts: Date.now(), body })); } catch {}
+          },
+          error: () => {}
+        });
+        return () => {};
+      }
 
       const sub = this.http.get<ApiResult<T>>(url, { headers: this.headers }).subscribe({
         next: body => {
@@ -49,10 +61,7 @@ export class LearningService {
           } catch {}
           observer.next(body);
         },
-        error: err => {
-          if (cached) observer.complete();
-          else observer.error(err);
-        },
+        error: err => observer.error(err),
         complete: () => observer.complete()
       });
 
