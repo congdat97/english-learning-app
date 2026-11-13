@@ -38,8 +38,8 @@
           <small>Ví dụ: {{ e.sentence }}<br><ng-container *ngIf="showTranslation">{{ e.translation_vi }}</ng-container></small>
         </div>
         <div class="word-actions">
-          <button class="tiny-btn" [class.speaking]="speakingKey === v.id + '-w'" (click)="speakOnce(v.id + '-w', v.word)">{{ speakingKey === v.id + '-w' ? '⏹' : '🔊 Nghe từ' }}</button>
-          <button class="tiny-btn" *ngFor="let e of v.examples; let ei = index" [class.speaking]="speakingKey === v.id + ':' + ei" (click)="speakOnce(v.id + ':' + ei, e.sentence)">{{ speakingKey === v.id + ':' + ei ? '⏹' : '▶ Nghe câu' }}</button>
+          <button class="tiny-btn icon-btn" [class.speaking]="speakingKey === v.id + '-w'" title="Nghe từ" aria-label="Nghe từ" (click)="speakOnce(v.id + '-w', v.word)">{{ speakingKey === v.id + '-w' ? '⏹' : '🔊' }}</button>
+          <button class="tiny-btn icon-btn" *ngFor="let e of v.examples; let ei = index" [class.speaking]="speakingKey === v.id + ':' + ei" title="Nghe câu" aria-label="Nghe câu" (click)="speakOnce(v.id + ':' + ei, e.sentence)">{{ speakingKey === v.id + ':' + ei ? '⏹' : '▶' }}</button>
           <button class="tiny-btn" [class.saved]="v.is_bookmarked" (click)="toggleFavorite(v)">{{ v.is_bookmarked ? '★ Đã lưu' : '☆ Lưu từ' }}</button>
         </div>
       </article>
@@ -59,7 +59,7 @@
         <div *ngFor="let line of l.transcript; let li = index" class="line" [class.reading]="speakingKey === l.id + ':' + li">
           <b>{{ line.speaker }}:</b> {{ line.text }}
           <span class="translation" *ngIf="showTranslation">{{ line.translation_vi }}</span>
-          <button class="tiny-btn" [class.speaking]="speakingKey === l.id + ':' + li" (click)="speakOnce(l.id + ':' + li, line.text)">{{ speakingKey === l.id + ':' + li ? '⏹' : 'Nghe' }}</button>
+          <button class="tiny-btn icon-btn" [class.speaking]="speakingKey === l.id + ':' + li" title="Nghe câu này" aria-label="Nghe câu này" (click)="speakOnce(l.id + ':' + li, line.text)">{{ speakingKey === l.id + ':' + li ? '⏹' : '🔊' }}</button>
         </div>
       </div>
       <div *ngFor="let q of l.questions" class="question">

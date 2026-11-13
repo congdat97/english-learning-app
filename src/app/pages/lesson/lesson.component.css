@@ -60,9 +60,16 @@ nav button { margin-right: 8px; }
 
 /* ===== Nút "Nghe" từng câu: đổi icon + màu khi câu đó đang đọc ===== */
 .tiny-btn.speaking {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: #ef4444;
+  border-color: #ef4444;
   color: #fff;
+}
+
+.icon-btn {
+  min-width: 34px;
+  padding: 7px 9px;
+  font-size: 14px;
+  line-height: 1;
 }
 
 /* ===== Dòng hội thoại đang được đọc: highlight nhẹ ===== */
