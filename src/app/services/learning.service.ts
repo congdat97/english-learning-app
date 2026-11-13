@@ -33,7 +33,10 @@ export class LearningService {
         const raw = localStorage.getItem(key);
         if (raw) {
           const parsed = JSON.parse(raw) as CacheEntry<T>;
-          if (parsed?.body && Date.now() - parsed.ts < this.maxAgeMs) cached = parsed;
+          if (parsed?.body) {
+            if (Date.now() - parsed.ts < this.maxAgeMs) cached = parsed;
+            else localStorage.removeItem(key);
+          }
         }
       } catch {}
 
