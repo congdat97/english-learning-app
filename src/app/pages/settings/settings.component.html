@@ -8,7 +8,7 @@
     <div class="card">
       <h3>Giọng đọc</h3>
       <p class="hint">Chỉ hiện giọng tiếng Anh khả dụng trên máy bạn</p>
-      <select name="voice" [(ngModel)]="voice">
+      <select name="voice" [(ngModel)]="voice" (ngModelChange)="onVoiceChange()">
         <option value="">Mặc định</option>
         <option *ngFor="let v of voices" [value]="v.name">{{ v.name }} ({{ v.lang }})</option>
       </select>

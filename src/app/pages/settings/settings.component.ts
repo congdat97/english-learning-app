@@ -98,8 +98,13 @@ export class SettingsComponent implements OnInit {
 
   selectTheme(theme: string): void {
     this.theme = theme;
-    // Ủy quyền ThemeService (lưu localStorage elf-theme + data-mode)
+    // Ủy quyền ThemeService (lưu localStorage elf-theme + data-mode) và tự lưu DB
     this.themeService.setTheme(theme);
+    this.settings.savePartial({ theme });
+  }
+
+  onVoiceChange(): void {
+    this.settings.savePartial({ voice: this.voice });
   }
 
   private persistLocal(): void {

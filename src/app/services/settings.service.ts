@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ThemeService } from './theme.service';
+import { LearningService } from './learning.service';
 
 export interface LearningSettings {
   dailyMinutes: number;
@@ -23,7 +24,7 @@ const DEFAULTS: LearningSettings = {
 export class SettingsService {
   private key = 'learning-settings';
 
-  constructor(private themeService: ThemeService) {}
+  constructor(private themeService: ThemeService, private learning: LearningService) {}
 
   load(): LearningSettings {
     try {
@@ -62,6 +63,23 @@ export class SettingsService {
 
   /** Đổi tốc độ đọc ngay trong bài học và lưu lại localStorage. */
   setAudioSpeed(rate: number): void {
-    this.save({ ...this.load(), audioSpeed: rate });
+    this.savePartial({ audioSpeed: rate });
+  }
+
+  /**
+   * Lưu một phần cài đặt ngay lập tức:
+   * ghi localStorage + đẩy toàn bộ payload lên DB (lỗi API thì im lặng, local vẫn giữ).
+   */
+  savePartial(partial: Partial<LearningSettings>): void {
+    const merged = { ...this.load(), ...partial };
+    this.save(merged);
+    this.learning.saveSettings({
+      daily_minutes: merged.dailyMinutes,
+      audio_speed: merged.audioSpeed,
+      show_translation: merged.showTranslation,
+      font_size: merged.fontSize,
+      voice: merged.voice,
+      theme: merged.theme
+    }).subscribe({ error: () => {} });
   }
 }
