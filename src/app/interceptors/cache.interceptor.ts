@@ -37,7 +37,7 @@ export const cacheInterceptor: HttpInterceptorFn = (req, next) => {
   }
   return next(req).pipe(
     tap((event: any) => {
-      if (event?.type === 4) {
+      if (event?.type === 4 && event?.body?.success !== false) {
         writeCache(key, event.body);
       }
     })
