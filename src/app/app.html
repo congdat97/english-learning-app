@@ -47,7 +47,7 @@
       <p class="settings-sub">Tùy chỉnh giao diện theo ý bạn.</p>
       <div class="settings-section-label">Bảng màu giao diện</div>
       <div class="theme-grid">
-        <button type="button" class="theme-card" *ngFor="let t of themes" [class.active]="currentTheme === t.id" (click)="setTheme(t.id)">
+        <button type="button" class="theme-card" *ngFor="let t of themes" [class.active]="currentTheme === t.id" (click)="setTheme(t.id)" [style.--tc]="t.primary">
           <span class="theme-check">✓</span>
           <div class="theme-swatch" [style.background]="'linear-gradient(135deg, ' + t.primary + ', ' + t.secondary + ')'">
             <div class="theme-swatch-bar"></div>
@@ -55,6 +55,7 @@
             <div class="theme-swatch-bar" style="opacity:.3"></div>
           </div>
           <div class="theme-name">{{ t.name }} <span class="theme-badge">{{ t.collection }}</span></div>
+          <div class="theme-sub">{{ t.primary }} · {{ t.secondary }}</div>
           <div class="theme-dots"><span [style.background]="t.primary"></span><span [style.background]="t.secondary"></span></div>
         </button>
       </div>

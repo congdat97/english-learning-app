@@ -61,6 +61,7 @@ export class App implements OnInit {
 
   setTheme(id: string): void {
     this.currentTheme = id;
+    this.settings.applyTheme(id);
     const saved = this.settings.load();
     saved.theme = id;
     this.settings.save(saved);
