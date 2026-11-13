@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { LearningService } from '../../services/learning.service';
 import { Lesson, Vocabulary, Listening, ReviewQuestion } from '../../models/learning.model';
 
 @Component({
   selector: 'app-lesson',
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule],
   templateUrl: './lesson.component.html',
   styleUrl: './lesson.component.css'
 })
