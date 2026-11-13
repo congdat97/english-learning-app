@@ -53,3 +53,12 @@ html[data-theme="mat-ong"]{--blue:#ca8a04;--blue2:#facc15;--pale:#fefce8}
   .app{grid-template-columns:1fr}
 }
 
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.page, .panel, .course, .word-card { animation: fadeIn .25s ease both; }
+.course, .word-card, .panel { transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
+.course:hover, .word-card:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(38,55,107,.12); }
+.tiny-btn, .primary, .option { transition: transform .15s ease, background .15s ease; }
+.tiny-btn:active, .primary:active, .option:active { transform: scale(.97); }
+.subnav button, .subnav a { transition: all .2s ease; }
+.subnav button:hover, .subnav a:hover { transform: translateY(-1px); }
+@media (max-width: 850px) { .bottom-nav { backdrop-filter: blur(8px); } }
