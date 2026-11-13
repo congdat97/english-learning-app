@@ -74,6 +74,15 @@
       </span>
     </a>
 
+    <a *ngIf="auth.isAdmin()" routerLink="/admin/users" routerLinkActive="active" class="nav-item"
+      (click)="closeMobileMenu()">
+      <span class="nav-icon">🛡️</span>
+
+      <span class="nav-text">
+        Tài khoản
+      </span>
+    </a>
+
   </nav>
 
 
@@ -82,6 +91,18 @@
   <!-- ============================================= -->
 
   <div class="header-right">
+
+    <!-- TAI KHOAN -->
+    <ng-container *ngIf="auth.isLoggedIn(); else loginLink">
+      <div class="user-chip" title="Tài khoản đang đăng nhập">
+        <span class="user-avatar">{{ auth.currentUser()!.username.charAt(0).toUpperCase() }}</span>
+        <span class="user-name">{{ auth.currentUser()!.username }}</span>
+        <button type="button" class="user-logout" (click)="logout()" title="Đăng xuất" aria-label="Đăng xuất">⏻</button>
+      </div>
+    </ng-container>
+    <ng-template #loginLink>
+      <a routerLink="/login" class="login-link">Đăng nhập</a>
+    </ng-template>
 
     <div class="local" [title]="'Đồng bộ gần nhất: ' + syncedAt">
       <span [class.offline-dot]="!syncing">{{ dataCount ? (syncing ? '🔄' : '🟢') : '🟡' }} {{ dataCount || 'Chưa có' }}</span>

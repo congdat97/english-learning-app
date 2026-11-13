@@ -1,0 +1,31 @@
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-logo">🅰️</div>
+    <h2>{{ mode === 'login' ? 'Đăng nhập' : 'Đăng ký' }}</h2>
+    <p class="auth-sub">English Step by Step</p>
+
+    <div class="auth-tabs">
+      <button type="button" [class.active]="mode === 'login'" (click)="switchMode('login')">Đăng nhập</button>
+      <button type="button" [class.active]="mode === 'register'" (click)="switchMode('register')">Đăng ký</button>
+    </div>
+
+    <form (ngSubmit)="submit()">
+      <label>
+        Tên đăng nhập
+        <input name="username" type="text" [(ngModel)]="username" autocomplete="username" placeholder="vd: hocvien01" />
+      </label>
+      <label>
+        Mật khẩu
+        <input name="password" type="password" [(ngModel)]="password" autocomplete="current-password" placeholder="ít nhất 6 ký tự" />
+      </label>
+
+      <p *ngIf="error" class="auth-error">{{ error }}</p>
+
+      <button class="auth-submit" type="submit" [disabled]="busy">
+        {{ busy ? 'Đang xử lý...' : (mode === 'login' ? 'Đăng nhập' : 'Tạo tài khoản') }}
+      </button>
+    </form>
+
+    <a routerLink="/dashboard" class="auth-back">← Về trang chủ (xem không cần tài khoản)</a>
+  </div>
+</div>

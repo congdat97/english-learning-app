@@ -6,6 +6,9 @@ import { LessonComponent } from './pages/lesson/lesson.component';
 import { BookmarksComponent } from './pages/bookmarks/bookmarks.component';
 import { ProgressComponent } from './pages/progress/progress.component';
 import { SettingsComponent } from './pages/settings/settings.component';
+import { LoginComponent } from './pages/login/login.component';
+import { AdminUsersComponent } from './pages/admin-users/admin-users.component';
+import { adminGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -16,5 +19,7 @@ export const routes: Routes = [
   { path: 'bookmarks', component: BookmarksComponent },
   { path: 'progress', component: ProgressComponent },
   { path: 'settings', component: SettingsComponent },
+  { path: 'login', component: LoginComponent },
+  { path: 'admin/users', component: AdminUsersComponent, canActivate: [adminGuard] },
   { path: '**', redirectTo: 'dashboard' }
 ];

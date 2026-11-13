@@ -8,6 +8,7 @@ import { ThemeService } from './services/theme.service';
 import { OfflineDataService } from './services/offline-data.service';
 import { ReminderService } from './services/reminder.service';
 import { SettingsService } from './services/settings.service';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -28,6 +29,8 @@ export class App implements OnInit {
 
   readonly theme =
     inject(ThemeService);
+
+  readonly auth = inject(AuthService);
 
   private syncSubscription?: Subscription;
 
@@ -90,6 +93,11 @@ export class App implements OnInit {
 
   closeMobileMenu(): void {
     this.mobileMenuOpen = false;
+  }
+
+  /** Đăng xuất và về trang chủ. */
+  logout(): void {
+    this.auth.logout();
   }
 
 

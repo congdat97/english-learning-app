@@ -1,0 +1,128 @@
+.auth-wrap {
+  min-height: 70vh;
+  display: grid;
+  place-items: center;
+  padding: 20px 0;
+}
+
+.auth-card {
+  width: min(400px, 100%);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.auth-logo {
+  font-size: 40px;
+}
+
+.auth-card h2 {
+  margin: 8px 0 2px;
+  font-size: 22px;
+}
+
+.auth-sub {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 0 0 16px;
+}
+
+.auth-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--primary-soft);
+  border-radius: 12px;
+  padding: 4px;
+  gap: 4px;
+  margin-bottom: 18px;
+}
+
+.auth-tabs button {
+  border: 0;
+  background: transparent;
+  padding: 8px;
+  border-radius: 9px;
+  font-weight: 800;
+  font-size: 13px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: .2s ease;
+}
+
+.auth-tabs button.active {
+  background: var(--primary);
+  color: #fff;
+}
+
+.auth-card form {
+  display: grid;
+  gap: 12px;
+  text-align: left;
+}
+
+.auth-card label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  display: grid;
+  gap: 5px;
+}
+
+.auth-card input {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 12px;
+  padding: 11px 13px;
+  font-size: 16px;
+  outline: none;
+  transition: border-color .2s;
+}
+
+.auth-card input:focus {
+  border-color: var(--primary);
+}
+
+.auth-error {
+  background: color-mix(in srgb, #ef4444 12%, transparent);
+  color: #ef4444;
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-size: 13px;
+  margin: 0;
+}
+
+.auth-submit {
+  border: 0;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 800;
+  border-radius: 12px;
+  padding: 12px;
+  cursor: pointer;
+  transition: .2s ease;
+}
+
+.auth-submit:hover {
+  filter: brightness(1.08);
+}
+
+.auth-submit:disabled {
+  opacity: .6;
+  cursor: default;
+}
+
+.auth-back {
+  display: inline-block;
+  margin-top: 16px;
+  font-size: 12px;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.auth-back:hover {
+  color: var(--primary);
+}

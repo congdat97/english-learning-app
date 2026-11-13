@@ -1,0 +1,50 @@
+<div class="settings">
+  <header class="settings-head">
+    <h2>Quản lý tài khoản</h2>
+    <p>Chỉ admin thấy trang này — tạo và xóa tài khoản cho học viên</p>
+  </header>
+
+  <div class="settings-grid">
+    <div class="card">
+      <h3>Tạo tài khoản mới</h3>
+      <p class="hint">Tài khoản dùng để đăng nhập vào app</p>
+      <label class="admin-label">
+        Tên đăng nhập
+        <input name="newUsername" type="text" [(ngModel)]="newUsername" placeholder="vd: hocvien02" />
+      </label>
+      <label class="admin-label">
+        Mật khẩu
+        <input name="newPassword" type="password" [(ngModel)]="newPassword" placeholder="ít nhất 6 ký tự" />
+      </label>
+      <label class="admin-label">
+        Vai trò
+        <select name="newRole" [(ngModel)]="newRole">
+          <option value="user">Học viên (user)</option>
+          <option value="admin">Quản trị (admin)</option>
+        </select>
+      </label>
+      <button class="primary" [disabled]="creating" (click)="createUser()">
+        {{ creating ? 'Đang tạo...' : '+ Tạo tài khoản' }}
+      </button>
+    </div>
+
+    <div class="card admin-list">
+      <h3>Danh sách tài khoản ({{ users.length }})</h3>
+      <p *ngIf="loading" class="hint">Đang tải...</p>
+      <div *ngFor="let u of users" class="admin-row">
+        <div class="admin-id">{{ u.id }}</div>
+        <div class="admin-name">
+          <strong>{{ u.username }}</strong>
+          <em [class.role-admin]="u.role === 'admin'">{{ u.role === 'admin' ? 'Quản trị' : 'Học viên' }}</em>
+        </div>
+        <button *ngIf="u.id !== auth.currentUser()?.id" class="tiny-btn danger" (click)="removeUser(u)">Xóa</button>
+      </div>
+    </div>
+  </div>
+
+  <p *ngIf="message" class="save-msg">{{ message }}</p>
+
+  <div class="actions">
+    <a routerLink="/dashboard" class="text-btn">← Quay lại</a>
+  </div>
+</div>
