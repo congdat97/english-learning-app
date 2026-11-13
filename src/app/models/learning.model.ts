@@ -34,6 +34,7 @@ export interface Vocabulary {
   meaning_vi: string;
   audio: string | null;
   is_favorite: boolean;
+  is_bookmarked?: boolean;
   examples?: VocabularyExample[];
 }
 
@@ -83,4 +84,6 @@ export interface UserProgress {
   score: number;
   total_questions: number;
   completed_at: string | null;
+  created_at?: string;
+  updated_at?: string;
 }

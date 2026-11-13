@@ -25,26 +25,18 @@ export class CoursesComponent implements OnInit, OnDestroy {
     clearTimeout(this.slowTimer);
   }
 
-  /** Icon riêng cho từng khóa học (theo tên + cấp độ). */
+  /** Icon theo lộ trình học: cây lớn dần, thống nhất một bộ cho mọi khóa. */
   courseEmoji(course: Course): string {
     const key = `${course.title} ${course.level}`.toLowerCase();
     if (key.includes('nền tảng') || key.includes('beginner')) return '🌱';
-    if (key.includes('giao tiếp') || key.includes('elementary')) return '☕';
-    if (key.includes('mở rộng') || key.includes('pre')) return '🌐';
-    if (key.includes('intermediate')) return '🗣️';
-    if (key.includes('advanced')) return '🎯';
-    return '📘';
+    if (key.includes('mở rộng') || key.includes('pre')) return '🌳';
+    if (key.includes('giao tiếp') || key.includes('elementary')) return '🌿';
+    return '🌿';
   }
 
-  /** Màu accent đi kèm icon, dùng làm biến --card-accent trên card. */
-  courseAccent(course: Course): string {
-    switch (this.courseEmoji(course)) {
-      case '🌱': return '#f59e0b';
-      case '☕': return '#0ea5e9';
-      case '🌐': return '#8b5cf6';
-      case '🗣️': return '#f43f5e';
-      case '🎯': return '#10b981';
-      default: return '#3b82f6';
-    }
+  /** Tên khóa hiển thị: bỏ tiền tố cấp độ trước dấu ":". */
+  courseName(course: Course): string {
+    const idx = course.title.indexOf(':');
+    return idx > 0 ? course.title.slice(idx + 1).trim() : course.title;
   }
 }

@@ -111,6 +111,11 @@ export class LearningService {
     try { localStorage.removeItem('api-cache:' + `${this.base}/lessons/progress/all`); } catch {}
   }
 
+  /** Xóa cache sổ từ vựng (gọi sau khi thêm/xóa bookmark). */
+  invalidateBookmarksCache(): void {
+    try { localStorage.removeItem('api-cache:' + `${this.base}/vocabulary/bookmarks`); } catch {}
+  }
+
   saveProgress(lessonId: number, status: string, score: number, total: number): Observable<ApiResult<UserProgress>> {
     return this.http.post<ApiResult<UserProgress>>(`${this.base}/lessons/${lessonId}/progress`, {
       status, score, total_questions: total

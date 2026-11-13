@@ -3,9 +3,9 @@
 <div *ngIf="slowApi && loading" class="slow-hint">⏳ API Render (bản miễn phí) đang khởi động sau khi ngủ — dữ liệu sẽ về trong 30–60 giây. Vui lòng đợi hoặc tải lại trang.</div>
 <div class="course-grid" *ngIf="!loading">
   <a *ngFor="let course of courses; let i = index" [routerLink]="['/courses', course.id]" class="course"
-     [style.--card-accent]="courseAccent(course)" [style.animation-delay]="(i * 80) + 'ms'">
+     [style.animation-delay]="(i * 80) + 'ms'">
     <div class="course-top"><div class="course-emoji">{{ courseEmoji(course) }}</div><span class="level">{{ course.level }}</span></div>
-    <h3>{{ course.title }}</h3>
+    <h3>{{ courseName(course) }}</h3>
     <p>{{ course.description }}</p>
     <div class="course-cta">Bắt đầu học <span>→</span></div>
   </a>

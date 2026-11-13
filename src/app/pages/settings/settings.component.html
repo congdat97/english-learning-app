@@ -6,33 +6,13 @@
 
   <div class="settings-grid">
     <div class="card">
-      <h3>Thời lượng học</h3>
-      <p class="hint">Số phút mục tiêu mỗi ngày</p>
-      <input name="dailyMinutes" type="range" min="5" max="60" step="5" [(ngModel)]="dailyMinutes" />
-      <div class="value">{{ dailyMinutes }} phút</div>
-    </div>
-
-    <div class="card">
-      <h3>Tốc độ audio</h3>
-      <p class="hint">Tốc độ đọc mặc định</p>
-      <input name="audioSpeed" type="range" min="0.5" max="2" step="0.25" [(ngModel)]="audioSpeed" />
-      <div class="value">{{ audioSpeed }}x</div>
-    </div>
-
-    <div class="card">
-      <h3>Cỡ chữ</h3>
-      <p class="hint">Điều chỉnh kích thước chữ</p>
-      <input name="fontSize" type="range" min="12" max="24" step="1" [(ngModel)]="fontSize" />
-      <div class="value">{{ fontSize }}px</div>
-    </div>
-
-    <div class="card">
       <h3>Giọng đọc</h3>
-      <p class="hint">Chọn giọng đọc nếu hỗ trợ</p>
+      <p class="hint">Chỉ hiện giọng tiếng Anh khả dụng trên máy bạn</p>
       <select name="voice" [(ngModel)]="voice">
         <option value="">Mặc định</option>
         <option *ngFor="let v of voices" [value]="v.name">{{ v.name }} ({{ v.lang }})</option>
       </select>
+      <button type="button" class="text-btn" style="margin-top:.5rem" (click)="testVoice()">🔊 Thử giọng</button>
     </div>
 
     <div class="card theme-card-block">
@@ -77,7 +57,8 @@
   </div>
 
   <div class="actions">
-    <button class="primary" (click)="save()">Lưu cài đặt</button>
+    <button class="primary" [disabled]="saving" (click)="save()">{{ saving ? 'Đang lưu...' : 'Lưu cài đặt' }}</button>
     <a routerLink="/dashboard" class="text-btn">← Quay lại</a>
+    <span *ngIf="saveMsg" class="save-msg">{{ saveMsg }}</span>
   </div>
 </div>

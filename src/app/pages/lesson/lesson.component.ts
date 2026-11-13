@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { LearningService } from '../../services/learning.service';
@@ -11,7 +11,7 @@ import { Lesson, Vocabulary, Listening, ReviewQuestion } from '../../models/lear
   templateUrl: './lesson.component.html',
   styleUrl: './lesson.component.css'
 })
-export class LessonComponent implements OnInit {
+export class LessonComponent implements OnInit, OnDestroy {
   lesson: Lesson | null = null;
   vocabulary: Vocabulary[] = [];
   listening: Listening[] = [];
@@ -22,12 +22,25 @@ export class LessonComponent implements OnInit {
   submitted = false;
   score = 0;
 
+  /** Tốc độ đọc — chỉnh ngay trong bài học. */
+  speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
+  speed = 1;
+
+  /** Key của mục đang đọc (đổi icon/màu nút tương ứng). */
+  speakingKey: string | number | null = null;
+  /** Id của đoạn hội thoại đang đọc cả nhóm (đổi nút ▶ thành ⏸). */
+  playingGroup: string | number | null = null;
+
+  private gapTimer: ReturnType<typeof setTimeout> | null = null;
+  private speakToken = 0;
+
   /** Chỉ alert 1 lần mỗi phiên để không spam. */
   private listeningAlertShown = false;
 
   constructor(private route: ActivatedRoute, private learning: LearningService, private settings: SettingsService) {}
 
   ngOnInit(): void {
+    this.speed = this.settings.audioSpeed;
     const id = Number(this.route.snapshot.paramMap.get('id'));
     this.learning.getLesson(id).subscribe({ next: (r) => this.lesson = r.data, error: () => this.loading = false });
     this.learning.getVocabulary(id).subscribe({ next: (r) => this.vocabulary = r.data, error: () => this.loading = false });
@@ -35,7 +48,12 @@ export class LessonComponent implements OnInit {
     this.learning.getReview(id).subscribe({ next: (r) => { this.review = r.data; this.loading = false; }, error: () => this.loading = false });
   }
 
+  ngOnDestroy(): void {
+    this.stopSpeaking();
+  }
+
   setSection(s: 'intro' | 'vocabulary' | 'listening' | 'review'): void {
+    this.stopSpeaking();
     this.section = s;
   }
 
@@ -54,10 +72,14 @@ export class LessonComponent implements OnInit {
   }
 
   toggleFavorite(v: Vocabulary): void {
-    this.learning.toggleFavorite(v.id).subscribe({
-      next: (r) => {
-        v.is_favorite = r.data?.is_favorite ?? !v.is_favorite;
-        this.learning.syncBookmarkCache(v);
+    const req$ = v.is_bookmarked
+      ? this.learning.unbookmark(v.id)
+      : this.learning.bookmark(v.id);
+    req$.subscribe({
+      next: () => {
+        v.is_bookmarked = !v.is_bookmarked;
+        v.is_favorite = v.is_bookmarked;
+        this.learning.invalidateBookmarksCache();
       },
       error: () => window.alert('⚠️ Không lưu được trạng thái từ vựng (API chưa hoạt động) — thử lại sau.')
     });
@@ -67,16 +89,78 @@ export class LessonComponent implements OnInit {
     return this.settings.showTranslation;
   }
 
-  speak(text: string): void {
-    if (!('speechSynthesis' in window)) return;
+  /** Đổi tốc độ đọc — áp dụng cho lần phát tiếp theo. */
+  setSpeed(rate: number): void {
+    this.speed = rate;
+    this.settings.setAudioSpeed(rate);
+  }
+
+  /** Đọc 1 mục (từ/câu) — bấm lại thì ngừng. */
+  speakOnce(key: string | number, text: string): void {
+    if (this.speakingKey === key) {
+      this.stopSpeaking();
+      return;
+    }
+    this.stopSpeaking();
+    this.speakingKey = key;
+    this.speakText(text, () => { this.speakingKey = null; });
+  }
+
+  /** Đọc cả đoạn hội thoại, có khoảng nghỉ giữa các câu. Bấm lại thì ngừng. */
+  playGroup(groupId: string | number, texts: string[]): void {
+    if (this.playingGroup === groupId) {
+      this.stopSpeaking();
+      return;
+    }
+    this.stopSpeaking();
+    this.playingGroup = groupId;
+    this.playQueue(groupId, texts, 0);
+  }
+
+  private playQueue(groupId: string | number, texts: string[], index: number): void {
+    if (this.playingGroup !== groupId || index >= texts.length) {
+      this.playingGroup = null;
+      this.speakingKey = null;
+      return;
+    }
+    const key = `${groupId}:${index}`;
+    this.speakingKey = key;
+    this.speakText(texts[index], () => {
+      if (this.playingGroup !== groupId) return;
+      // Khoảng nghỉ giữa các câu trước khi đọc câu tiếp theo
+      this.gapTimer = setTimeout(() => this.playQueue(groupId, texts, index + 1), 700);
+    });
+  }
+
+  stopSpeaking(): void {
+    if (this.gapTimer) {
+      clearTimeout(this.gapTimer);
+      this.gapTimer = null;
+    }
+    this.speakToken++;
+    this.speakingKey = null;
+    this.playingGroup = null;
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+  }
+
+  private speakText(text: string, onDone: () => void): void {
+    if (!('speechSynthesis' in window)) {
+      onDone();
+      return;
+    }
+    const token = ++this.speakToken;
     const s = this.settings.load();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'en-US';
-    utterance.rate = s.audioSpeed;
+    utterance.rate = this.speed;
     if (s.voice) {
       const voice = speechSynthesis.getVoices().find(v => v.name === s.voice);
       if (voice) utterance.voice = voice;
     }
+    utterance.onend = () => { if (token === this.speakToken) onDone(); };
+    utterance.onerror = () => { if (token === this.speakToken) onDone(); };
     window.speechSynthesis.cancel();
     window.speechSynthesis.speak(utterance);
   }

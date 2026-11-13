@@ -45,7 +45,11 @@ export class SettingsService {
   }
 
   applyFontSize(size: number): void {
+    // Styles dùng px nên đổi font-size gốc là vô hiệu —
+    // zoom toàn trang theo tỷ lệ size/16 để cỡ chữ nhìn thấy được.
+    const scale = size / 16;
     document.documentElement.style.fontSize = `${size}px`;
+    (document.body.style as CSSStyleDeclaration & { zoom: string }).zoom = String(scale);
   }
 
   get audioSpeed(): number {
@@ -54,5 +58,10 @@ export class SettingsService {
 
   get showTranslation(): boolean {
     return this.load().showTranslation;
+  }
+
+  /** Đổi tốc độ đọc ngay trong bài học và lưu lại localStorage. */
+  setAudioSpeed(rate: number): void {
+    this.save({ ...this.load(), audioSpeed: rate });
   }
 }

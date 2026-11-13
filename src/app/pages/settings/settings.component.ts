@@ -22,6 +22,9 @@ export class SettingsComponent implements OnInit {
 
   voices: SpeechSynthesisVoice[] = [];
 
+  saving = false;
+  saveMsg = '';
+
   readonly themeService = inject(ThemeService);
 
   constructor(private learning: LearningService, private settings: SettingsService) {}
@@ -49,15 +52,44 @@ export class SettingsComponent implements OnInit {
         this.apply();
       }
     });
-    if (typeof speechSynthesis !== 'undefined') {
-      this.voices = speechSynthesis.getVoices();
-      speechSynthesis.onvoiceschanged = () => {
-        this.voices = speechSynthesis.getVoices();
-      };
+    this.loadVoices();
+  }
+
+  private loadVoices(): void {
+    if (typeof speechSynthesis === 'undefined') return;
+    const refresh = () => {
+      this.voices = speechSynthesis
+        .getVoices()
+        .filter(v => v.lang.toLowerCase().startsWith('en'))
+        .sort((a, b) => a.name.localeCompare(b.name));
+    };
+    refresh();
+    speechSynthesis.onvoiceschanged = refresh;
+  }
+
+  /** Áp dụng thử ngay khi kéo thanh cỡ chữ. */
+  previewFontSize(): void {
+    this.settings.applyFontSize(this.fontSize);
+  }
+
+  /** Đọc câu mẫu bằng giọng + tốc độ hiện tại để kiểm tra trước khi lưu. */
+  testVoice(): void {
+    if (typeof speechSynthesis === 'undefined') return;
+    const utterance = new SpeechSynthesisUtterance("Hello! Let's learn English, step by step.");
+    utterance.lang = 'en-US';
+    utterance.rate = this.audioSpeed;
+    if (this.voice) {
+      const v = speechSynthesis.getVoices().find(x => x.name === this.voice);
+      if (v) utterance.voice = v;
     }
+    speechSynthesis.cancel();
+    speechSynthesis.speak(utterance);
   }
 
   save(): void {
+    if (this.saving) return;
+    this.saving = true;
+    this.saveMsg = '';
     const payload = {
       daily_minutes: this.dailyMinutes,
       audio_speed: this.audioSpeed,
@@ -69,11 +101,13 @@ export class SettingsComponent implements OnInit {
     this.learning.saveSettings(payload).subscribe({
       next: () => {
         this.persistLocal();
-        window.alert('✅ Đã lưu cài đặt lên server.');
+        this.saving = false;
+        this.saveMsg = '✅ Đã lưu cài đặt.';
       },
       error: () => {
         this.persistLocal();
-        window.alert('⚠️ Không lưu được lên server (API chưa hoạt động) — cài đặt chỉ được lưu tạm trên máy này.');
+        this.saving = false;
+        this.saveMsg = '⚠️ Lưu tạm trên máy này (API chưa phản hồi) — sẽ tự đồng bộ khi API hoạt động.';
       }
     });
   }

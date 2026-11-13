@@ -8,10 +8,8 @@
   to { opacity: 1; transform: none; }
 }
 
-/* Icon theo màu accent của từng khóa (được nạp qua --card-accent) */
+/* Icon thống nhất một màu chủ đề cho mọi khóa */
 .course-emoji {
-  background: color-mix(in srgb, var(--card-accent, var(--primary)) 16%, transparent);
-  border: 1px solid color-mix(in srgb, var(--card-accent, var(--primary)) 24%, transparent);
   transition: transform .25s ease;
 }
 
@@ -19,20 +17,14 @@
   transform: scale(1.12) rotate(-5deg);
 }
 
-/* Badge cấp độ ăn theo accent */
-.course .level {
-  color: var(--card-accent, var(--primary));
-  background: color-mix(in srgb, var(--card-accent, var(--primary)) 12%, transparent);
-}
-
-/* Dòng kêu gọi hành động cuối card */
+/* Dòng kêu gọi hành động cuối card (màu thống nhất theo chủ đề) */
 .course-cta {
   display: flex;
   align-items: center;
   gap: 6px;
   font-size: 12px;
   font-weight: 800;
-  color: var(--card-accent, var(--primary));
+  color: var(--primary);
 }
 
 .course-cta span {
@@ -45,7 +37,7 @@
 
 .course:hover {
   transform: translateY(-5px);
-  box-shadow: 0 14px 30px color-mix(in srgb, var(--card-accent, var(--primary)) 14%, transparent);
+  box-shadow: var(--shadow);
 }
 
 @media (prefers-reduced-motion: reduce) {

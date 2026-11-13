@@ -7,9 +7,7 @@ import {
   of
 } from 'rxjs';
 
-import { HttpClient } from '@angular/common/http';
-
-import { environment } from '../../environments/environment';
+import { LearningService } from './learning.service';
 
 import { Course, Vocabulary } from '../models/learning.model';
 
@@ -31,9 +29,7 @@ const PREFIX = 'elf-data.';
 @Injectable({ providedIn: 'root' })
 export class OfflineDataService {
 
-  private readonly http = inject(HttpClient);
-
-  private readonly apiUrl = environment.apiUrl;
+  private readonly learning = inject(LearningService);
 
   // =====================================================
   // STORAGE
@@ -189,20 +185,15 @@ export class OfflineDataService {
   /**
    * Tải dữ liệu cần dùng offline
    * (khóa học + từ đã lưu) về localStorage.
+   * Đi qua cache SWR chung của LearningService.
    */
   syncAll() {
 
     return forkJoin({
-      courses: this.http
-        .get<{ success: boolean; data: Course[] }>(
-          `${this.apiUrl}/courses`
-        )
+      courses: this.learning.getCourses()
         .pipe(map(response => response.data)),
 
-      bookmarks: this.http
-        .get<{ success: boolean; data: Vocabulary[] }>(
-          `${this.apiUrl}/vocabulary/bookmarks`
-        )
+      bookmarks: this.learning.getBookmarks()
         .pipe(map(response => response.data))
     })
       .pipe(

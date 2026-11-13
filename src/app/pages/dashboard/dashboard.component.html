@@ -8,9 +8,9 @@
   <div class="hero-art">📚</div>
 </section>
 <div class="stats">
-  <div class="stat stat-stub" (click)="stubAlert('Bài đã hoàn thành')"><div class="stat-icon">🎯</div><div><strong>0</strong><small>Bài đã hoàn thành</small></div></div>
-  <div class="stat stat-stub" (click)="stubAlert('Từ đã lưu')"><div class="stat-icon">🔤</div><div><strong>0</strong><small>Từ đã lưu</small></div></div>
-  <div class="stat stat-stub" (click)="stubAlert('Streak ngày')"><div class="stat-icon">🔥</div><div><strong>1 ngày</strong><small>Hãy duy trì thói quen</small></div></div>
+  <div class="stat"><div class="stat-icon">🎯</div><div><strong>{{ completedLessons }}</strong><small>Bài đã hoàn thành</small></div></div>
+  <div class="stat"><div class="stat-icon">🔤</div><div><strong>{{ savedWords }}</strong><small>Từ đã lưu</small></div></div>
+  <div class="stat"><div class="stat-icon">🔥</div><div><strong>{{ streakDays }} ngày</strong><small>{{ streakDays > 0 ? 'Duy trì chuỗi học nhé!' : 'Học ngay để bắt đầu chuỗi' }}</small></div></div>
 </div>
 <div class="section-head"><div><h2>Khóa học của bạn</h2><p>Chọn chủ đề phù hợp để bắt đầu</p></div><a class="text-btn" routerLink="/courses">Xem tất cả →</a></div>
 <div *ngIf="loading" class="loading">Đang tải khóa học...</div>
@@ -18,9 +18,9 @@
 <div *ngIf="error" class="error">Không tải được dữ liệu. <button (click)="load()">Thử lại</button></div>
 <div class="course-grid" *ngIf="!loading && !error && courses.length">
   <a *ngFor="let course of courses; let i = index" [routerLink]="['/courses', course.id]" class="course"
-     [style.--card-accent]="courseAccent(course)" [style.animation-delay]="(i * 80) + 'ms'">
+     [style.animation-delay]="(i * 80) + 'ms'">
     <div class="course-top"><div class="course-emoji">{{ courseEmoji(course) }}</div><span class="level">{{ course.level }}</span></div>
-    <h3>{{ course.title }}</h3>
+    <h3>{{ courseName(course) }}</h3>
     <p>{{ course.description }}</p>
     <div class="course-cta">Bắt đầu học <span>→</span></div>
   </a>

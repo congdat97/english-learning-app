@@ -1,3 +1,80 @@
 .vocab { border: 1px solid #eee; padding: 12px; margin: 8px 0; border-radius: 8px; }
 button.selected { font-weight: bold; }
 nav button { margin-right: 8px; }
+
+/* ===== Hàng chọn tốc độ đọc (ngay trong bài học) ===== */
+.speed-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin: 10px 0 2px;
+}
+
+.speed-label {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--muted);
+  margin-right: 2px;
+}
+
+.speed-chip {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  border-radius: 20px;
+  padding: 5px 11px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: .18s ease;
+}
+
+.speed-chip:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.speed-chip.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+/* ===== Nút phát cả đoạn: đổi icon + màu khi đang đọc ===== */
+.play {
+  transition: .2s ease;
+}
+
+.play.playing {
+  background: #ef4444;
+  border-color: #ef4444;
+  color: #fff;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, #ef4444 45%, transparent); }
+  50% { box-shadow: 0 0 0 8px transparent; }
+}
+
+/* ===== Nút "Nghe" từng câu: đổi icon + màu khi câu đó đang đọc ===== */
+.tiny-btn.speaking {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+/* ===== Dòng hội thoại đang được đọc: highlight nhẹ ===== */
+.line {
+  transition: background .25s ease;
+}
+
+.line.reading {
+  background: var(--primary-soft);
+  border-radius: 10px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play.playing { animation: none; }
+}
