@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
@@ -18,15 +18,18 @@ interface CourseProgress {
   templateUrl: './progress.component.html',
   styleUrl: './progress.component.css'
 })
-export class ProgressComponent implements OnInit {
+export class ProgressComponent implements OnInit, OnDestroy {
   items: CourseProgress[] = [];
   loading = true;
+  slowApi = false;
+  private slowTimer?: ReturnType<typeof setTimeout>;
   totalCompleted = 0;
   totalLessons = 0;
 
   constructor(private learning: LearningService) {}
 
   ngOnInit(): void {
+    this.slowTimer = setTimeout(() => { if (this.loading) this.slowApi = true; }, 8000);
     this.learning.getCourses().subscribe({
       next: (res) => {
         const courses = res.data;
@@ -52,5 +55,9 @@ export class ProgressComponent implements OnInit {
       },
       error: () => { this.loading = false; }
     });
+  }
+
+  ngOnDestroy(): void {
+    clearTimeout(this.slowTimer);
   }
 }

@@ -14,6 +14,7 @@
 </div>
 <div class="section-head"><div><h2>Khóa học của bạn</h2><p>Chọn chủ đề phù hợp để bắt đầu</p></div><a class="text-btn" routerLink="/courses">Xem tất cả →</a></div>
 <div *ngIf="loading" class="loading">Đang tải khóa học...</div>
+<div *ngIf="slowApi && loading" class="slow-hint">⏳ API Render (bản miễn phí) đang khởi động sau khi ngủ — dữ liệu sẽ về trong 30–60 giây. Vui lòng đợi hoặc tải lại trang.</div>
 <div *ngIf="error" class="error">Không tải được dữ liệu. <button (click)="load()">Thử lại</button></div>
 <div class="course-grid" *ngIf="!loading && !error && courses.length">
   <a *ngFor="let course of courses" [routerLink]="['/courses', course.id]" class="course">

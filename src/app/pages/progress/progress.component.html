@@ -1,5 +1,6 @@
 <div class="section-head"><div><h2>Tiến độ học tập</h2><p>Mỗi bước nhỏ đều đáng tự hào</p></div></div>
 <p *ngIf="loading">Loading...</p>
+<div *ngIf="slowApi && loading" class="slow-hint">⏳ API Render (bản miễn phí) đang khởi động sau khi ngủ — dữ liệu sẽ về trong 30–60 giây. Tiến độ gồm nhiều request nên có thể chậm hơn.</div>
 <div *ngIf="!loading">
   <div class="stats">
     <div class="stat"><div class="stat-icon">🎯</div><div><strong>{{ totalCompleted }}/{{ totalLessons }}</strong><small>Bài học hoàn thành</small></div></div>

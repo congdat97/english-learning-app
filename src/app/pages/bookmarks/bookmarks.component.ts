@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -12,11 +12,13 @@ import { Vocabulary } from '../../models/learning.model';
   templateUrl: './bookmarks.component.html',
   styleUrl: './bookmarks.component.css'
 })
-export class BookmarksComponent implements OnInit {
+export class BookmarksComponent implements OnInit, OnDestroy {
   bookmarks: Vocabulary[] = [];
   filtered: Vocabulary[] = [];
   search = '';
   loading = true;
+  slowApi = false;
+  private slowTimer?: ReturnType<typeof setTimeout>;
 
   // =================================================
   // REMINDER
@@ -42,12 +44,17 @@ export class BookmarksComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadBookmarks();
+    this.slowTimer = setTimeout(() => { if (this.loading) this.slowApi = true; }, 8000);
 
     this.reminderEnabled =
       this.reminderService.enabled;
 
     this.reminderPermission =
       this.reminderService.permission;
+  }
+
+  ngOnDestroy(): void {
+    clearTimeout(this.slowTimer);
   }
 
   // =================================================

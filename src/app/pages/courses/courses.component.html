@@ -1,5 +1,6 @@
 <div class="section-head"><div><h2>Tất cả khóa học</h2><p>Lộ trình từ nền tảng đến giao tiếp tự tin</p></div></div>
 <p *ngIf="loading">Loading...</p>
+<div *ngIf="slowApi && loading" class="slow-hint">⏳ API Render (bản miễn phí) đang khởi động sau khi ngủ — dữ liệu sẽ về trong 30–60 giây. Vui lòng đợi hoặc tải lại trang.</div>
 <div class="course-grid" *ngIf="!loading">
   <a *ngFor="let course of courses" [routerLink]="['/courses', course.id]" class="course">
     <div class="course-top"><div class="course-emoji">📘</div><span class="level">{{ course.level }}</span></div>

@@ -161,6 +161,7 @@
 <div class="section-head"><div><h2>Sổ từ vựng cá nhân</h2><p>Những từ bạn đã đánh dấu để ôn tập</p></div></div>
 <input placeholder="Tìm từ vựng..." style="width:100%;padding:12px;border:1px solid var(--border);border-radius:11px;margin-bottom:14px;background:var(--surface);color:var(--text)" [(ngModel)]="search" (ngModelChange)="applyFilter()" />
 <p *ngIf="loading">Loading...</p>
+<div *ngIf="slowApi && loading" class="slow-hint">⏳ API Render (bản miễn phí) đang khởi động sau khi ngủ — dữ liệu sẽ về trong 30–60 giây. Vui lòng đợi hoặc tải lại trang.</div>
 <div class="vocab-grid" *ngIf="!loading">
   <article *ngFor="let v of filtered" class="word-card">
     <div class="word-head"><h3>{{ v.word }}</h3><span class="ipa">{{ v.ipa }}</span></div>

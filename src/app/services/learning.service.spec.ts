@@ -15,6 +15,7 @@ describe('LearningService', () => {
     });
     service = TestBed.inject(LearningService);
     http = TestBed.inject(HttpTestingController);
+    localStorage.clear();
   });
 
   afterEach(() => http.verify());
@@ -94,5 +95,80 @@ describe('LearningService', () => {
     const req = http.expectOne(`${base}/vocabulary/7/bookmark`);
     expect(req.request.method).toBe('DELETE');
     req.flush({ success: true });
+  });
+
+  describe('cache layer', () => {
+    function seedCache(url: string, body: unknown, ts = Date.now()) {
+      localStorage.setItem(`api-cache:${url}`, JSON.stringify({ ts, body }));
+    }
+
+    it('emits cached data immediately, then fresh API data, and updates cache', () => {
+      const url = `${base}/courses`;
+      seedCache(url, { success: true, data: [{ id: 9, title: 'cached' }] });
+      const emissions: any[] = [];
+      let completed = false;
+      service.getCourses().subscribe({ next: e => emissions.push(e), complete: () => (completed = true) });
+
+      const req = http.expectOne(url);
+      req.flush({ success: true, data: [{ id: 9, title: 'fresh' }] });
+
+      expect(emissions.length).toBe(2);
+      expect(emissions[0].data[0].title).toBe('cached');
+      expect(emissions[1].data[0].title).toBe('fresh');
+      expect(completed).toBe(true);
+      const saved = JSON.parse(localStorage.getItem(`api-cache:${url}`) || '{}');
+      expect(saved.body.data[0].title).toBe('fresh');
+    });
+
+    it('falls back to cache without erroring when the API fails', () => {
+      const url = `${base}/courses`;
+      seedCache(url, { success: true, data: [{ id: 9, title: 'cached' }] });
+      const emissions: any[] = [];
+      let errorCaught = false;
+      let completed = false;
+      service.getCourses().subscribe({
+        next: e => emissions.push(e),
+        error: () => (errorCaught = true),
+        complete: () => (completed = true)
+      });
+      http.expectOne(url).flush('boom', { status: 500, statusText: 'Server Error' });
+
+      expect(emissions.length).toBe(1);
+      expect(emissions[0].data[0].title).toBe('cached');
+      expect(errorCaught).toBe(false);
+      expect(completed).toBe(true);
+    });
+
+    it('errors when there is no cache and the API fails', () => {
+      let errorCaught = false;
+      let completed = false;
+      service.getCourses().subscribe({
+        error: () => (errorCaught = true),
+        complete: () => (completed = true)
+      });
+      http.expectOne(`${base}/courses`).flush('boom', { status: 500, statusText: 'Server Error' });
+
+      expect(errorCaught).toBe(true);
+      expect(completed).toBe(false);
+    });
+
+    it('ignores stale cache beyond max age', () => {
+      const url = `${base}/courses`;
+      seedCache(url, { success: true, data: [{ id: 9, title: 'stale' }] }, Date.now() - 20 * 60 * 1000);
+      const emissions: any[] = [];
+      service.getCourses().subscribe(e => emissions.push(e));
+      http.expectOne(url).flush({ success: true, data: [{ id: 9, title: 'fresh' }] });
+
+      expect(emissions.length).toBe(1);
+      expect(emissions[0].data[0].title).toBe('fresh');
+    });
+
+    it('clearCache removes all api-cache entries', () => {
+      localStorage.setItem('api-cache:x', '1');
+      localStorage.setItem('other', 'keep');
+      service.clearCache();
+      expect(localStorage.getItem('api-cache:x')).toBeNull();
+      expect(localStorage.getItem('other')).toBe('keep');
+    });
   });
 });

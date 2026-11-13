@@ -17,6 +17,7 @@ describe('DashboardComponent', () => {
       providers: [provideRouter([]), provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
     }).compileComponents();
 
+    localStorage.clear();
     fixture = TestBed.createComponent(DashboardComponent);
     component = fixture.componentInstance;
     http = TestBed.inject(HttpTestingController);

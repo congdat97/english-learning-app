@@ -559,6 +559,9 @@ html[data-theme="mat-ong"] {
 .tiny-btn.saved{background:var(--secondary-soft-2);color:#b16b22}
 .listen-box{background:var(--surface-variant);border-radius:17px;padding:20px}.audio-controls{display:flex;align-items:center;gap:10px;margin:15px 0;flex-wrap:wrap}.play{width:46px;height:46px;border-radius:50%;background:var(--primary);color:var(--on-primary);font-size:18px}.audio-controls select{padding:9px;border:1px solid var(--border);border-radius:9px;background:var(--surface);color:var(--text)}.transcript{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:14px;margin-top:14px}.line{padding:7px 0;border-bottom:1px solid var(--border);font-size:13px}.line:last-child{border:0}.line b{color:var(--primary);margin-right:8px}.translation{display:block;color:var(--muted);font-size:11px}.question{margin-top:18px}.option{display:block;width:100%;text-align:left;padding:11px 13px;border:1px solid var(--border);border-radius:10px;background:var(--surface);margin:8px 0;color:var(--text)}.option.selected{border-color:var(--primary);background:var(--primary-soft)}.option.correct{border-color:#40b88a;background:rgba(64,184,138,.12)}.option.wrong{border-color:#e27b7b;background:rgba(226,123,123,.12)}.feedback{font-size:13px;margin-top:10px;font-weight:700}.primary{background:var(--primary);color:var(--on-primary);padding:11px 17px;border-radius:10px;font-weight:800}.muted{color:var(--muted)}.result{text-align:center;padding:30px}.score{font-size:42px;color:var(--primary);font-weight:850}.hidden{display:none!important}
 
+/* Thông báo API khởi động chậm (Render free tier) */
+.slow-hint{background:var(--secondary-soft);border:1px dashed var(--secondary);border-radius:12px;padding:10px 14px;margin:10px 0;font-size:13px;color:var(--text);animation:fadeIn .3s ease}
+
 /* ---------- ANIMATION ---------- */
 
 @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
