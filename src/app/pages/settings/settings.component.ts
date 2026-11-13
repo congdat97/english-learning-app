@@ -16,6 +16,7 @@ export class SettingsComponent implements OnInit {
   showTranslation = true;
   fontSize = 16;
   voice = '';
+  theme = 'blue';
 
   voices: SpeechSynthesisVoice[] = [];
 
@@ -28,7 +29,9 @@ export class SettingsComponent implements OnInit {
     this.showTranslation = saved.showTranslation;
     this.fontSize = saved.fontSize;
     this.voice = saved.voice;
+    this.theme = saved.theme;
     this.settings.applyFontSize(this.fontSize);
+    this.settings.applyTheme(this.theme);
     if (typeof speechSynthesis !== 'undefined') {
       this.voices = speechSynthesis.getVoices();
       speechSynthesis.onvoiceschanged = () => {
@@ -43,7 +46,8 @@ export class SettingsComponent implements OnInit {
       audioSpeed: this.audioSpeed,
       showTranslation: this.showTranslation,
       fontSize: this.fontSize,
-      voice: this.voice
+      voice: this.voice,
+      theme: this.theme
     });
   }
 }

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { LearningService } from '../../services/learning.service';
+import { SettingsService } from '../../services/settings.service';
 import { Lesson, Vocabulary, Listening, ReviewQuestion } from '../../models/learning.model';
 
 @Component({
@@ -21,7 +22,7 @@ export class LessonComponent implements OnInit {
   submitted = false;
   score = 0;
 
-  constructor(private route: ActivatedRoute, private learning: LearningService) {}
+  constructor(private route: ActivatedRoute, private learning: LearningService, private settings: SettingsService) {}
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
@@ -44,10 +45,20 @@ export class LessonComponent implements OnInit {
     this.learning.toggleFavorite(v.id).subscribe({ next: (r) => v.is_favorite = r.data.is_favorite });
   }
 
+  get showTranslation(): boolean {
+    return this.settings.showTranslation;
+  }
+
   speak(text: string): void {
     if (!('speechSynthesis' in window)) return;
+    const s = this.settings.load();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'en-US';
+    utterance.rate = s.audioSpeed;
+    if (s.voice) {
+      const voice = speechSynthesis.getVoices().find(v => v.name === s.voice);
+      if (voice) utterance.voice = voice;
+    }
     window.speechSynthesis.cancel();
     window.speechSynthesis.speak(utterance);
   }

@@ -29,7 +29,7 @@
         <small>{{ v.part_of_speech }}</small>
         <p><b>{{ v.meaning_vi }}</b></p>
         <div *ngFor="let e of v.examples">
-          <small>Ví dụ: {{ e.sentence }}<br>{{ e.translation_vi }}</small>
+          <small>Ví dụ: {{ e.sentence }}<br><ng-container *ngIf="showTranslation">{{ e.translation_vi }}</ng-container></small>
         </div>
         <div class="word-actions">
           <button class="tiny-btn" (click)="speak(v.word)">🔊 Nghe từ</button>
@@ -52,7 +52,7 @@
       <div class="transcript">
         <div *ngFor="let line of l.transcript" class="line">
           <b>{{ line.speaker }}:</b> {{ line.text }}
-          <span class="translation">{{ line.translation_vi }}</span>
+          <span class="translation" *ngIf="showTranslation">{{ line.translation_vi }}</span>
           <button class="tiny-btn" (click)="speak(line.text)">Nghe</button>
         </div>
       </div>
