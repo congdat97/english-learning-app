@@ -18,10 +18,12 @@
   width: min(720px, 92vw);
   max-height: 85vh;
   overflow: auto;
-  background: #fff;
+  background: var(--white, #fff);
+  color: var(--ink);
   border-radius: 18px;
   padding: 20px;
-  box-shadow: 0 20px 60px rgba(0,0,0,.25);
+  box-shadow: var(--shadow, 0 20px 60px rgba(0,0,0,.25));
+  animation: fadeIn .2s ease both;
 }
 .settings-head {
   display: flex;
@@ -29,11 +31,13 @@
   align-items: center;
 }
 .settings-close {
-  background: #f1f3ff;
+  background: var(--pale);
+  color: var(--ink);
+  border: none;
   border-radius: 8px;
   padding: 6px 10px;
 }
-.settings-sub { color: #666; margin: 8px 0 16px; }
+.settings-sub { color: var(--muted); margin: 8px 0 16px; }
 .settings-section-label { font-weight: 700; margin: 12px 0 8px; }
 .theme-grid {
   display: grid;
@@ -41,19 +45,21 @@
   gap: 12px;
 }
 .theme-card {
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--line);
   border-radius: 12px;
   padding: 10px;
-  background: #fff;
+  background: var(--white, #fff);
+  color: var(--ink);
   text-align: left;
   position: relative;
 }
-.theme-card.active { border-color: #4f46e5; box-shadow: 0 0 0 2px rgba(79,70,229,.2); }
+.theme-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.theme-card.active { border-color: var(--blue); box-shadow: 0 0 0 2px color-mix(in srgb, var(--blue) 25%, transparent); }
 .theme-check {
   position: absolute;
   top: 8px;
   right: 8px;
-  color: #4f46e5;
+  color: var(--blue);
   opacity: 0;
 }
 .theme-card.active .theme-check { opacity: 1; }
@@ -73,6 +79,16 @@
   border-radius: 4px;
 }
 .theme-name { font-weight: 700; font-size: 13px; }
-.theme-badge { font-size: 10px; color: #666; margin-left: 4px; }
+.theme-badge { font-size: 10px; color: var(--muted); margin-left: 4px; }
 .theme-dots { display: flex; gap: 4px; margin-top: 4px; }
 .theme-dots span { width: 10px; height: 10px; border-radius: 50%; }
+.settings-button {
+  background: var(--pale);
+  color: var(--ink);
+  border: none;
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 1rem;
+}
+.settings-button:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
