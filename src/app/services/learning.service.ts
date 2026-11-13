@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { finalize, shareReplay, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { Course, Lesson, Listening, ReviewQuestion, UserProgress, Vocabulary } from '../models/learning.model';
 
@@ -17,7 +18,27 @@ export class LearningService {
   private headers = new HttpHeaders({ 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' });
   private readonly maxAgeMs = 24 * 60 * 60 * 1000;
 
+  /** Các GET đang chạy: nhiều nơi gọi cùng lúc thì share 1 kết nối. */
+  private inflight = new Map<string, Observable<ApiResult<unknown>>>();
+
   constructor(private http: HttpClient) {}
+
+  private fetchAndCache<T>(url: string): Observable<ApiResult<T>> {
+    const existing = this.inflight.get(url) as Observable<ApiResult<T>> | undefined;
+    if (existing) return existing;
+
+    const obs = this.http.get<ApiResult<T>>(url, { headers: this.headers }).pipe(
+      tap({
+        next: body => {
+          try { localStorage.setItem('api-cache:' + url, JSON.stringify({ ts: Date.now(), body })); } catch {}
+        },
+        finalize: () => this.inflight.delete(url)
+      }),
+      shareReplay({ bufferSize: 1, refCount: false })
+    );
+    this.inflight.set(url, obs as Observable<ApiResult<unknown>>);
+    return obs;
+  }
 
   /**
    * Cache-first + revalidate:
@@ -45,26 +66,15 @@ export class LearningService {
       if (cached) {
         observer.next(cached.body);
         observer.complete();
-        this.http.get<ApiResult<T>>(url, { headers: this.headers }).subscribe({
-          next: body => {
-            try { localStorage.setItem(key, JSON.stringify({ ts: Date.now(), body })); } catch {}
-          },
-          error: () => {}
-        });
+        this.fetchAndCache<T>(url).subscribe({ error: () => {} });
         return () => {};
       }
 
-      const sub = this.http.get<ApiResult<T>>(url, { headers: this.headers }).subscribe({
-        next: body => {
-          try {
-            localStorage.setItem(key, JSON.stringify({ ts: Date.now(), body }));
-          } catch {}
-          observer.next(body);
-        },
+      const sub = this.fetchAndCache<T>(url).subscribe({
+        next: body => observer.next(body),
         error: err => observer.error(err),
         complete: () => observer.complete()
       });
-
       return () => sub.unsubscribe();
     });
   }

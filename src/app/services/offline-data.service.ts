@@ -4,14 +4,15 @@ import {
   catchError,
   forkJoin,
   map,
-  of
+  of,
+  switchMap
 } from 'rxjs';
 
 import { LearningService } from './learning.service';
 
-import { Course, Vocabulary } from '../models/learning.model';
+import { Course, Lesson, UserProgress, Vocabulary } from '../models/learning.model';
 
-export type OfflineDataKey = 'courses' | 'bookmarks';
+export type OfflineDataKey = 'courses' | 'bookmarks' | 'progress' | 'lessons';
 
 export interface OfflineDataMeta {
   syncedAt: string | null;
@@ -183,51 +184,60 @@ export class OfflineDataService {
   // =====================================================
 
   /**
-   * Tải dữ liệu cần dùng offline
-   * (khóa học + từ đã lưu) về localStorage.
-   * Đi qua cache SWR chung của LearningService.
+   * Tải dữ liệu cần dùng offline về localStorage:
+   * khóa học + sổ từ + tiến độ tổng + danh sách lesson mỗi khóa.
+   * Đi qua cache SWR của LearningService (cache hit = không chờ API).
    */
   syncAll() {
 
-    return forkJoin({
-      courses: this.learning.getCourses()
-        .pipe(map(response => response.data)),
+    return this.learning.getCourses().pipe(
+      map(response => response.data || []),
+      switchMap(courses => forkJoin({
+        courses: of(courses),
 
-      bookmarks: this.learning.getBookmarks()
-        .pipe(map(response => response.data))
-    })
-      .pipe(
-        map(result => {
+        bookmarks: this.learning.getBookmarks()
+          .pipe(map(r => r.data || []), catchError(() => of([] as Vocabulary[]))),
 
-          this.set('courses', result.courses);
+        progress: this.learning.getAllProgress()
+          .pipe(map(r => r.data || []), catchError(() => of([] as UserProgress[]))),
 
-          this.set('bookmarks', result.bookmarks);
+        lessons: forkJoin(
+          courses.map(c =>
+            this.learning.getLessons(c.id)
+              .pipe(map(r => r.data || []), catchError(() => of([] as Lesson[])))
+          )
+        )
+      })),
+      map(result => {
 
-          this.saveMeta({
-            courses: result.courses.length,
-            bookmarks: result.bookmarks.length
-          });
+        this.set('courses', result.courses);
 
-          return result;
+        this.set('bookmarks', result.bookmarks);
 
-        })
-      );
+        this.set('progress', result.progress);
+
+        this.set('lessons', result.lessons.flat());
+
+        this.saveMeta({
+          courses: result.courses.length,
+          bookmarks: result.bookmarks.length
+        });
+
+        return { courses: result.courses, bookmarks: result.bookmarks };
+
+      })
+    );
 
   }
 
   /**
-   * Nếu chưa có dữ liệu offline
-   * thì tự tải và lưu 1 lần.
+   * Luôn đồng bộ khi mở app:
+   * - Có cache -> trả tức thì + refresh nền (không chặn UI).
+   * - Chưa có cache -> tải lần đầu (nền, UI vẫn hiện trạng thái chờ riêng).
    */
   ensureData() {
-
-    if (this.hasData()) {
-      return of(null);
-    }
-
     return this.syncAll()
       .pipe(catchError(() => of(null)));
-
   }
 
   // =====================================================
