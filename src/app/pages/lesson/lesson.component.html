@@ -58,7 +58,7 @@
       </div>
       <div *ngFor="let q of l.questions" class="question">
         <b>{{ q.question }}</b>
-        <button *ngFor="let opt of q.options" class="option" [class.selected]="answers[q.id] === opt" (click)="answers[q.id]=opt">{{ opt }}</button>
+        <button *ngFor="let opt of q.options" class="option" [class.selected]="answers[q.id] === opt" (click)="pickListening(q, opt)">{{ opt }}</button>
       </div>
     </div>
     <p *ngIf="listening.length === 0">No listening.</p>

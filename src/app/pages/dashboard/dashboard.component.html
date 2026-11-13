@@ -8,9 +8,9 @@
   <div class="hero-art">📚</div>
 </section>
 <div class="stats">
-  <div class="stat"><div class="stat-icon">🎯</div><div><strong>0</strong><small>Bài đã hoàn thành</small></div></div>
-  <div class="stat"><div class="stat-icon">🔤</div><div><strong>0</strong><small>Từ đã lưu</small></div></div>
-  <div class="stat"><div class="stat-icon">🔥</div><div><strong>1 ngày</strong><small>Hãy duy trì thói quen</small></div></div>
+  <div class="stat stat-stub" (click)="stubAlert('Bài đã hoàn thành')"><div class="stat-icon">🎯</div><div><strong>0</strong><small>Bài đã hoàn thành</small></div></div>
+  <div class="stat stat-stub" (click)="stubAlert('Từ đã lưu')"><div class="stat-icon">🔤</div><div><strong>0</strong><small>Từ đã lưu</small></div></div>
+  <div class="stat stat-stub" (click)="stubAlert('Streak ngày')"><div class="stat-icon">🔥</div><div><strong>1 ngày</strong><small>Hãy duy trì thói quen</small></div></div>
 </div>
 <div class="section-head"><div><h2>Khóa học của bạn</h2><p>Chọn chủ đề phù hợp để bắt đầu</p></div><a class="text-btn" routerLink="/courses">Xem tất cả →</a></div>
 <div *ngIf="loading" class="loading">Đang tải khóa học...</div>

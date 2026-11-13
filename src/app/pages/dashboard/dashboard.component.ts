@@ -29,4 +29,9 @@ export class DashboardComponent implements OnInit {
       error: () => { this.error = true; this.loading = false; }
     });
   }
+
+  /** Stats hiện đang là dữ liệu mẫu — bấm vào sẽ cảnh báo. */
+  stubAlert(label: string): void {
+    window.alert(`⚠️ "${label}" đang hiển thị dữ liệu mẫu — tính năng theo dõi tiến độ thực tế chưa hoạt động.`);
+  }
 }

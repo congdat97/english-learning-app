@@ -5,3 +5,5 @@
 .loading { background: #eef2ff; color: #3730a3; }
 .empty { background: #f3f4f6; color: #374151; }
 .error button { margin-left: 8px; }
+.stat-stub { cursor: pointer; }
+.stat-stub:hover { transform: translateY(-2px); box-shadow: 0 8px 20px var(--primary-soft); }

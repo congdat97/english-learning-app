@@ -22,6 +22,9 @@ export class LessonComponent implements OnInit {
   submitted = false;
   score = 0;
 
+  /** Chỉ alert 1 lần mỗi phiên để không spam. */
+  private listeningAlertShown = false;
+
   constructor(private route: ActivatedRoute, private learning: LearningService, private settings: SettingsService) {}
 
   ngOnInit(): void {
@@ -39,6 +42,15 @@ export class LessonComponent implements OnInit {
   selectAnswer(q: ReviewQuestion, option: string): void {
     if (this.submitted) return;
     this.answers[q.id] = option;
+  }
+
+  /** Luyện nghe: lưu lựa chọn + cảnh báo tính năng chưa chấm điểm. */
+  pickListening(q: { id: number }, option: string): void {
+    this.answers[q.id] = option;
+    if (!this.listeningAlertShown) {
+      this.listeningAlertShown = true;
+      window.alert('⚠️ Tính năng chấm điểm Luyện nghe chưa hoàn thiện — lựa chọn của bạn chưa được tính điểm.');
+    }
   }
 
   toggleFavorite(v: Vocabulary): void {
