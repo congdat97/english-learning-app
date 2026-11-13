@@ -19,3 +19,15 @@ main{padding:30px 38px 50px;min-width:0;overflow-x:hidden}.topbar{display:flex;j
 @media(max-width:850px){.app{grid-template-columns:1fr}.sidebar{padding:12px 15px;border-right:0;border-bottom:1px solid var(--line);gap:10px}.brand{padding:0 4px}.nav-label,.sidebar-bottom{display:none}.nav{display:flex;overflow:auto}.nav a{white-space:nowrap;padding:9px 11px}.nav-icon{display:none}main{padding:22px 18px 40px}.course-grid{grid-template-columns:repeat(2,1fr)}.vocab-grid{grid-template-columns:1fr}}
 @media(max-width:560px){.topbar h1{font-size:21px}.profile span{display:none}.hero{padding:22px}.hero h2{font-size:23px}.hero-art{font-size:52px;margin:0}.stats{gap:8px}.stat{padding:11px;gap:8px}.stat-icon{width:33px;height:33px;font-size:16px}.stat strong{font-size:17px}.stat small{font-size:10px}.course-grid,.vocab-grid{grid-template-columns:1fr}.lesson-intro{padding:17px}.lesson-emoji{font-size:40px}}
 .topbar{flex-wrap:wrap;gap:12px}h1,h2,h3,p{overflow-wrap:anywhere}button,input,select{max-width:100%}
+html[data-theme="mac-dinh"]{--blue:#c66b2c;--blue2:#e8a34e;--pale:#fff0e6}
+html[data-theme="tim-mong"]{--blue:#6c5ce7;--blue2:#00b894;--pale:#f2eaff}
+html[data-theme="may-sang"]{--blue:#2f80ed;--blue2:#22b8cf;--pale:#eaf4ff}
+html[data-theme="dem-than"]{--blue:#8b5cf6;--blue2:#2dd4bf;--pale:#f2eaff}
+html[data-theme="hong-dao"]{--blue:#ec4899;--blue2:#fb923c;--pale:#fff0f1}
+html[data-theme="dai-duong"]{--blue:#0369a1;--blue2:#06b6d4;--pale:#eaf4ff}
+html[data-theme="hoang-hon"]{--blue:#f97316;--blue2:#f43f5e;--pale:#fff0dc}
+html[data-theme="rung-thong"]{--blue:#059669;--blue2:#10b981;--pale:#e7f8f0}
+html[data-theme="sakura"]{--blue:#ec4899;--blue2:#f9a8d4;--pale:#fff0f6}
+html[data-theme="neon-dem"]{--blue:#22d3ee;--blue2:#a78bfa;--pale:#0f172a}
+html[data-theme="ca-phe"]{--blue:#92400e;--blue2:#d97706;--pale:#fff7ed}
+html[data-theme="mat-ong"]{--blue:#ca8a04;--blue2:#facc15;--pale:#fefce8}
