@@ -1,9 +1,62 @@
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
-.grid a { display: block; padding: 16px; border: 1px solid #ddd; border-radius: 8px; text-decoration: none; color: inherit; }
+/* Hiệu ứng vào trang mượt + nhịp trễ từng card */
+.course {
+  animation: cardIn .5s ease both;
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Icon theo màu accent của từng khóa (được nạp qua --card-accent) */
+.course-emoji {
+  background: color-mix(in srgb, var(--card-accent, var(--primary)) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--card-accent, var(--primary)) 24%, transparent);
+  transition: transform .25s ease;
+}
+
+.course:hover .course-emoji {
+  transform: scale(1.12) rotate(-5deg);
+}
+
+/* Badge cấp độ ăn theo accent */
+.course .level {
+  color: var(--card-accent, var(--primary));
+  background: color-mix(in srgb, var(--card-accent, var(--primary)) 12%, transparent);
+}
+
+/* Dòng kêu gọi hành động cuối card */
+.course-cta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--card-accent, var(--primary));
+}
+
+.course-cta span {
+  transition: transform .2s ease;
+}
+
+.course:hover .course-cta span {
+  transform: translateX(4px);
+}
+
+.course:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 14px 30px color-mix(in srgb, var(--card-accent, var(--primary)) 14%, transparent);
+}
+
+.stat-stub { cursor: pointer; transition: transform .2s ease, box-shadow .2s ease; }
+.stat-stub:hover { transform: translateY(-2px); box-shadow: 0 8px 20px var(--primary-soft); }
+
 .loading, .error, .empty { padding: 16px; border-radius: 8px; margin: 12px 0; }
 .error { background: #fee2e2; color: #991b1b; }
 .loading { background: #eef2ff; color: #3730a3; }
 .empty { background: #f3f4f6; color: #374151; }
 .error button { margin-left: 8px; }
-.stat-stub { cursor: pointer; }
-.stat-stub:hover { transform: translateY(-2px); box-shadow: 0 8px 20px var(--primary-soft); }
+
+@media (prefers-reduced-motion: reduce) {
+  .course { animation: none; }
+}

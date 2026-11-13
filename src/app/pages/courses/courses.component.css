@@ -1,0 +1,53 @@
+/* Hiệu ứng vào trang mượt + nhịp trễ từng card */
+.course {
+  animation: cardIn .5s ease both;
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Icon theo màu accent của từng khóa (được nạp qua --card-accent) */
+.course-emoji {
+  background: color-mix(in srgb, var(--card-accent, var(--primary)) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--card-accent, var(--primary)) 24%, transparent);
+  transition: transform .25s ease;
+}
+
+.course:hover .course-emoji {
+  transform: scale(1.12) rotate(-5deg);
+}
+
+/* Badge cấp độ ăn theo accent */
+.course .level {
+  color: var(--card-accent, var(--primary));
+  background: color-mix(in srgb, var(--card-accent, var(--primary)) 12%, transparent);
+}
+
+/* Dòng kêu gọi hành động cuối card */
+.course-cta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--card-accent, var(--primary));
+}
+
+.course-cta span {
+  transition: transform .2s ease;
+}
+
+.course:hover .course-cta span {
+  transform: translateX(4px);
+}
+
+.course:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 14px 30px color-mix(in srgb, var(--card-accent, var(--primary)) 14%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .course { animation: none; }
+}

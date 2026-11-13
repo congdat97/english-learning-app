@@ -549,7 +549,8 @@ html[data-theme="mat-ong"] {
 
 .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:27px}.eyebrow{font-size:12px;color:var(--muted);font-weight:650}.topbar h1{font-size:25px;letter-spacing:-.8px;margin:2px 0 0}.profile{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px}.avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--primary-soft-2);color:var(--primary);font-weight:800}
 .hero{background:linear-gradient(115deg,var(--primary),var(--secondary));color:var(--on-primary);border-radius:23px;padding:28px 30px;display:flex;justify-content:space-between;align-items:center;gap:20px;box-shadow:0 15px 30px var(--primary-soft-2);overflow:hidden;position:relative}.hero:after{content:"";position:absolute;width:240px;height:240px;border:1px solid #ffffff26;border-radius:50%;right:8%;top:-120px;box-shadow:0 0 0 28px #ffffff0a,0 0 0 58px #ffffff0a}.hero-copy{position:relative;z-index:1;max-width:520px}.hero .tag{font-size:11px;font-weight:800;letter-spacing:1.2px;opacity:.8}.hero h2{font-size:27px;line-height:1.2;margin:9px 0}.hero p{margin:0 0 18px;color:rgba(255,255,255,.85);font-size:14px}.primary-light{background:var(--surface);color:var(--primary);padding:11px 17px;border-radius:11px;font-weight:800}
-.hero-art{font-size:78px;position:relative;z-index:1;margin:0 25px}
+.hero-art{font-size:78px;position:relative;z-index:1;margin:0 25px;animation:heroFloat 4s ease-in-out infinite;display:inline-block}
+@keyframes heroFloat{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-9px) rotate(3deg)}}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:20px 0 28px}.stat{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:17px;display:flex;align-items:center;gap:13px}.stat-icon{width:42px;height:42px;border-radius:13px;background:var(--primary-soft);display:grid;place-items:center;font-size:20px}.stat strong{display:block;font-size:21px;line-height:1.2}.stat small{color:var(--muted);font-size:12px}
 .section-head{display:flex;justify-content:space-between;align-items:end;margin:25px 0 13px}.section-head h2{font-size:18px;margin:0;letter-spacing:-.4px}.section-head p{margin:3px 0 0;color:var(--muted);font-size:12px}.text-btn{background:none;color:var(--primary);font-weight:750;font-size:13px}
 .course-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.course{background:var(--surface);border:1px solid var(--border);border-radius:17px;padding:17px;transition:.2s;cursor:pointer}.course:hover{transform:translateY(-3px);box-shadow:var(--shadow)}.course-top{display:flex;justify-content:space-between;align-items:center}.course-emoji{width:43px;height:43px;border-radius:14px;display:grid;place-items:center;font-size:21px;background:var(--primary-soft)}.level{font-size:10px;font-weight:800;color:var(--primary);background:var(--primary-soft-2);border-radius:20px;padding:5px 8px}.course h3{font-size:15px;margin:13px 0 4px}.course p{font-size:12px;color:var(--muted);margin:0 0 15px;min-height:36px}.course-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:7px}.bar{height:6px;background:var(--border);border-radius:10px;overflow:hidden}.bar span{height:100%;display:block;background:var(--primary);border-radius:10px}
@@ -667,3 +668,150 @@ html[data-theme="mat-ong"] {
 }
 
 .topbar{flex-wrap:wrap;gap:12px}h1,h2,h3,p{overflow-wrap:anywhere}button,input,select{max-width:100%}
+
+/* =========================================================
+   UI POLISH LAYER
+   ========================================================= */
+
+body {
+  background:
+    radial-gradient(circle at 8% 4%, color-mix(in srgb, var(--blue) 10%, transparent), transparent 34%),
+    radial-gradient(circle at 92% 12%, color-mix(in srgb, var(--blue2) 9%, transparent), transparent 30%),
+    radial-gradient(circle at 50% 100%, color-mix(in srgb, var(--blue) 6%, transparent), transparent 40%),
+    var(--bg);
+  background-attachment: fixed;
+}
+
+/* --- Cards: soft layered shadows --- */
+.stat, .course, .panel, .word-card, .listen-box, .transcript, .sidebar-bottom {
+  border-radius: 16px;
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, .04),
+    0 10px 28px -14px rgba(15, 23, 42, .14);
+}
+
+.course, .word-card, .panel {
+  transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+}
+
+.course:hover, .word-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px -16px color-mix(in srgb, var(--blue) 28%, rgba(15,23,42,.2));
+  border-color: color-mix(in srgb, var(--blue) 35%, var(--line));
+}
+
+/* --- Buttons --- */
+.primary {
+  background: linear-gradient(135deg, var(--blue), var(--blue2));
+  box-shadow: 0 6px 16px -4px color-mix(in srgb, var(--blue) 45%, transparent);
+}
+.primary:hover { transform: translateY(-1px); filter: brightness(1.06); box-shadow: 0 9px 22px -6px color-mix(in srgb, var(--blue) 55%, transparent); }
+.primary:active { transform: scale(.97); }
+
+/* --- Sidebar nav: left accent on active --- */
+.nav a { border-radius: 12px; }
+.nav a.active {
+  background: var(--pale);
+  box-shadow: inset 3px 0 0 0 var(--blue);
+  font-weight: 750;
+}
+.nav a:not(.active):hover { transform: translateX(2px); }
+
+/* --- Brand logo pulse --- */
+.logo { animation: logoGlow 4s ease-in-out infinite; }
+@keyframes logoGlow {
+  0%, 100% { box-shadow: 0 7px 16px color-mix(in srgb, var(--blue) 30%, transparent); }
+  50% { box-shadow: 0 7px 26px color-mix(in srgb, var(--blue) 55%, transparent); }
+}
+
+/* --- Avatar ring --- */
+.avatar { box-shadow: 0 0 0 3px var(--white), 0 0 0 5px color-mix(in srgb, var(--blue) 30%, transparent); }
+
+/* --- Hero shimmer --- */
+.hero {
+  background: linear-gradient(115deg, var(--blue), var(--blue2));
+  box-shadow: 0 16px 36px -10px color-mix(in srgb, var(--blue) 45%, transparent);
+}
+.hero::before {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0; left: -60%;
+  width: 45%;
+  background: linear-gradient(105deg, transparent, rgba(255,255,255,.14), transparent);
+  transform: skewX(-20deg);
+  animation: heroShine 6s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes heroShine {
+  0%, 55% { left: -60%; }
+  100% { left: 130%; }
+}
+
+/* --- Lesson number badge: gradient --- */
+.lesson-number { background: linear-gradient(135deg, var(--blue), var(--blue2)); color: #fff; box-shadow: 0 4px 10px -3px color-mix(in srgb, var(--blue) 45%, transparent); }
+
+/* --- Progress bars: gradient + shine --- */
+.bar span, .mini-progress span { background: linear-gradient(90deg, var(--blue), var(--blue2)); position: relative; overflow: hidden; }
+.bar span::after, .mini-progress span::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,.45) 50%, transparent 70%);
+  animation: barShine 2.6s ease-in-out infinite;
+}
+@keyframes barShine {
+  0% { transform: translateX(-100%); }
+  60%, 100% { transform: translateX(100%); }
+}
+
+/* --- Subnav pills --- */
+.subnav button.active, .subnav a.active {
+  background: linear-gradient(135deg, var(--pale), color-mix(in srgb, var(--blue) 10%, var(--white)));
+  border-color: color-mix(in srgb, var(--blue) 35%, var(--line));
+}
+
+/* --- Word card left accent --- */
+.word-card { position: relative; }
+.word-card::before {
+  content: "";
+  position: absolute; left: 0; top: 12px; bottom: 12px;
+  width: 3px; border-radius: 3px;
+  background: linear-gradient(var(--blue), var(--blue2));
+  opacity: 0;
+  transition: opacity .2s ease;
+}
+.word-card:hover::before { opacity: 1; }
+
+/* --- Options --- */
+.option:not(.correct):not(.wrong):hover {
+  border-color: color-mix(in srgb, var(--blue) 45%, var(--line));
+  background: var(--pale);
+  transform: translateX(2px);
+}
+.option.selected {
+  background: linear-gradient(135deg, var(--pale), color-mix(in srgb, var(--blue) 8%, var(--white)));
+  box-shadow: inset 3px 0 0 0 var(--blue);
+}
+
+/* --- Bottom nav active pill --- */
+.bottom-nav a { border-radius: 12px; }
+.bottom-nav a.active { background: var(--pale); }
+
+/* --- Lesson rows hover --- */
+.lesson-row { border-radius: 10px; transition: background .2s ease; }
+.lesson-row:hover { background: var(--pale); }
+
+/* --- Level pill --- */
+.level { background: var(--pale); color: var(--blue); }
+
+/* --- Eyebrow --- */
+.eyebrow { text-transform: uppercase; letter-spacing: 1.1px; font-size: 11px; }
+
+/* --- Staggered entrance --- */
+.stats .stat, .course-grid .course { animation: fadeUp .45s ease both; }
+.stats .stat:nth-child(2), .course-grid .course:nth-child(2) { animation-delay: .06s; }
+.stats .stat:nth-child(3), .course-grid .course:nth-child(3) { animation-delay: .12s; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+/* --- Result score pop --- */
+.result .score { animation: scorePop .5s cubic-bezier(.34,1.56,.64,1) both; }
+@keyframes scorePop { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: scale(1); } }

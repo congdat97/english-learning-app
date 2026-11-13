@@ -12,21 +12,18 @@ import { tap } from 'rxjs/operators';
  * CACHE-FIRST + STALE-WHILE-REVALIDATE
  *
  * GET:
- *  - Có cache "tươi" (< 5 phút) -> dùng ngay, không gọi API.
- *  - Có cache "cũ" -> dùng ngay + tự gọi nền để làm mới cache.
+ *  - Có cache -> dùng ngay từ localStorage + tự gọi nền để làm mới cache
+ *    (dữ liệu ít thay đổi nên hiển thị tức thì là ưu tiên).
  *  - Chưa có cache -> gọi API, thành công thì lưu vào localStorage.
- *  - API lỗi mà còn cache cũ -> vẫn trả cache cũ (dùng offline được).
+ *  - API lỗi mà còn cache -> vẫn trả cache cũ (dùng offline được).
  *
  * Ghi (POST/PUT/DELETE) thành công -> xóa cache cùng nhóm tài nguyên
  * để lần GET sau lấy dữ liệu mới.
  */
 
-const FRESH_TTL = 5 * 60 * 1000;
-
 const PREFIX = 'http_cache_';
 
 interface CacheEntry {
-  expiry: number;
   body: unknown;
 }
 
@@ -79,7 +76,7 @@ function writeEntry(
 
     localStorage.setItem(
       PREFIX + key,
-      JSON.stringify({ expiry: Date.now() + FRESH_TTL, body })
+      JSON.stringify({ body })
     );
 
   } catch {
@@ -207,18 +204,13 @@ export const cacheInterceptor: HttpInterceptorFn = (req, next) => {
 
   const entry = readEntry(key);
 
-  // 1) Cache tươi: dùng ngay, không gọi API
-  if (entry && entry.expiry > Date.now()) {
-    return of(toResponse(req, entry.body));
-  }
-
-  // 2) Cache cũ: dùng ngay + làm mới nền
+  // 1) Có cache: dùng ngay + làm mới nền
   if (entry) {
     revalidate(req, next, key);
     return of(toResponse(req, entry.body));
   }
 
-  // 3) Chưa có cache: gọi API và lưu lại
+  // 2) Chưa có cache: gọi API và lưu lại
   return next(req).pipe(
     tap((event: HttpEvent<unknown>) => {
 

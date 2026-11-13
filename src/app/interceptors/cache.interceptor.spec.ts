@@ -34,28 +34,15 @@ describe('CacheInterceptor', () => {
     expect(entry.body.data).toEqual([1, 2, 3]);
   });
 
-  it('serves fresh cache without hitting the API', () => {
+  it('serves cache without waiting for the API, then revalidates in background', () => {
     localStorage.setItem(
       'http_cache_/api/courses',
-      JSON.stringify({ expiry: Date.now() + 60_000, body: { success: true, data: ['cached'] } })
+      JSON.stringify({ body: { success: true, data: ['cached'] } })
     );
 
     let result: unknown;
     http.get('/api/courses').subscribe((r) => (result = r));
     expect(result).toEqual({ success: true, data: ['cached'] });
-
-    httpMock.expectNone('/api/courses');
-  });
-
-  it('serves stale cache and revalidates in background', () => {
-    localStorage.setItem(
-      'http_cache_/api/courses',
-      JSON.stringify({ expiry: Date.now() - 60_000, body: { success: true, data: ['stale'] } })
-    );
-
-    let result: unknown;
-    http.get('/api/courses').subscribe((r) => (result = r));
-    expect(result).toEqual({ success: true, data: ['stale'] });
 
     // Background revalidate request happens
     httpMock.expectOne('/api/courses').flush({ success: true, data: ['fresh'] });
@@ -72,14 +59,15 @@ describe('CacheInterceptor', () => {
 
     let second: unknown;
     http.get('/api/settings').subscribe((r) => (second = r));
-    httpMock.expectNone('/api/settings');
     expect(second).toEqual({ success: true, data: { theme: 'mac-dinh' } });
-  });
 
+    // Second GET is served from cache; a background revalidate still runs
+    httpMock.expectOne('/api/settings').flush({ success: true, data: { theme: 'mac-dinh' } });
+  });
   it('clears resource family caches after successful POST', () => {
     localStorage.setItem(
       'http_cache_/api/lessons/1/progress',
-      JSON.stringify({ expiry: Date.now() + 60_000, body: { success: true, data: null } })
+      JSON.stringify({ body: { success: true, data: null } })
     );
 
     http.post('/api/lessons/1/progress', {}).subscribe();
@@ -91,7 +79,7 @@ describe('CacheInterceptor', () => {
   it('keeps other family caches when posting to another family', () => {
     localStorage.setItem(
       'http_cache_/api/courses',
-      JSON.stringify({ expiry: Date.now() + 60_000, body: { success: true, data: [] } })
+      JSON.stringify({ body: { success: true, data: [] } })
     );
 
     http.post('/api/lessons/1/progress', {}).subscribe();
