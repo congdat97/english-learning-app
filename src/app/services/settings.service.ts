@@ -15,7 +15,7 @@ const DEFAULTS: LearningSettings = {
   showTranslation: true,
   fontSize: 16,
   voice: '',
-  theme: 'blue'
+  theme: 'mac-dinh'
 };
 
 @Injectable({ providedIn: 'root' })
@@ -37,7 +37,7 @@ export class SettingsService {
   }
 
   applyTheme(theme: string): void {
-    document.body.setAttribute('data-theme', theme);
+    document.documentElement.setAttribute('data-theme', theme);
   }
 
   applyFontSize(size: number): void {
