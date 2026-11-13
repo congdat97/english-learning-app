@@ -38,12 +38,23 @@
     <div class="card">
       <h3>Chủ đề màu</h3>
       <p class="hint">Thay đổi màu giao diện</p>
-      <select [(ngModel)]="theme">
-        <option value="blue">Blue</option>
-        <option value="green">Green</option>
-        <option value="purple">Purple</option>
-        <option value="orange">Orange</option>
-      </select>
+      <button class="primary" type="button" (click)="openThemePicker()">Chọn chủ đề</button>
+      <div class="theme-modal" *ngIf="themePickerOpen">
+        <div class="theme-backdrop" (click)="closeThemePicker()"></div>
+        <div class="theme-panel">
+          <h3>Chọn chủ đề màu</h3>
+          <div class="theme-grid">
+            <button *ngFor="let t of ['mac-dinh','tim-mong','may-sang','dem-than','hong-dao','dai-duong','hoang-hon','rung-thong','sakura','neon-dem','ca-phe','mat-ong']"
+                    type="button"
+                    class="theme-swatch"
+                    [attr.data-theme]="t"
+                    (click)="selectTheme(t)">
+              {{ t }}
+            </button>
+          </div>
+          <button class="text-btn" type="button" (click)="closeThemePicker()">Đóng</button>
+        </div>
+      </div>
     </div>
 
     <div class="card toggle-card">

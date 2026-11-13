@@ -16,7 +16,8 @@ export class SettingsComponent implements OnInit {
   showTranslation = true;
   fontSize = 16;
   voice = '';
-  theme = 'blue';
+  theme = 'mac-dinh';
+  themePickerOpen = false;
 
   voices: SpeechSynthesisVoice[] = [];
 
@@ -49,5 +50,19 @@ export class SettingsComponent implements OnInit {
       voice: this.voice,
       theme: this.theme
     });
+  }
+
+  openThemePicker(): void {
+    this.themePickerOpen = true;
+  }
+
+  closeThemePicker(): void {
+    this.themePickerOpen = false;
+  }
+
+  selectTheme(theme: string): void {
+    this.theme = theme;
+    this.settings.applyTheme(theme);
+    this.themePickerOpen = false;
   }
 }
