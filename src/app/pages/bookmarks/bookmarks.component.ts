@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { LearningService } from '../../services/learning.service';
 import { ReminderService } from '../../services/reminder.service';
+import { SettingsService } from '../../services/settings.service';
 import { Vocabulary } from '../../models/learning.model';
 
 @Component({
@@ -39,7 +40,8 @@ export class BookmarksComponent implements OnInit, OnDestroy {
 
   constructor(
     private learning: LearningService,
-    private reminderService: ReminderService
+    private reminderService: ReminderService,
+    private settings: SettingsService
   ) {}
 
   ngOnInit(): void {
@@ -85,8 +87,14 @@ export class BookmarksComponent implements OnInit, OnDestroy {
 
   speak(text: string): void {
     if (!('speechSynthesis' in window)) return;
+    const s = this.settings.load();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'en-US';
+    utterance.rate = s.audioSpeed;
+    if (s.voice) {
+      const voice = speechSynthesis.getVoices().find(v => v.name === s.voice);
+      if (voice) utterance.voice = voice;
+    }
     window.speechSynthesis.cancel();
     window.speechSynthesis.speak(utterance);
   }
