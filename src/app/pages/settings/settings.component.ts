@@ -14,6 +14,9 @@ export class SettingsComponent implements OnInit {
   audioSpeed = 1;
   showTranslation = true;
   fontSize = 16;
+  voice = '';
+
+  voices: SpeechSynthesisVoice[] = [];
 
   ngOnInit(): void {
     const saved = localStorage.getItem('learning-settings');
@@ -23,8 +26,15 @@ export class SettingsComponent implements OnInit {
       this.audioSpeed = parsed.audioSpeed ?? this.audioSpeed;
       this.showTranslation = parsed.showTranslation ?? this.showTranslation;
       this.fontSize = parsed.fontSize ?? this.fontSize;
+      this.voice = parsed.voice ?? this.voice;
     }
     this.applyFontSize();
+    if (typeof speechSynthesis !== 'undefined') {
+      this.voices = speechSynthesis.getVoices();
+      speechSynthesis.onvoiceschanged = () => {
+        this.voices = speechSynthesis.getVoices();
+      };
+    }
   }
 
   save(): void {
@@ -32,7 +42,8 @@ export class SettingsComponent implements OnInit {
       dailyMinutes: this.dailyMinutes,
       audioSpeed: this.audioSpeed,
       showTranslation: this.showTranslation,
-      fontSize: this.fontSize
+      fontSize: this.fontSize,
+      voice: this.voice
     }));
     this.applyFontSize();
   }
