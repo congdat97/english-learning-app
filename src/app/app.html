@@ -1,6 +1,5 @@
 <div class="app">
-  <button class="menu-toggle" (click)="toggleMenu()" aria-label="Menu">☰</button>
-  <aside class="sidebar" [class.open]="menuOpen">
+  <aside class="sidebar">
     <div class="brand"><div class="logo">✦</div> English Step by Step</div>
     <div>
       <div class="nav-label">MENU CHÍNH</div>
@@ -26,5 +25,13 @@
       </div>
       <div class="profile"><span>Người học mới</span><div class="avatar">A</div></div>
     </header>
-    <button type="button" class="settings-button" (click)="openSettings()" title="Cài đặt giao diện" aria-label="Cài đặt giao diện">\r\n      <span>⚙️</span>\r\n    </button>\r\n    <router-outlet />\r\n  </main>
+    <router-outlet />
+  </main>
+  <nav class="bottom-nav">
+    <a routerLink="/dashboard" routerLinkActive="active"><span>🏠</span><small>Home</small></a>
+    <a routerLink="/courses" routerLinkActive="active"><span>📚</span><small>Courses</small></a>
+    <a routerLink="/bookmarks" routerLinkActive="active"><span>⭐</span><small>Saved</small></a>
+    <a routerLink="/progress" routerLinkActive="active"><span>📊</span><small>Progress</small></a>
+    <a routerLink="/settings" routerLinkActive="active"><span>⚙️</span><small>Settings</small></a>
+  </nav>
 </div>
