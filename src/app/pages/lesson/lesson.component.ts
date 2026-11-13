@@ -41,6 +41,11 @@ export class LessonComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.speed = this.settings.audioSpeed;
+    // Giá trị lưu lạ (không nằm trong danh sách chip) -> trả về mặc định 1x
+    if (!this.speeds.includes(this.speed)) {
+      this.speed = 1;
+      this.settings.save({ ...this.settings.load(), audioSpeed: 1 });
+    }
     const id = Number(this.route.snapshot.paramMap.get('id'));
     this.learning.getLesson(id).subscribe({ next: (r) => this.lesson = r.data, error: () => this.loading = false });
     this.learning.getVocabulary(id).subscribe({ next: (r) => this.vocabulary = r.data, error: () => this.loading = false });

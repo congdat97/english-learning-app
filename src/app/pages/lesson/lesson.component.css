@@ -65,11 +65,14 @@ nav button { margin-right: 8px; }
   color: #fff;
 }
 
+/* ===== Nút icon (🔊 / ⏹) thay chữ "Nghe" ===== */
+.icon-speak,
 .icon-btn {
   min-width: 34px;
   padding: 7px 9px;
   font-size: 14px;
   line-height: 1;
+  text-align: center;
 }
 
 /* ===== Dòng hội thoại đang được đọc: highlight nhẹ ===== */
