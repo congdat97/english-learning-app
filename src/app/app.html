@@ -92,12 +92,33 @@
 
   <div class="header-right">
 
-    <!-- TAI KHOAN -->
+    <!-- TAI KHOAN: avatar ẩn menu (đăng xuất nằm trong menu) -->
     <ng-container *ngIf="auth.isLoggedIn(); else loginLink">
-      <div class="user-chip" title="Tài khoản đang đăng nhập">
-        <span class="user-avatar">{{ auth.currentUser()!.username.charAt(0).toUpperCase() }}</span>
-        <span class="user-name">{{ auth.currentUser()!.username }}</span>
-        <button type="button" class="user-logout" (click)="logout()" title="Đăng xuất" aria-label="Đăng xuất">⏻</button>
+      <div class="user-area">
+        <button type="button" class="user-avatar-btn" (click)="toggleUserMenu()"
+                [title]="'Tài khoản: ' + auth.currentUser()!.username"
+                aria-label="Menu tài khoản">
+          {{ auth.currentUser()!.username.charAt(0).toUpperCase() }}
+        </button>
+
+        <div class="user-menu" *ngIf="userMenuOpen">
+          <div class="user-menu-head">
+            <strong>{{ auth.currentUser()!.username }}</strong>
+            <em>{{ auth.currentUser()!.role === 'admin' ? 'Quản trị' : 'Học viên' }}</em>
+          </div>
+
+          <a *ngIf="auth.isAdmin()" routerLink="/admin/users" class="user-menu-item" (click)="closeUserMenu()">
+            🛡️ Quản lý tài khoản
+          </a>
+
+          <a routerLink="/settings" class="user-menu-item" (click)="closeUserMenu()">
+            ⚙️ Cài đặt
+          </a>
+
+          <button type="button" class="user-menu-item logout" (click)="logout()">
+            ⏻ Đăng xuất
+          </button>
+        </div>
       </div>
     </ng-container>
     <ng-template #loginLink>

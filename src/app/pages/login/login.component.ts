@@ -15,6 +15,7 @@ export class LoginComponent {
 
   username = '';
   password = '';
+  showPassword = false;
   error = '';
   busy = false;
 

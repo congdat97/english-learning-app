@@ -86,6 +86,43 @@
   border-color: var(--primary);
 }
 
+/* Ô mật khẩu + nút hiện/ẩn */
+.pass-wrap {
+  position: relative;
+  display: block;
+}
+
+.pass-wrap input {
+  width: 100%;
+  padding-right: 42px;
+  box-sizing: border-box;
+}
+
+.pass-toggle {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-size: 15px;
+  padding: 5px 7px;
+  border-radius: 8px;
+  line-height: 1;
+}
+
+.pass-toggle:hover {
+  background: var(--primary-soft);
+}
+
+.auth-demo {
+  margin: 14px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
 .auth-error {
   background: color-mix(in srgb, #ef4444 12%, transparent);
   color: #ef4444;

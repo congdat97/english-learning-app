@@ -38,6 +38,9 @@ export class App implements OnInit {
 
   settingsOpen = false;
 
+  /** Menu tài khoản (avatar) trên header. */
+  userMenuOpen = false;
+
   // =====================================================
   // SYNC STATUS
   // =====================================================
@@ -97,7 +100,16 @@ export class App implements OnInit {
 
   /** Đăng xuất và về trang chủ. */
   logout(): void {
+    this.userMenuOpen = false;
     this.auth.logout();
+  }
+
+  toggleUserMenu(): void {
+    this.userMenuOpen = !this.userMenuOpen;
+  }
+
+  closeUserMenu(): void {
+    this.userMenuOpen = false;
   }
 
 

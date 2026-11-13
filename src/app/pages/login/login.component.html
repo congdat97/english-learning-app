@@ -16,7 +16,13 @@
       </label>
       <label>
         Mật khẩu
-        <input name="password" type="password" [(ngModel)]="password" autocomplete="current-password" placeholder="ít nhất 6 ký tự" />
+        <span class="pass-wrap">
+          <input name="password" [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password" autocomplete="current-password" placeholder="ít nhất 6 ký tự" />
+          <button type="button" class="pass-toggle" (click)="showPassword = !showPassword"
+                  [attr.aria-label]="showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'">
+            {{ showPassword ? '🙈' : '👁️' }}
+          </button>
+        </span>
       </label>
 
       <p *ngIf="error" class="auth-error">{{ error }}</p>
@@ -25,6 +31,8 @@
         {{ busy ? 'Đang xử lý...' : (mode === 'login' ? 'Đăng nhập' : 'Tạo tài khoản') }}
       </button>
     </form>
+
+    <p *ngIf="mode === 'login'" class="auth-demo">Chưa có tài khoản? Chuyển sang tab <b>Đăng ký</b>, hoặc liên hệ admin để được cấp tài khoản.</p>
 
     <a routerLink="/dashboard" class="auth-back">← Về trang chủ (xem không cần tài khoản)</a>
   </div>
