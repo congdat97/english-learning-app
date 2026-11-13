@@ -31,7 +31,7 @@
     <div class="section-head"><div><h2>Vocabulary · Từ vựng</h2><p>Nghe phát âm, đọc ví dụ và lưu từ cần ôn</p></div></div>
     <div class="vocab-grid">
       <article *ngFor="let v of vocabulary" class="word-card">
-        <div class="word-head"><h3>{{ v.word }}</h3><span class="ipa">{{ v.ipa }}</span></div>
+        <div class="word-head"><h3>{{ v.word }}</h3><span class="ipa" *ngIf="v.ipa">{{ v.ipa }}</span></div>
         <small>{{ v.part_of_speech }}</small>
         <p><b>{{ v.meaning_vi }}</b></p>
         <div *ngFor="let e of v.examples">

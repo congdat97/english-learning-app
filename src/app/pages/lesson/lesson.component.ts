@@ -84,7 +84,7 @@ export class LessonComponent implements OnInit, OnDestroy {
       next: () => {
         v.is_bookmarked = !v.is_bookmarked;
         v.is_favorite = v.is_bookmarked;
-        this.learning.invalidateBookmarksCache();
+        this.learning.syncBookmarkCache(v, v.is_bookmarked);
       },
       error: () => window.alert('⚠️ Không lưu được trạng thái từ vựng (API chưa hoạt động) — thử lại sau.')
     });

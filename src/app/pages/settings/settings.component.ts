@@ -52,7 +52,14 @@ export class SettingsComponent implements OnInit {
         .sort((a, b) => a.name.localeCompare(b.name));
     };
     refresh();
-    speechSynthesis.onvoiceschanged = refresh;
+    speechSynthesis.addEventListener('voiceschanged', refresh);
+    // Chrome/Edge có lúc load danh sách giọng trễ -> thử lại vài lần
+    let tries = 0;
+    const timer = setInterval(() => {
+      tries++;
+      if (this.voices.length > 0 || tries >= 12) { clearInterval(timer); return; }
+      refresh();
+    }, 500);
   }
 
   /** Đọc câu mẫu bằng giọng hiện tại để kiểm tra. */

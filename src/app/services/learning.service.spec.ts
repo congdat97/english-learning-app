@@ -175,7 +175,7 @@ describe('LearningService', () => {
 
     it('ignores stale cache beyond max age', () => {
       const url = `${base}/courses`;
-      seedCache(url, { success: true, data: [{ id: 9, title: 'stale' }] }, Date.now() - 20 * 60 * 1000);
+      seedCache(url, { success: true, data: [{ id: 9, title: 'stale' }] }, Date.now() - 25 * 60 * 60 * 1000);
       const emissions: any[] = [];
       service.getCourses().subscribe(e => emissions.push(e));
       http.expectOne(url).flush({ success: true, data: [{ id: 9, title: 'fresh' }] });

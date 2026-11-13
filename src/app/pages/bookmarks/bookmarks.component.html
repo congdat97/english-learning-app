@@ -132,7 +132,7 @@
 
         <strong>
             {{ reminderLastWord.word }}
-            <em>{{ reminderLastWord.ipa }}</em>
+            <em *ngIf="reminderLastWord.ipa">{{ reminderLastWord.ipa }}</em>
         </strong>
 
         <span>
@@ -164,7 +164,7 @@
 <div *ngIf="slowApi && loading" class="slow-hint">⏳ API Render (bản miễn phí) đang khởi động sau khi ngủ — dữ liệu sẽ về trong 30–60 giây. Vui lòng đợi hoặc tải lại trang.</div>
 <div class="vocab-grid" *ngIf="!loading">
   <article *ngFor="let v of filtered" class="word-card">
-    <div class="word-head"><h3>{{ v.word }}</h3><span class="ipa">{{ v.ipa }}</span></div>
+    <div class="word-head"><h3>{{ v.word }}</h3><span class="ipa" *ngIf="v.ipa">{{ v.ipa }}</span></div>
     <small>{{ v.part_of_speech }}</small>
     <p><b>{{ v.meaning_vi }}</b></p>
     <div class="word-actions">

@@ -15,7 +15,7 @@ interface CacheEntry<T> {
 export class LearningService {
   private base = environment.apiUrl;
   private headers = new HttpHeaders({ 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' });
-  private readonly maxAgeMs = 10 * 60 * 1000;
+  private readonly maxAgeMs = 24 * 60 * 60 * 1000;
 
   constructor(private http: HttpClient) {}
 
@@ -155,15 +155,15 @@ export class LearningService {
     } catch {}
   }
 
-  /** Đồng bộ 1 từ trong cache sổ từ vựng sau khi toggle favorite. */
-  syncBookmarkCache(v: Vocabulary): void {
+  /** Đồng bộ 1 từ trong cache sổ từ vựng (saved=true: thêm vào, false: xóa đi). */
+  syncBookmarkCache(v: Vocabulary, saved: boolean): void {
     const url = 'api-cache:' + `${this.base}/vocabulary/bookmarks`;
     try {
       const raw = localStorage.getItem(url);
       if (!raw) return;
       const entry = JSON.parse(raw) as { ts: number; body: { success: boolean; data: Vocabulary[] } };
       const list = (entry.body?.data ?? []).filter(b => b.id !== v.id);
-      if (v.is_favorite) list.unshift(v);
+      if (saved) list.unshift({ ...v, is_bookmarked: true });
       entry.body.data = list;
       localStorage.setItem(url, JSON.stringify(entry));
     } catch {}
