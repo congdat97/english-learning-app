@@ -14,6 +14,7 @@ export class SettingsComponent implements OnInit {
   audioSpeed = 1;
   showTranslation = true;
   fontSize = 16;
+  theme = 'blue';
   voice = '';
 
   voices: SpeechSynthesisVoice[] = [];
@@ -26,9 +27,10 @@ export class SettingsComponent implements OnInit {
       this.audioSpeed = parsed.audioSpeed ?? this.audioSpeed;
       this.showTranslation = parsed.showTranslation ?? this.showTranslation;
       this.fontSize = parsed.fontSize ?? this.fontSize;
-      this.voice = parsed.voice ?? this.voice;
+      this.theme = parsed.theme ?? this.theme;
     }
     this.applyFontSize();
+    this.applyTheme();
     if (typeof speechSynthesis !== 'undefined') {
       this.voices = speechSynthesis.getVoices();
       speechSynthesis.onvoiceschanged = () => {
@@ -43,12 +45,26 @@ export class SettingsComponent implements OnInit {
       audioSpeed: this.audioSpeed,
       showTranslation: this.showTranslation,
       fontSize: this.fontSize,
-      voice: this.voice
+      theme: this.theme
     }));
     this.applyFontSize();
+    this.applyTheme();
   }
 
   private applyFontSize(): void {
     document.documentElement.style.fontSize = `${this.fontSize}px`;
+  }
+
+  private applyTheme(): void {
+    const themes: Record<string, Record<string, string>> = {
+      blue: { '--blue': '#5267e8', '--blue2': '#7485ff', '--pale': '#eef1ff' },
+      green: { '--blue': '#10b981', '--blue2': '#34d399', '--pale': '#e7f8f0' },
+      purple: { '--blue': '#7c3aed', '--blue2': '#a78bfa', '--pale': '#f2eaff' },
+      orange: { '--blue': '#f97316', '--blue2': '#fb923c', '--pale': '#fff0e6' }
+    };
+    const selected = themes[this.theme] || themes['blue'];
+    Object.keys(selected).forEach((key) => {
+      document.documentElement.style.setProperty(key, selected[key]);
+    });
   }
 }

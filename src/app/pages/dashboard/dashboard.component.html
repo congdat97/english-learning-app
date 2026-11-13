@@ -13,11 +13,13 @@
   <div class="stat"><div class="stat-icon">🔥</div><div><strong>1 ngày</strong><small>Hãy duy trì thói quen</small></div></div>
 </div>
 <div class="section-head"><div><h2>Khóa học của bạn</h2><p>Chọn chủ đề phù hợp để bắt đầu</p></div><a class="text-btn" routerLink="/courses">Xem tất cả →</a></div>
-<div class="course-grid" *ngIf="!loading">
+<div *ngIf="loading" class="loading">Đang tải khóa học...</div>
+<div *ngIf="error" class="error">Không tải được dữ liệu. <button (click)="load()">Thử lại</button></div>
+<div class="course-grid" *ngIf="!loading && !error && courses.length">
   <a *ngFor="let course of courses" [routerLink]="['/courses', course.id]" class="course">
     <div class="course-top"><div class="course-emoji" [style.background]="course.level === 'Beginner' ? '#fff0dc' : '#e8f7ef'">📘</div><span class="level">{{ course.level }}</span></div>
     <h3>{{ course.title }}</h3>
     <p>{{ course.description }}</p>
   </a>
 </div>
-<p *ngIf="loading">Loading...</p>
+<div *ngIf="!loading && !error && !courses.length" class="empty">Chưa có khóa học.</div>

@@ -1,2 +1,7 @@
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
 .grid a { display: block; padding: 16px; border: 1px solid #ddd; border-radius: 8px; text-decoration: none; color: inherit; }
+.loading, .error, .empty { padding: 16px; border-radius: 8px; margin: 12px 0; }
+.error { background: #fee2e2; color: #991b1b; }
+.loading { background: #eef2ff; color: #3730a3; }
+.empty { background: #f3f4f6; color: #374151; }
+.error button { margin-left: 8px; }
