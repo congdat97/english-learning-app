@@ -13,10 +13,6 @@ import { ThemeService } from '../../services/theme.service';
   styleUrl: './settings.component.css'
 })
 export class SettingsComponent implements OnInit {
-  dailyMinutes = 15;
-  audioSpeed = 1;
-  showTranslation = true;
-  fontSize = 16;
   voice = '';
   theme = 'mac-dinh';
 
@@ -30,26 +26,18 @@ export class SettingsComponent implements OnInit {
   constructor(private learning: LearningService, private settings: SettingsService) {}
 
   ngOnInit(): void {
+    const saved = this.settings.load();
+    this.voice = saved.voice;
+    this.theme = saved.theme;
     this.learning.getSettings().subscribe({
       next: (res) => {
         const data = res.data || {};
-        this.dailyMinutes = data.daily_minutes ?? this.dailyMinutes;
-        this.audioSpeed = data.audio_speed ?? this.audioSpeed;
-        this.showTranslation = data.show_translation ?? this.showTranslation;
-        this.fontSize = data.font_size ?? this.fontSize;
         this.voice = data.voice ?? this.voice;
         this.theme = data.theme ?? this.theme;
-        this.apply();
+        this.themeService.setTheme(this.theme);
       },
       error: () => {
-        const saved = this.settings.load();
-        this.dailyMinutes = saved.dailyMinutes;
-        this.audioSpeed = saved.audioSpeed;
-        this.showTranslation = saved.showTranslation;
-        this.fontSize = saved.fontSize;
-        this.voice = saved.voice;
-        this.theme = saved.theme;
-        this.apply();
+        // Đã dùng giá trị local ở trên
       }
     });
     this.loadVoices();
@@ -67,17 +55,12 @@ export class SettingsComponent implements OnInit {
     speechSynthesis.onvoiceschanged = refresh;
   }
 
-  /** Áp dụng thử ngay khi kéo thanh cỡ chữ. */
-  previewFontSize(): void {
-    this.settings.applyFontSize(this.fontSize);
-  }
-
-  /** Đọc câu mẫu bằng giọng + tốc độ hiện tại để kiểm tra trước khi lưu. */
+  /** Đọc câu mẫu bằng giọng hiện tại để kiểm tra. */
   testVoice(): void {
     if (typeof speechSynthesis === 'undefined') return;
     const utterance = new SpeechSynthesisUtterance("Hello! Let's learn English, step by step.");
     utterance.lang = 'en-US';
-    utterance.rate = this.audioSpeed;
+    utterance.rate = this.settings.audioSpeed;
     if (this.voice) {
       const v = speechSynthesis.getVoices().find(x => x.name === this.voice);
       if (v) utterance.voice = v;
@@ -90,11 +73,12 @@ export class SettingsComponent implements OnInit {
     if (this.saving) return;
     this.saving = true;
     this.saveMsg = '';
+    const current = this.settings.load();
     const payload = {
-      daily_minutes: this.dailyMinutes,
-      audio_speed: this.audioSpeed,
-      show_translation: this.showTranslation,
-      font_size: this.fontSize,
+      daily_minutes: current.dailyMinutes,
+      audio_speed: current.audioSpeed,
+      show_translation: current.showTranslation,
+      font_size: current.fontSize,
       voice: this.voice,
       theme: this.theme
     };
@@ -120,17 +104,9 @@ export class SettingsComponent implements OnInit {
 
   private persistLocal(): void {
     this.settings.save({
-      dailyMinutes: this.dailyMinutes,
-      audioSpeed: this.audioSpeed,
-      showTranslation: this.showTranslation,
-      fontSize: this.fontSize,
+      ...this.settings.load(),
       voice: this.voice,
       theme: this.theme
     });
-  }
-
-  private apply(): void {
-    this.settings.applyFontSize(this.fontSize);
-    // Theme do ThemeService quản lý (đã áp khi khởi động)
   }
 }
