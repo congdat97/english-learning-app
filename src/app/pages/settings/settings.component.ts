@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { LearningService } from '../../services/learning.service';
 import { SettingsService } from '../../services/settings.service';
+import { ThemeService } from '../../services/theme.service';
 
 @Component({
   selector: 'app-settings',
@@ -18,9 +19,10 @@ export class SettingsComponent implements OnInit {
   fontSize = 16;
   voice = '';
   theme = 'mac-dinh';
-  themePickerOpen = false;
 
   voices: SpeechSynthesisVoice[] = [];
+
+  readonly themeService = inject(ThemeService);
 
   constructor(private learning: LearningService, private settings: SettingsService) {}
 
@@ -70,18 +72,10 @@ export class SettingsComponent implements OnInit {
     });
   }
 
-  openThemePicker(): void {
-    this.themePickerOpen = true;
-  }
-
-  closeThemePicker(): void {
-    this.themePickerOpen = false;
-  }
-
   selectTheme(theme: string): void {
     this.theme = theme;
-    this.settings.applyTheme(theme);
-    this.themePickerOpen = false;
+    // Ủy quyền ThemeService (lưu localStorage elf-theme + data-mode)
+    this.themeService.setTheme(theme);
   }
 
   private persistLocal(): void {
@@ -97,6 +91,6 @@ export class SettingsComponent implements OnInit {
 
   private apply(): void {
     this.settings.applyFontSize(this.fontSize);
-    this.settings.applyTheme(this.theme);
+    // Theme do ThemeService quản lý (đã áp khi khởi động)
   }
 }

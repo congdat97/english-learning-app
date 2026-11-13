@@ -1,69 +1,156 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink, RouterOutlet } from '@angular/router';
-import { SettingsService } from './services/settings.service';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
-interface ThemeOption {
-  id: string;
-  name: string;
-  collection: string;
-  primary: string;
-  secondary: string;
-}
+import { Subscription } from 'rxjs';
+
+import { ThemeService } from './services/theme.service';
+import { OfflineDataService } from './services/offline-data.service';
+import { ReminderService } from './services/reminder.service';
+import { SettingsService } from './services/settings.service';
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, RouterLink, RouterOutlet],
+  imports: [CommonModule, RouterLink, RouterLinkActive, RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
 export class App implements OnInit {
+
+  private offlineDataService =
+    inject(OfflineDataService);
+
+  private readonly reminderService =
+    inject(ReminderService);
+
+  private readonly settings =
+    inject(SettingsService);
+
+  readonly theme =
+    inject(ThemeService);
+
+  private syncSubscription?: Subscription;
+
+  mobileMenuOpen = false;
+
   settingsOpen = false;
-  currentTheme = 'mac-dinh';
 
-  themes: ThemeOption[] = [
-    { id: 'mac-dinh', name: 'Mặc định', collection: 'Classic', primary: '#c66b2c', secondary: '#e8a34e' },
-    { id: 'tim-mong', name: 'Tím mộng', collection: 'Pastel', primary: '#6c5ce7', secondary: '#00b894' },
-    { id: 'may-sang', name: 'Mây sáng', collection: 'Sky', primary: '#2f80ed', secondary: '#22b8cf' },
-    { id: 'dem-than', name: 'Đêm thẳm', collection: 'Dark', primary: '#8b5cf6', secondary: '#2dd4bf' },
-    { id: 'hong-dao', name: 'Hồng đào', collection: 'Warm', primary: '#ec4899', secondary: '#fb923c' },
-    { id: 'dai-duong', name: 'Đại dương', collection: 'Ocean', primary: '#0369a1', secondary: '#06b6d4' },
-    { id: 'hoang-hon', name: 'Hoàng hôn', collection: 'Sunset', primary: '#f97316', secondary: '#f43f5e' },
-    { id: 'rung-thong', name: 'Rừng thông', collection: 'Nature', primary: '#059669', secondary: '#10b981' },
-    { id: 'sakura', name: 'Sakura', collection: 'Blossom', primary: '#ec4899', secondary: '#f9a8d4' },
-    { id: 'neon-dem', name: 'Neon đêm', collection: 'Neon', primary: '#22d3ee', secondary: '#a78bfa' },
-    { id: 'ca-phe', name: 'Cà phê', collection: 'Cozy', primary: '#92400e', secondary: '#d97706' },
-    { id: 'mat-ong', name: 'Mật ong', collection: 'Honey', primary: '#ca8a04', secondary: '#facc15' }
-  ];
+  // =====================================================
+  // SYNC STATUS
+  // =====================================================
 
-  constructor(private router: Router, private settings: SettingsService) {}
+  syncing = false;
+
+  syncError = '';
+
+  syncedAt = '--';
+
+  dataCount = 0;
 
   ngOnInit(): void {
-    const saved = this.settings.load();
-    this.currentTheme = saved.theme || 'mac-dinh';
-    this.settings.applyTheme(this.currentTheme);
-    this.settings.applyFontSize(saved.fontSize);
+
+    // Áp dụng cỡ chữ đã lưu
+    this.settings.applyFontSize(
+      this.settings.load().fontSize
+    );
+
+    // Tự động tải dữ liệu về
+    // localStorage nếu chưa có
+    this.offlineDataService
+      .ensureData()
+      .subscribe(() => this.refreshStatus());
+
+    // Khởi động nhắc học
+    // nếu đang bật từ trước
+    this.reminderService.initFromStorage();
+
   }
+
+
+  private refreshStatus(): void {
+
+    const meta =
+      this.offlineDataService.getMeta();
+
+    this.syncedAt =
+      meta.syncedAt
+        ? new Date(meta.syncedAt)
+          .toLocaleString('vi-VN')
+        : '--';
+
+    this.dataCount =
+      meta.counts.bookmarks ?? 0;
+
+  }
+
+
+  toggleMobileMenu(): void {
+    this.mobileMenuOpen = !this.mobileMenuOpen;
+  }
+
+  closeMobileMenu(): void {
+    this.mobileMenuOpen = false;
+  }
+
+
+  // =====================================================
+  // SETTINGS / THEME
+  // =====================================================
 
   openSettings(): void {
     this.settingsOpen = true;
   }
 
+
   closeSettings(): void {
     this.settingsOpen = false;
   }
 
+
   closeSettingsOnBackdrop(event: MouseEvent): void {
-    if ((event.target as HTMLElement).classList.contains('settings-overlay')) {
+
+    if (event.target === event.currentTarget) {
       this.closeSettings();
     }
+
   }
 
-  setTheme(id: string): void {
-    this.currentTheme = id;
-    this.settings.applyTheme(id);
-    const saved = this.settings.load();
-    saved.theme = id;
-    this.settings.save(saved);
+  /**
+   * Gọi API, tải mới dữ liệu
+   * và tạo lại JSON trong localStorage.
+   */
+  syncData(): void {
+
+    if (this.syncing) {
+      return;
+    }
+
+    this.syncing = true;
+
+    this.syncError = '';
+
+    this.syncSubscription = this
+      .offlineDataService
+      .syncAll()
+      .subscribe({
+        next: () => {
+
+          this.syncing = false;
+
+          this.refreshStatus();
+
+        },
+
+        error: () => {
+
+          this.syncing = false;
+
+          this.syncError =
+            'Không thể đồng bộ. API chưa sẵn sàng.';
+
+        }
+      });
+
   }
+
 }

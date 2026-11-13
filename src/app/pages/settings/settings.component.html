@@ -35,25 +35,32 @@
       </select>
     </div>
 
-    <div class="card">
+    <div class="card theme-card-block">
       <h3>Chủ đề màu</h3>
-      <p class="hint">Thay đổi màu giao diện</p>
-      <button class="primary" type="button" (click)="openThemePicker()">Chọn chủ đề</button>
-      <div class="theme-modal" *ngIf="themePickerOpen">
-        <div class="theme-backdrop" (click)="closeThemePicker()"></div>
-        <div class="theme-panel">
-          <h3>Chọn chủ đề màu</h3>
-          <div class="theme-grid">
-            <button *ngFor="let t of ['mac-dinh','tim-mong','may-sang','dem-than','hong-dao','dai-duong','hoang-hon','rung-thong','sakura','neon-dem','ca-phe','mat-ong']"
-                    type="button"
-                    class="theme-swatch"
-                    [attr.data-theme]="t"
-                    (click)="selectTheme(t)">
-              {{ t }}
-            </button>
-          </div>
-          <button class="text-btn" type="button" (click)="closeThemePicker()">Đóng</button>
-        </div>
+      <p class="hint">Thay đổi màu giao diện — hiện tại: {{ themeService.currentTheme.name }}</p>
+
+      <div class="settings-section-label">Chế độ hiển thị</div>
+      <div class="mode-switch">
+        <button type="button" class="mode-option" [class.active]="themeService.currentMode === 'light'" (click)="themeService.setMode('light')">☀️ Sáng</button>
+        <button type="button" class="mode-option" [class.active]="themeService.currentMode === 'dark'" (click)="themeService.setMode('dark')">🌙 Tối</button>
+      </div>
+
+      <div class="settings-section-label">Bảng màu giao diện</div>
+      <div class="theme-grid">
+        <button *ngFor="let t of themeService.themes"
+                type="button"
+                class="theme-card"
+                [class.active]="themeService.currentTheme.id === t.id"
+                (click)="selectTheme(t.id)">
+          <span class="theme-check">✓</span>
+          <span class="theme-swatch" [style.background]="'linear-gradient(135deg, ' + t.primary + ', ' + t.secondary + ')'">
+            <span class="theme-swatch-bar"></span>
+            <span class="theme-swatch-bar" style="opacity:.55"></span>
+            <span class="theme-swatch-bar" style="opacity:.3"></span>
+          </span>
+          <span class="theme-name">{{ t.name }} <em class="theme-badge">{{ t.collection }}</em></span>
+          <span class="theme-sub">{{ t.primary }} · {{ t.secondary }}</span>
+        </button>
       </div>
     </div>
 

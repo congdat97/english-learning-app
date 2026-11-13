@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { ThemeService } from './theme.service';
 
 export interface LearningSettings {
   dailyMinutes: number;
@@ -22,6 +23,8 @@ const DEFAULTS: LearningSettings = {
 export class SettingsService {
   private key = 'learning-settings';
 
+  constructor(private themeService: ThemeService) {}
+
   load(): LearningSettings {
     try {
       const saved = localStorage.getItem(this.key);
@@ -37,7 +40,8 @@ export class SettingsService {
   }
 
   applyTheme(theme: string): void {
-    document.documentElement.setAttribute('data-theme', theme);
+    // Ủy quyền cho ThemeService (quản lý data-theme + data-mode)
+    this.themeService.setTheme(theme);
   }
 
   applyFontSize(size: number): void {

@@ -1,5 +1,165 @@
+<!-- ================================================= -->
+<!-- REMINDER -->
+<!-- ================================================= -->
+
+<section class="reminder-card">
+
+    <div class="reminder-icon">
+        ⏰
+    </div>
+
+    <div class="reminder-info">
+
+        <strong>
+            {{ reminderTitle }}
+        </strong>
+
+        <small *ngIf="!testMsg && !reminderHint">
+            {{ reminderSubtitle }}
+        </small>
+
+        <small
+            class="hint-ok"
+            *ngIf="testMsg">
+            {{ testMsg }}
+        </small>
+
+        <small
+            class="hint-error"
+            *ngIf="reminderHint">
+            {{ reminderHint }}
+        </small>
+
+    </div>
+
+    <button
+        type="button"
+        class="reminder-test-btn"
+        title="Gửi thử 1 thông báo ngay"
+        [disabled]="reminderTestBusy"
+        (click)="testNotification()">
+
+        {{ reminderTestBusy ? '⏳ Đang gửi...' : '🔔 Gửi thử' }}
+
+    </button>
+
+    <button
+        type="button"
+        class="reminder-toggle"
+        [class.on]="reminderEnabled"
+        [disabled]="reminderBusy"
+        (click)="toggleReminder()">
+
+        <span class="knob"></span>
+
+        <span class="label">
+            {{ reminderEnabled ? 'Đang bật' : 'Tắt' }}
+        </span>
+
+    </button>
+
+    <!-- LỊCH NHẮC: khoảng lặp + giờ cố định -->
+    <div class="reminder-settings">
+
+        <label class="set-item">
+            <span>Lặp lại</span>
+
+            <select
+                [value]="reminderInterval"
+                (change)="onReminderIntervalChange($event)">
+                <option [value]="0">Không lặp</option>
+                <option [value]="10">Mỗi 10 phút</option>
+                <option [value]="15">Mỗi 15 phút</option>
+                <option [value]="30">Mỗi 30 phút</option>
+                <option [value]="45">Mỗi 45 phút</option>
+                <option [value]="60">Mỗi 1 giờ</option>
+                <option [value]="120">Mỗi 2 giờ</option>
+            </select>
+        </label>
+
+        <div class="set-item set-times">
+            <span>Giờ cố định</span>
+
+            <div class="daily-row">
+
+                <button
+                    type="button"
+                    class="daily-chip"
+                    *ngFor="let t of reminderDailyTimes"
+                    [title]="'Xóa lịch ' + t"
+                    (click)="removeDailyTime(t)">
+                    {{ t }} <i>✕</i>
+                </button>
+
+                <input
+                    #dailyTimeInput
+                    type="time"
+                    class="daily-input"
+                    aria-label="Chọn giờ nhắc">
+
+                <button
+                    type="button"
+                    class="daily-add"
+                    (click)="addDailyTime(dailyTimeInput.value, dailyTimeInput)">
+                    ＋ Thêm
+                </button>
+
+            </div>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================================================= -->
+<!-- REMINDER LAST WORD -->
+<!-- ================================================= -->
+
+<section
+    class="reminder-lastword"
+    *ngIf="reminderLastWord">
+
+    <div class="lastword-icon">
+        🔔
+    </div>
+
+    <div class="lastword-info">
+
+        <small>
+            Nhắc lúc {{ reminderLastTime }}
+        </small>
+
+        <strong>
+            {{ reminderLastWord.word }}
+            <em>{{ reminderLastWord.ipa }}</em>
+        </strong>
+
+        <span>
+            {{ reminderLastWord.meaning_vi }}
+        </span>
+
+    </div>
+
+    <button
+        type="button"
+        class="lastword-speak"
+        title="Đọc từ"
+        (click)="speak(reminderLastWord.word)">
+
+        🔊
+
+    </button>
+
+</section>
+
+
+<!-- ================================================= -->
+<!-- HEADER -->
+<!-- ================================================= -->
+
 <div class="section-head"><div><h2>Sổ từ vựng cá nhân</h2><p>Những từ bạn đã đánh dấu để ôn tập</p></div></div>
-<input placeholder="Tìm từ vựng..." style="width:100%;padding:12px;border:1px solid var(--line);border-radius:11px;margin-bottom:14px" [(ngModel)]="search" (ngModelChange)="applyFilter()" />
+<input placeholder="Tìm từ vựng..." style="width:100%;padding:12px;border:1px solid var(--border);border-radius:11px;margin-bottom:14px;background:var(--surface);color:var(--text)" [(ngModel)]="search" (ngModelChange)="applyFilter()" />
 <p *ngIf="loading">Loading...</p>
 <div class="vocab-grid" *ngIf="!loading">
   <article *ngFor="let v of filtered" class="word-card">

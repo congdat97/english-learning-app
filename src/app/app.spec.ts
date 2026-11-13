@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { App } from './app';
 import { routes } from './app.routes';
-import { SettingsService } from './services/settings.service';
+import { ThemeService } from './services/theme.service';
 
 describe('App', () => {
   beforeEach(async () => {
@@ -26,19 +26,20 @@ describe('App', () => {
     expect(compiled.querySelector('nav')).toBeTruthy();
   });
 
-  it('renders exactly one bottom-nav', async () => {
+  it('renders the sticky header', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelectorAll('.bottom-nav').length).toBe(1);
+    expect(compiled.querySelectorAll('header.top').length).toBe(1);
   });
 
   it('applies saved theme on init', () => {
-    localStorage.setItem('learning-settings', JSON.stringify({ theme: 'tim-mong' }));
+    localStorage.setItem('elf-theme', 'tim-mong');
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();
     expect(document.documentElement.getAttribute('data-theme')).toBe('tim-mong');
-    expect(fixture.componentInstance.currentTheme).toBe('tim-mong');
+    const theme = TestBed.inject(ThemeService);
+    expect(theme.currentTheme.id).toBe('tim-mong');
   });
 
   it('opens and closes the settings popup', () => {
@@ -54,29 +55,42 @@ describe('App', () => {
   it('closes popup when clicking the backdrop only', () => {
     const fixture = TestBed.createComponent(App);
     const app = fixture.componentInstance;
+    const backdrop = {} as MouseEvent['target'];
     app.settingsOpen = true;
-    app.closeSettingsOnBackdrop({ target: { classList: { contains: () => true } } } as unknown as MouseEvent);
+    app.closeSettingsOnBackdrop({ target: backdrop, currentTarget: backdrop } as unknown as MouseEvent);
     expect(app.settingsOpen).toBe(false);
     app.settingsOpen = true;
-    app.closeSettingsOnBackdrop({ target: { classList: { contains: () => false } } } as unknown as MouseEvent);
+    app.closeSettingsOnBackdrop({ target: {}, currentTarget: {} } as unknown as MouseEvent);
     expect(app.settingsOpen).toBe(true);
   });
 
-  it('setTheme updates state and persists to localStorage', () => {
+  it('theme.setTheme updates state and persists to localStorage', () => {
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();
-    const app = fixture.componentInstance;
-    app.setTheme('hoang-hon');
-    expect(app.currentTheme).toBe('hoang-hon');
-    const saved = JSON.parse(localStorage.getItem('learning-settings') || '{}');
-    expect(saved.theme).toBe('hoang-hon');
+    const theme = TestBed.inject(ThemeService);
+    theme.setTheme('hoang-hon');
+    expect(theme.currentTheme.id).toBe('hoang-hon');
+    expect(localStorage.getItem('elf-theme')).toBe('hoang-hon');
     const applied = document.documentElement.getAttribute('data-theme');
     expect(applied).toBe('hoang-hon');
   });
 
+  it('theme.setMode toggles light/dark and persists', () => {
+    const fixture = TestBed.createComponent(App);
+    fixture.detectChanges();
+    const theme = TestBed.inject(ThemeService);
+    theme.setMode('dark');
+    expect(document.documentElement.getAttribute('data-mode')).toBe('dark');
+    expect(localStorage.getItem('elf-mode')).toBe('dark');
+    theme.setMode('light');
+    expect(document.documentElement.getAttribute('data-mode')).toBe('light');
+  });
+
   it('lists 12 themes with unique ids', () => {
     const fixture = TestBed.createComponent(App);
-    const ids = fixture.componentInstance.themes.map(t => t.id);
+    fixture.detectChanges();
+    const theme = TestBed.inject(ThemeService);
+    const ids = theme.themes.map(t => t.id);
     expect(ids.length).toBe(12);
     expect(new Set(ids).size).toBe(12);
   });

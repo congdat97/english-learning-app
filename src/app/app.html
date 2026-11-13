@@ -1,64 +1,274 @@
-<div class="app">
-  <aside class="sidebar">
-    <div class="brand"><div class="logo">✦</div> English Step by Step</div>
-    <div>
-      <div class="nav-label">MENU CHÍNH</div>
-      <nav class="nav">
-        <a routerLink="/dashboard" routerLinkActive="active"><span class="nav-icon">⌂</span>Trang chủ</a>
-        <a routerLink="/courses" routerLinkActive="active"><span class="nav-icon">▤</span>Khóa học</a>
-        <a routerLink="/bookmarks" routerLinkActive="active"><span class="nav-icon">◇</span>Sổ từ vựng</a>
-        <a routerLink="/progress" routerLinkActive="active"><span class="nav-icon">◷</span>Tiến độ</a>
-        <a routerLink="/settings" routerLinkActive="active"><span class="nav-icon">⚙</span>Cài đặt</a>
-      </nav>
+<header class="top">
+
+  <!-- ============================================= -->
+  <!-- BRAND -->
+  <!-- ============================================= -->
+
+  <a routerLink="/dashboard" class="brand">
+
+    <div class="brand-icon">
+      A
     </div>
-    <div class="sidebar-bottom">
-      <strong>🌱 Mỗi ngày một chút</strong>
-      <p>Học đều đặn để tiến bộ từng bước.</p>
-      <div class="mini-progress"><span style="width:12%"></span></div>
+
+    <div class="brand-text">
+      <strong>English Step by Step</strong>
+      <small>Học tiếng Anh từng bước nhỏ mỗi ngày</small>
     </div>
-  </aside>
-  <main>
-    <header class="topbar">
-      <div>
-        <div class="eyebrow">THỨ TỐT ĐẸP BẮT ĐẦU TỪ NHỮNG ĐIỀU NHỎ</div>
-        <h1>Chào mừng bạn trở lại! 👋</h1>
-      </div>
-      <div class="profile">
-        <button type="button" class="settings-button" (click)="openSettings()" aria-label="Cài đặt giao diện">⚙️</button>
-        <span>Người học mới</span><div class="avatar">A</div>
-      </div>
-    </header>
-    <router-outlet />
-  </main>
-  <nav class="bottom-nav">
-    <a routerLink="/dashboard" routerLinkActive="active"><span>🏠</span><small>Home</small></a>
-    <a routerLink="/courses" routerLinkActive="active"><span>📚</span><small>Courses</small></a>
-    <a routerLink="/bookmarks" routerLinkActive="active"><span>⭐</span><small>Saved</small></a>
-    <a routerLink="/progress" routerLinkActive="active"><span>📊</span><small>Progress</small></a>
-    <a routerLink="/settings" routerLinkActive="active"><span>⚙️</span><small>Settings</small></a>
+
+  </a>
+
+
+  <!-- ============================================= -->
+  <!-- MENU -->
+  <!-- ============================================= -->
+
+  <nav class="main-nav" [class.mobile-open]="mobileMenuOpen">
+
+    <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-item"
+      (click)="closeMobileMenu()">
+      <span class="nav-icon">🏠</span>
+
+      <span class="nav-text">
+        Trang chủ
+      </span>
+    </a>
+
+    <a routerLink="/courses" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-item"
+      (click)="closeMobileMenu()">
+      <span class="nav-icon">📚</span>
+
+      <span class="nav-text">
+        Khóa học
+      </span>
+    </a>
+
+    <a routerLink="/bookmarks" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-item"
+      (click)="closeMobileMenu()">
+
+      <span class="nav-icon">⭐</span>
+
+      <span class="nav-text">
+        Sổ từ vựng
+      </span>
+    </a>
+
+    <a routerLink="/progress" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-item"
+      (click)="closeMobileMenu()">
+      <span class="nav-icon">📊</span>
+
+      <span class="nav-text">
+        Tiến độ
+      </span>
+    </a>
+
+
+    <div class="nav-divider"></div>
+
+
+    <a routerLink="/settings" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-item"
+      (click)="closeMobileMenu()">
+      <span class="nav-icon">⚙️</span>
+
+      <span class="nav-text">
+        Cài đặt
+      </span>
+    </a>
+
   </nav>
 
-  <div class="settings-overlay" [class.open]="settingsOpen" (click)="closeSettingsOnBackdrop($event)">
-    <div class="settings-modal" role="dialog" aria-label="Cài đặt giao diện">
-      <div class="settings-head">
-        <h2>🎨 Cài đặt</h2>
-        <button type="button" class="settings-close" (click)="closeSettings()" aria-label="Đóng">✕</button>
-      </div>
-      <p class="settings-sub">Tùy chỉnh giao diện theo ý bạn.</p>
-      <div class="settings-section-label">Bảng màu giao diện</div>
-      <div class="theme-grid">
-        <button type="button" class="theme-card" *ngFor="let t of themes" [class.active]="currentTheme === t.id" (click)="setTheme(t.id)" [style.--tc]="t.primary">
-          <span class="theme-check">✓</span>
-          <div class="theme-swatch" [style.background]="'linear-gradient(135deg, ' + t.primary + ', ' + t.secondary + ')'">
-            <div class="theme-swatch-bar"></div>
-            <div class="theme-swatch-bar" style="opacity:.55"></div>
-            <div class="theme-swatch-bar" style="opacity:.3"></div>
-          </div>
-          <div class="theme-name">{{ t.name }} <span class="theme-badge">{{ t.collection }}</span></div>
-          <div class="theme-sub">{{ t.primary }} · {{ t.secondary }}</div>
-          <div class="theme-dots"><span [style.background]="t.primary"></span><span [style.background]="t.secondary"></span></div>
-        </button>
-      </div>
+
+  <!-- ============================================= -->
+  <!-- RIGHT -->
+  <!-- ============================================= -->
+
+  <div class="header-right">
+
+    <div class="local" [title]="'Đồng bộ gần nhất: ' + syncedAt">
+      <span [class.offline-dot]="!syncing">{{ dataCount ? (syncing ? '🔄' : '🟢') : '🟡' }} {{ dataCount || 'Chưa có' }}</span>
     </div>
+
+    <!-- SYNC -->
+    <button
+      type="button"
+      class="sync-button"
+      [class.syncing]="syncing"
+      [class.has-error]="syncError"
+      [disabled]="syncing"
+      (click)="syncData()"
+      [title]="syncing
+        ? 'Đang đồng bộ...'
+        : 'Đồng bộ dữ liệu (lần cuối: ' + syncedAt + ')'">
+
+      <!-- ICON -->
+      <span class="sync-icon">{{ syncing ? '⏳' : '🔄' }}</span>
+
+      <!-- STATUS DOT -->
+      <span
+        class="sync-dot"
+        [class.error]="syncError"
+        [class.empty]="!dataCount">
+      </span>
+
+    </button>
+
+
+    <!-- SETTINGS / THEME -->
+    <button
+      type="button"
+      class="settings-button"
+      (click)="openSettings()"
+      title="Cài đặt giao diện"
+      aria-label="Cài đặt giao diện">
+
+      <span>⚙️</span>
+
+    </button>
+
+
+    <div
+      *ngIf="syncError"
+      class="sync-error"
+      (click)="syncError = ''">
+
+      {{ syncError }}
+
+    </div>
+
+
+    <!-- MOBILE MENU -->
+    <button type="button" class="menu-button" aria-label="Mở menu" (click)="toggleMobileMenu()">
+      {{ mobileMenuOpen ? '✕' : '☰' }}
+    </button>
+
   </div>
+
+</header>
+
+
+<!-- ============================================= -->
+<!-- PAGE -->
+<!-- ============================================= -->
+
+<main class="page-content">
+
+  <div class="app-main">
+
+    <router-outlet />
+
+  </div>
+
+</main>
+
+
+<!-- ============================================= -->
+<!-- SETTINGS MODAL (THEME)                        -->
+<!-- ============================================= -->
+
+<div
+  class="settings-overlay"
+  [class.open]="settingsOpen"
+  (click)="closeSettingsOnBackdrop($event)">
+
+  <div class="settings-modal" role="dialog" aria-label="Cài đặt giao diện">
+
+    <div class="settings-head">
+
+      <h2>⚙️ Cài đặt</h2>
+
+      <button
+        type="button"
+        class="settings-close"
+        (click)="closeSettings()"
+        aria-label="Đóng">
+
+        ✕
+
+      </button>
+
+    </div>
+
+    <p class="settings-sub">
+      Tùy chỉnh giao diện ứng dụng theo ý bạn.
+    </p>
+
+
+    <!-- LIGHT / DARK -->
+    <div class="settings-section-label">
+      Chế độ hiển thị
+    </div>
+
+    <div class="mode-switch">
+
+      <button
+        type="button"
+        class="mode-option"
+        [class.active]="theme.currentMode === 'light'"
+        (click)="theme.setMode('light')">
+
+        ☀️ Sáng
+
+      </button>
+
+      <button
+        type="button"
+        class="mode-option"
+        [class.active]="theme.currentMode === 'dark'"
+        (click)="theme.setMode('dark')">
+
+        🌙 Tối
+
+      </button>
+
+    </div>
+
+
+    <!-- THEME GRID -->
+    <div class="settings-section-label">
+      Bảng màu giao diện
+    </div>
+
+    <div class="theme-grid">
+
+      <button
+        type="button"
+        class="theme-card"
+        *ngFor="let t of theme.themes"
+        [class.active]="theme.currentTheme.id === t.id"
+        (click)="theme.setTheme(t.id)">
+
+        <span class="theme-check">✓</span>
+
+        <div
+          class="theme-swatch"
+          [style.background]="'linear-gradient(135deg, ' + t.primary + ', ' + t.secondary + ')'">
+
+          <div class="theme-swatch-bar"></div>
+          <div class="theme-swatch-bar" style="opacity: .55"></div>
+          <div class="theme-swatch-bar" style="opacity: .3"></div>
+
+        </div>
+
+        <div class="theme-name">
+
+          {{ t.name }}
+
+          <span class="theme-badge">{{ t.collection }}</span>
+
+        </div>
+
+        <div class="theme-sub">{{ t.primary }} · {{ t.secondary }}</div>
+
+        <div class="theme-dots">
+
+          <span [style.background]="t.primary"></span>
+          <span [style.background]="t.secondary"></span>
+
+        </div>
+
+      </button>
+
+    </div>
+
+  </div>
+
 </div>
