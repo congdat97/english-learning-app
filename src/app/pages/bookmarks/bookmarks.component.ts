@@ -103,6 +103,7 @@ export class BookmarksComponent implements OnInit, OnDestroy {
     this.learning.unbookmark(v.id).subscribe({
       next: () => {
         this.bookmarks = this.bookmarks.filter(b => b.id !== v.id);
+        this.learning.updateCachedBookmarks(this.bookmarks);
         this.applyFilter();
       },
       error: () => window.alert('⚠️ Không xóa được từ khỏi sổ từ vựng (API chưa hoạt động) — thử lại sau.')

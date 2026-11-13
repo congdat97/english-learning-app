@@ -63,6 +63,27 @@ describe('LearningService', () => {
     http.expectOne(`${base}/lessons/3/progress`).flush({ success: true, data: null });
   });
 
+  it('getAllProgress builds /lessons/progress/all', () => {
+    service.getAllProgress().subscribe();
+    const req = http.expectOne(`${base}/lessons/progress/all`);
+    expect(req.request.method).toBe('GET');
+    req.flush({ success: true, data: [] });
+  });
+
+  it('invalidateProgressCache removes the bulk progress cache', () => {
+    localStorage.setItem('api-cache:' + `${base}/lessons/progress/all`, JSON.stringify({ ts: Date.now(), body: { success: true, data: [] } }));
+    service.invalidateProgressCache();
+    expect(localStorage.getItem('api-cache:' + `${base}/lessons/progress/all`)).toBeNull();
+  });
+
+  it('updateCachedBookmarks rewrites the bookmarks cache when it exists', () => {
+    const url = 'api-cache:' + `${base}/vocabulary/bookmarks`;
+    localStorage.setItem(url, JSON.stringify({ ts: Date.now(), body: { success: true, data: [] } }));
+    service.updateCachedBookmarks([{ id: 1 } as any]);
+    const saved = JSON.parse(localStorage.getItem(url) || '{}');
+    expect(saved.body.data.length).toBe(1);
+  });
+
   it('saveProgress posts the correct payload', () => {
     service.saveProgress(3, 'completed', 2, 4).subscribe();
     const req = http.expectOne(`${base}/lessons/3/progress`);

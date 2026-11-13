@@ -101,6 +101,16 @@ export class LearningService {
     return this.cachedGet<UserProgress | null>(`${this.base}/lessons/${lessonId}/progress`);
   }
 
+  /** Lấy tiến độ của TẤT CẢ lesson trong 1 request duy nhất. */
+  getAllProgress(): Observable<ApiResult<UserProgress[]>> {
+    return this.cachedGet<UserProgress[]>(`${this.base}/lessons/progress/all`);
+  }
+
+  /** Xóa cache tiến độ tổng (gọi sau khi lưu tiến độ mới). */
+  invalidateProgressCache(): void {
+    try { localStorage.removeItem('api-cache:' + `${this.base}/lessons/progress/all`); } catch {}
+  }
+
   saveProgress(lessonId: number, status: string, score: number, total: number): Observable<ApiResult<UserProgress>> {
     return this.http.post<ApiResult<UserProgress>>(`${this.base}/lessons/${lessonId}/progress`, {
       status, score, total_questions: total
@@ -129,5 +139,28 @@ export class LearningService {
 
   unbookmark(vocabularyId: number): Observable<{ success: boolean }> {
     return this.http.delete<{ success: boolean }>(`${this.base}/vocabulary/${vocabularyId}/bookmark`);
+  }
+
+  /** Cập nhật cache sổ từ vựng ngay sau khi thêm/xóa bookmark. */
+  updateCachedBookmarks(list: Vocabulary[]): void {
+    const url = 'api-cache:' + `${this.base}/vocabulary/bookmarks`;
+    try {
+      const raw = localStorage.getItem(url);
+      if (raw) localStorage.setItem(url, JSON.stringify({ ts: Date.now(), body: { success: true, data: list } }));
+    } catch {}
+  }
+
+  /** Đồng bộ 1 từ trong cache sổ từ vựng sau khi toggle favorite. */
+  syncBookmarkCache(v: Vocabulary): void {
+    const url = 'api-cache:' + `${this.base}/vocabulary/bookmarks`;
+    try {
+      const raw = localStorage.getItem(url);
+      if (!raw) return;
+      const entry = JSON.parse(raw) as { ts: number; body: { success: boolean; data: Vocabulary[] } };
+      const list = (entry.body?.data ?? []).filter(b => b.id !== v.id);
+      if (v.is_favorite) list.unshift(v);
+      entry.body.data = list;
+      localStorage.setItem(url, JSON.stringify(entry));
+    } catch {}
   }
 }
