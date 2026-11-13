@@ -4,6 +4,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ActivatedRoute } from '@angular/router';
 import { environment } from '../../../environments/environment';
+import { AuthService } from '../../services/auth.service';
 import { LessonComponent } from './lesson.component';
 import { ReviewQuestion } from '../../models/learning.model';
 
@@ -32,6 +33,12 @@ describe('LessonComponent', () => {
     fixture = TestBed.createComponent(LessonComponent);
     component = fixture.componentInstance;
     http = TestBed.inject(HttpTestingController);
+    // Đăng nhập giả để test được luồng lưu tiến độ theo user
+    TestBed.inject(AuthService).login('tester', '123456').subscribe();
+    http.expectOne(`${base}/auth/login`).flush({
+      success: true,
+      data: { token: 't', user: { id: 9, username: 'tester', role: 'user' } }
+    });
   });
 
   afterEach(() => http.verify());

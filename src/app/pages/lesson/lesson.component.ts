@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { LearningService } from '../../services/learning.service';
 import { SettingsService } from '../../services/settings.service';
+import { AuthService } from '../../services/auth.service';
 import { Lesson, Vocabulary, Listening, ReviewQuestion } from '../../models/learning.model';
 
 @Component({
@@ -39,7 +40,7 @@ export class LessonComponent implements OnInit, OnDestroy {
 
   /** Chá»‰ alert 1 láº§n má»—i phiÃªn Ä‘á»ƒ khÃ´ng spam. */
 
-  constructor(private route: ActivatedRoute, private learning: LearningService, private settings: SettingsService) {}
+  constructor(private route: ActivatedRoute, private learning: LearningService, private settings: SettingsService, private auth: AuthService) {}
 
   ngOnInit(): void {
     this.speed = this.settings.audioSpeed;
@@ -91,6 +92,10 @@ export class LessonComponent implements OnInit, OnDestroy {
   }
 
   toggleFavorite(v: Vocabulary): void {
+    if (!this.auth.isLoggedIn()) {
+      window.alert('🔐 Cần đăng nhập để lưu từ vào sổ từ vựng. Bấm "Đăng nhập" trên đầu trang.');
+      return;
+    }
     const req$ = v.is_bookmarked
       ? this.learning.unbookmark(v.id)
       : this.learning.bookmark(v.id);
@@ -98,9 +103,9 @@ export class LessonComponent implements OnInit, OnDestroy {
       next: () => {
         v.is_bookmarked = !v.is_bookmarked;
         v.is_favorite = v.is_bookmarked;
-        this.learning.syncBookmarkCache(v, v.is_bookmarked);
+        this.learning.invalidateBookmarksCache();
       },
-      error: () => window.alert('âš ï¸ KhÃ´ng lÆ°u Ä‘Æ°á»£c tráº¡ng thÃ¡i tá»« vá»±ng (API chÆ°a hoáº¡t Ä‘á»™ng) â€” thá»­ láº¡i sau.')
+      error: () => window.alert('⚠️ Không lưu được trạng thái từ vựng (API chưa hoạt động) — thử lại sau.')
     });
   }
 
@@ -188,9 +193,13 @@ export class LessonComponent implements OnInit, OnDestroy {
     this.submitted = true;
     this.score = this.review.filter(q => this.answers[q.id] === q.answer).length;
     if (this.lesson) {
+      if (!this.auth.isLoggedIn()) {
+        window.alert(`✅ Hoàn thành bài học! Điểm: ${this.score}/${this.review.length}. Đăng nhập để lưu tiến độ vào tài khoản.`);
+        return;
+      }
       this.learning.saveProgress(this.lesson.id, 'completed', this.score, this.review.length).subscribe({
-        next: () => { this.learning.invalidateProgressCache(); window.alert(`âœ… HoÃ n thÃ nh bÃ i há»c! Äiá»ƒm: ${this.score}/${this.review.length} (Ä‘Ã£ lÆ°u tiáº¿n Ä‘á»™).`); },
-        error: () => window.alert(`âš ï¸ KhÃ´ng lÆ°u Ä‘Æ°á»£c tiáº¿n Ä‘á»™ lÃªn server (API chÆ°a hoáº¡t Ä‘á»™ng) â€” Ä‘iá»ƒm ${this.score}/${this.review.length} chá»‰ hiá»ƒn thá»‹ táº¡m thá»i.`)
+        next: () => { this.learning.invalidateProgressCache(); window.alert(`✅ Hoàn thành bài học! Điểm: ${this.score}/${this.review.length} (đã lưu tiến độ).`); },
+        error: () => window.alert(`⚠️ Không lưu được tiến độ lên server (API chưa hoạt động) — điểm ${this.score}/${this.review.length} chỉ hiển thị tạm thời.`)
       });
     }
   }

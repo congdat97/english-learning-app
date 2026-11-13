@@ -4,9 +4,13 @@ import {
   HttpResponse
 } from '@angular/common/http';
 
+import { inject } from '@angular/core';
+
 import { of } from 'rxjs';
 
 import { tap } from 'rxjs/operators';
+
+import { AuthService } from '../services/auth.service';
 
 /**
  * CACHE-FIRST + STALE-WHILE-REVALIDATE
@@ -180,7 +184,12 @@ function toResponse(
 
 export const cacheInterceptor: HttpInterceptorFn = (req, next) => {
 
-  const key = req.urlWithParams;
+  // Cache phân theo user đăng nhập để không lẫn dữ liệu giữa các tài khoản
+  const auth = inject(AuthService);
+
+  const uid = auth.currentUser()?.id;
+
+  const key = (uid ? uid + ':' : '') + req.urlWithParams;
 
   // ===== GHI: không cache, chỉ xóa cache cùng nhóm khi thành công =====
   if (req.method !== 'GET') {

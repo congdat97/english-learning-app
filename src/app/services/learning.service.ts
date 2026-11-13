@@ -1,8 +1,9 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, shareReplay, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
+import { AuthService } from './auth.service';
 import { Course, Lesson, Listening, ReviewQuestion, UserProgress, Vocabulary } from '../models/learning.model';
 
 type ApiResult<T> = { success: boolean; data: T };
@@ -21,7 +22,15 @@ export class LearningService {
   /** Các GET đang chạy: nhiều nơi gọi cùng lúc thì share 1 kết nối. */
   private inflight = new Map<string, Observable<ApiResult<unknown>>>();
 
+  private auth = inject(AuthService);
+
   constructor(private http: HttpClient) {}
+
+  /** Cache phân theo user — user A không thấy cache của user B. */
+  private cacheKey(url: string): string {
+    const uid = this.auth.currentUser()?.id;
+    return 'api-cache:' + (uid ? uid + ':' : '') + url;
+  }
 
   private fetchAndCache<T>(url: string): Observable<ApiResult<T>> {
     const existing = this.inflight.get(url) as Observable<ApiResult<T>> | undefined;
@@ -30,7 +39,7 @@ export class LearningService {
     const obs = this.http.get<ApiResult<T>>(url, { headers: this.headers }).pipe(
       tap({
         next: body => {
-          try { localStorage.setItem('api-cache:' + url, JSON.stringify({ ts: Date.now(), body })); } catch {}
+          try { localStorage.setItem(this.cacheKey(url), JSON.stringify({ ts: Date.now(), body })); } catch {}
         },
         finalize: () => this.inflight.delete(url)
       }),
@@ -48,7 +57,7 @@ export class LearningService {
    */
   private cachedGet<T>(url: string): Observable<ApiResult<T>> {
     return new Observable<ApiResult<T>>(observer => {
-      const key = 'api-cache:' + url;
+      const key = this.cacheKey(url);
       let cached: CacheEntry<T> | null = null;
       try {
         const raw = localStorage.getItem(key);
@@ -127,12 +136,12 @@ export class LearningService {
 
   /** Xóa cache tiến độ tổng (gọi sau khi lưu tiến độ mới). */
   invalidateProgressCache(): void {
-    try { localStorage.removeItem('api-cache:' + `${this.base}/lessons/progress/all`); } catch {}
+    try { localStorage.removeItem(this.cacheKey(`${this.base}/lessons/progress/all`)); } catch {}
   }
 
   /** Xóa cache sổ từ vựng (gọi sau khi thêm/xóa bookmark). */
   invalidateBookmarksCache(): void {
-    try { localStorage.removeItem('api-cache:' + `${this.base}/vocabulary/bookmarks`); } catch {}
+    try { localStorage.removeItem(this.cacheKey(`${this.base}/vocabulary/bookmarks`)); } catch {}
   }
 
   saveProgress(lessonId: number, status: string, score: number, total: number): Observable<ApiResult<UserProgress>> {
@@ -167,7 +176,7 @@ export class LearningService {
 
   /** Cập nhật cache sổ từ vựng ngay sau khi thêm/xóa bookmark. */
   updateCachedBookmarks(list: Vocabulary[]): void {
-    const url = 'api-cache:' + `${this.base}/vocabulary/bookmarks`;
+    const url = this.cacheKey(`${this.base}/vocabulary/bookmarks`);
     try {
       const raw = localStorage.getItem(url);
       if (raw) localStorage.setItem(url, JSON.stringify({ ts: Date.now(), body: { success: true, data: list } }));
@@ -176,7 +185,7 @@ export class LearningService {
 
   /** Đồng bộ 1 từ trong cache sổ từ vựng (saved=true: thêm vào, false: xóa đi). */
   syncBookmarkCache(v: Vocabulary, saved: boolean): void {
-    const url = 'api-cache:' + `${this.base}/vocabulary/bookmarks`;
+    const url = this.cacheKey(`${this.base}/vocabulary/bookmarks`);
     try {
       const raw = localStorage.getItem(url);
       if (!raw) return;
