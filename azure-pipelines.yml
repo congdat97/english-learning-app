@@ -155,3 +155,4 @@ stages:
               Write-Host " Push to GitHub SUCCESS"
               Write-Host "========================================"
             displayName: 'Mirror repository to GitHub'
+            continueOnError: true
