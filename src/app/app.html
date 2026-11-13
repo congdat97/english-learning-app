@@ -1,9 +1,10 @@
 <div class="app">
-  <aside class="sidebar">
+  <button class="menu-toggle" (click)="toggleMenu()" aria-label="Menu">☰</button>
+  <aside class="sidebar" [class.open]="menuOpen">
     <div class="brand"><div class="logo">✦</div> English Step by Step</div>
     <div>
       <div class="nav-label">MENU CHÍNH</div>
-      <nav class="nav">
+      <nav class="nav" (click)="closeMenu()">
         <a routerLink="/dashboard" routerLinkActive="active"><span class="nav-icon">⌂</span>Trang chủ</a>
         <a routerLink="/courses" routerLinkActive="active"><span class="nav-icon">▤</span>Khóa học</a>
         <a routerLink="/bookmarks" routerLinkActive="active"><span class="nav-icon">◇</span>Sổ từ vựng</a>
@@ -25,6 +26,5 @@
       </div>
       <div class="profile"><span>Người học mới</span><div class="avatar">A</div></div>
     </header>
-    <router-outlet />
-  </main>
+    <button type="button" class="settings-button" (click)="openSettings()" title="Cài đặt giao diện" aria-label="Cài đặt giao diện">\r\n      <span>⚙️</span>\r\n    </button>\r\n    <router-outlet />\r\n  </main>
 </div>
