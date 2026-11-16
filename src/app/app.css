@@ -1452,3 +1452,24 @@
   padding: 0 4px;
   white-space: nowrap;
 }
+
+/* --- ADMIN link buttons (kề bên menu-button) --- */
+.admin-link-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 17px;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, .05);
+  transition: border-color .2s ease, box-shadow .2s ease, transform .15s ease;
+}
+.admin-link-btn:hover {
+  border-color: color-mix(in srgb, var(--primary) 45%, var(--border));
+  background: var(--primary-soft);
+  box-shadow: 0 6px 16px -6px color-mix(in srgb, var(--primary) 40%, transparent);
+  transform: translateY(-1px);
+}
+.admin-link-btn:active { transform: scale(.94); }

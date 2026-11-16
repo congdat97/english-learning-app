@@ -126,13 +126,6 @@
             <em>{{ auth.currentUser()!.role === 'admin' ? 'Quản trị' : 'Học viên' }}</em>
           </div>
 
-          <a *ngIf="auth.isAdmin()" routerLink="/admin/users" class="user-menu-item" (click)="closeUserMenu()">
-            🛡️ Quản lý tài khoản
-          </a>
-          <a *ngIf="auth.isAdmin()" routerLink="/admin/progress" class="user-menu-item" (click)="closeUserMenu()">
-            📊 Tiến độ học viên
-          </a>
-
           <a routerLink="/settings" class="user-menu-item" (click)="closeUserMenu()">
             ⚙️ Cài đặt
           </a>
@@ -172,18 +165,6 @@
     </button>
 
 
-    <!-- SETTINGS / THEME (ngay cạnh nút Đồng bộ) -->
-    <button
-      type="button"
-      class="settings-button"
-      (click)="openSettings()"
-      title="Cài đặt giao diện"
-      aria-label="Cài đặt giao diện">
-
-      <span>⚙️</span>
-
-    </button>
-
     <div class="local" [title]="'Đồng bộ gần nhất: ' + syncedAt">
       <span [class.offline-dot]="!syncing">{{ dataCount ? (syncing ? '🔄' : '🟢') : '🟡' }} {{ dataCount || 'Chưa có' }}</span>
     </div>
@@ -198,6 +179,16 @@
 
     </div>
 
+
+    <!-- ADMIN: nút các form quản lý kề bên nút menu -->
+    <ng-container *ngIf="auth.isLoggedIn() && auth.isAdmin()">
+      <button type="button" routerLink="/admin/users" title="Quản lý tài khoản" class="admin-link-btn">
+        🛡️
+      </button>
+      <button type="button" routerLink="/admin/progress" title="Tiến độ học viên" class="admin-link-btn">
+        📊
+      </button>
+    </ng-container>
 
     <!-- MOBILE MENU -->
     <button type="button" class="menu-button" [class.open]="mobileMenuOpen" aria-label="Mở menu" (click)="toggleMobileMenu()">
