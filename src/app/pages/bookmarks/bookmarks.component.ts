@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -17,6 +17,7 @@ export class BookmarksComponent implements OnInit, OnDestroy {
   bookmarks: Vocabulary[] = [];
   filtered: Vocabulary[] = [];
   search = '';
+  speakingWord: string | null = null;
   loading = true;
   slowApi = false;
   private slowTimer?: ReturnType<typeof setTimeout>;
@@ -41,7 +42,8 @@ export class BookmarksComponent implements OnInit, OnDestroy {
   constructor(
     private learning: LearningService,
     private reminderService: ReminderService,
-    private settings: SettingsService
+    private settings: SettingsService,
+    private zone: NgZone
   ) {}
 
   ngOnInit(): void {
@@ -57,6 +59,7 @@ export class BookmarksComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     clearTimeout(this.slowTimer);
+    this.stopSpeaking();
   }
 
   // =================================================
@@ -87,6 +90,16 @@ export class BookmarksComponent implements OnInit, OnDestroy {
 
   speak(text: string): void {
     if (!('speechSynthesis' in window)) return;
+
+    // Bấm lại từ đang đọc -> dừng
+    if (this.speakingWord === text) {
+      this.stopSpeaking();
+      return;
+    }
+
+    this.stopSpeaking();
+    this.speakingWord = text;
+
     const s = this.settings.load();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'en-US';
@@ -95,8 +108,15 @@ export class BookmarksComponent implements OnInit, OnDestroy {
       const voice = speechSynthesis.getVoices().find(v => v.name === s.voice);
       if (voice) utterance.voice = voice;
     }
+    utterance.onend = () => this.zone.run(() => { this.speakingWord = null; });
+    utterance.onerror = () => this.zone.run(() => { this.speakingWord = null; });
     window.speechSynthesis.cancel();
     window.speechSynthesis.speak(utterance);
+  }
+
+  stopSpeaking(): void {
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    this.zone.run(() => { this.speakingWord = null; });
   }
 
   unbookmark(v: Vocabulary): void {
