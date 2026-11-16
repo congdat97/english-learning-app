@@ -7,13 +7,14 @@
   <a routerLink="/dashboard" class="brand">
 
     <div class="brand-icon">
-      <!-- Logo: bậc thang học nâng dần + mũi tên đi lên -->
-      <svg viewBox="0 0 48 48" width="26" height="26" aria-hidden="true">
+      <!-- Logo: bậc thang học nâng dần + mũi tên đi lên + ngôi sao nhỏ -->
+      <svg viewBox="0 0 48 48" width="28" height="28" aria-hidden="true">
         <g fill="currentColor">
           <rect x="11" y="29" width="7" height="8" rx="2.2"/>
           <rect x="20.5" y="23" width="7" height="14" rx="2.2"/>
           <rect x="30" y="17" width="7" height="20" rx="2.2"/>
           <path d="M30.5 12.5l6-5 6 5-2.4 0 0 2.2a1.4 1.4 0 0 1-2.8 0l0-2.2z"/>
+          <path d="M9.5 8.5l1.35 3.15L14 13l-3.15 1.35L9.5 17.5l-1.35-3.15L5 13l3.15-1.35z"/>
         </g>
       </svg>
     </div>
@@ -88,42 +89,7 @@
 
   <div class="header-right">
 
-    <!-- TAI KHOAN: avatar ẩn menu (đăng xuất nằm trong menu) -->
-    <ng-container *ngIf="auth.isLoggedIn(); else loginLink">
-      <div class="user-area">
-        <button type="button" class="user-avatar-btn" (click)="toggleUserMenu()"
-                [title]="'Tài khoản: ' + auth.currentUser()!.username"
-                aria-label="Menu tài khoản">
-          <span class="uab-letter">{{ auth.currentUser()!.username.charAt(0).toUpperCase() }}</span>
-          <span class="uab-name">{{ auth.currentUser()!.username }}</span>
-          <span class="uab-caret">▾</span>
-        </button>
-
-        <div class="user-menu" *ngIf="userMenuOpen">
-          <div class="user-menu-head">
-            <strong>{{ auth.currentUser()!.username }}</strong>
-            <em>{{ auth.currentUser()!.role === 'admin' ? 'Quản trị' : 'Học viên' }}</em>
-          </div>
-
-          <a *ngIf="auth.isAdmin()" routerLink="/admin/users" class="user-menu-item" (click)="closeUserMenu()">
-            🛡️ Quản trị tài khoản
-          </a>
-
-          <a *ngIf="auth.isAdmin()" routerLink="/admin/progress" class="user-menu-item" (click)="closeUserMenu()">
-            📊 Tiến độ học viên
-          </a>
-          
-          <button type="button" class="user-menu-item logout" (click)="logout()">
-            ⏻ Đăng xuất
-          </button>
-        </div>
-      </div>
-    </ng-container>
-    <ng-template #loginLink>
-      <a routerLink="/login" class="login-link">Đăng nhập</a>
-    </ng-template>
-
-    <!-- SYNC -->
+    <!-- SYNC: nút tròn trắng, chấm trạng thái xanh -->
     <button
       type="button"
       class="sync-button"
@@ -133,10 +99,18 @@
       (click)="syncData()"
       [title]="syncing
         ? 'Đang đồng bộ...'
-        : 'Đồng bộ dữ liệu (lần cuối: ' + syncedAt + ')'">
+        : 'Đồng bộ dữ liệu (lần cuối: ' + syncedAt + ')'"
+      aria-label="Đồng bộ dữ liệu">
 
-      <!-- ICON -->
-      <span class="sync-icon">{{ syncing ? '⏳' : '🔄' }}</span>
+      <!-- ICON: mũi tên xoay tròn -->
+      <span class="sync-icon">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+             stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M23 4v6h-6"/>
+          <path d="M1 20v-6h6"/>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+        </svg>
+      </span>
 
       <!-- STATUS DOT -->
       <span
@@ -157,7 +131,41 @@
 
     </div>
 
-    <!-- MOBILE MENU -->
+    <!-- TAI KHOAN: avatar tròn + mũi tên ẩn menu (đăng xuất nằm trong menu) -->
+    <ng-container *ngIf="auth.isLoggedIn(); else loginLink">
+      <div class="user-area">
+        <button type="button" class="user-avatar-btn" (click)="toggleUserMenu()"
+                [title]="'Tài khoản: ' + auth.currentUser()!.username"
+                aria-label="Menu tài khoản">
+          <span class="uab-letter">{{ auth.currentUser()!.username.charAt(0).toUpperCase() }}</span>
+          <span class="uab-caret">▾</span>
+        </button>
+
+        <div class="user-menu" *ngIf="userMenuOpen">
+          <div class="user-menu-head">
+            <strong>{{ auth.currentUser()!.username }}</strong>
+            <em>{{ auth.currentUser()!.role === 'admin' ? 'Quản trị' : 'Học viên' }}</em>
+          </div>
+
+          <a *ngIf="auth.isAdmin()" routerLink="/admin/users" class="user-menu-item" (click)="closeUserMenu()">
+            🛡️ Quản trị tài khoản
+          </a>
+
+          <a *ngIf="auth.isAdmin()" routerLink="/admin/progress" class="user-menu-item" (click)="closeUserMenu()">
+            📊 Tiến độ học viên
+          </a>
+
+          <button type="button" class="user-menu-item logout" (click)="logout()">
+            ⏻ Đăng xuất
+          </button>
+        </div>
+      </div>
+    </ng-container>
+    <ng-template #loginLink>
+      <a routerLink="/login" class="login-link">Đăng nhập</a>
+    </ng-template>
+
+    <!-- MOBILE MENU: nút tròn trắng 3 gạch -->
     <button type="button" class="menu-button" [class.open]="mobileMenuOpen" aria-label="Mở menu" (click)="toggleMobileMenu()">
       <span class="mb-bar"></span>
       <span class="mb-bar"></span>

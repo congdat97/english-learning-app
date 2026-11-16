@@ -1497,3 +1497,283 @@
   transform: translateY(-1px);
 }
 .admin-link-btn:active { transform: scale(.94); }
+
+/* =========================================================
+   HEADER v3 — theo ?nh thi?t k? English Step by Step
+   (icon vuông l?n + tiêu d? d?m + nút tròn tr?ng: sync / avatar / menu)
+   ========================================================= */
+
+.top {
+  height: 84px;
+
+  padding: 0 32px;
+
+  border-bottom: 0;
+
+  box-shadow: none;
+}
+
+.brand {
+  gap: 14px;
+}
+
+.brand-icon {
+  width: 54px;
+  height: 54px;
+
+  border-radius: 17px;
+
+  border: 2.5px solid rgba(255, 255, 255, 0.95);
+
+  box-shadow: 0 10px 24px -6px color-mix(in srgb, var(--primary) 55%, transparent);
+}
+
+.brand-icon svg {
+  width: 30px;
+  height: 30px;
+}
+
+.brand-text strong {
+  font-size: 20px;
+  font-weight: 900;
+
+  letter-spacing: -0.3px;
+}
+
+.brand-text small {
+  font-size: 12px;
+}
+
+.header-right {
+  gap: 14px;
+}
+
+/* --- SYNC: nút tròn tr?ng + ch?m tr?ng thái xanh nh?p nháy nh? --- */
+
+.sync-button {
+  width: 48px;
+  height: 48px;
+
+  border-radius: 50%;
+  border: 0;
+
+  background: var(--surface);
+
+  color: var(--primary);
+
+  box-shadow:
+    0 4px 14px rgba(15, 23, 42, 0.10),
+    0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+.sync-button:hover:not(:disabled) {
+  border-color: transparent;
+
+  transform: translateY(-2px) scale(1.04);
+
+  box-shadow: 0 10px 22px -6px color-mix(in srgb, var(--primary) 45%, transparent);
+}
+
+.sync-button:active:not(:disabled) {
+  transform: scale(0.92);
+}
+
+.sync-button .sync-icon {
+  display: grid;
+  place-items: center;
+}
+
+.sync-button .sync-icon svg {
+  display: block;
+}
+
+.sync-dot {
+  top: 0;
+  right: 0;
+
+  width: 13px;
+  height: 13px;
+
+  border: 2.5px solid var(--header-bg);
+
+  background: #22c55e;
+
+  animation: dotPulse 2.4s ease-in-out infinite;
+}
+
+@keyframes dotPulse {
+
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.45);
+  }
+
+  50% {
+    box-shadow: 0 0 0 4px rgba(34, 197, 94, 0);
+  }
+
+}
+
+.sync-dot.empty {
+  background: #f59e0b;
+}
+
+.sync-dot.error {
+  background: #ef4444;
+
+  animation: none;
+}
+
+/* --- AVATAR: vòng tròn tr?ng + ch? cái gradient + mui tên --- */
+
+.user-avatar-btn {
+  gap: 6px;
+
+  height: 48px;
+
+  padding: 5px 12px 5px 5px;
+
+  border-radius: 999px;
+  border: 0;
+
+  background: var(--surface);
+
+  box-shadow:
+    0 4px 14px rgba(15, 23, 42, 0.10),
+    0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+.uab-letter {
+  width: 38px;
+  height: 38px;
+
+  font-size: 17px;
+}
+
+.uab-caret {
+  font-size: 11px;
+
+  color: var(--text);
+}
+
+/* --- MENU 3 G?CH: nút tròn tr?ng --- */
+
+.menu-button {
+  width: 48px;
+  height: 48px;
+
+  border-radius: 50%;
+  border: 0;
+
+  background: var(--surface);
+
+  gap: 5.5px;
+
+  box-shadow:
+    0 4px 14px rgba(15, 23, 42, 0.10),
+    0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+.menu-button .mb-bar {
+  width: 20px;
+  height: 2.4px;
+
+  background: var(--text);
+}
+
+.menu-button:hover {
+  background: var(--surface);
+
+  border-color: transparent;
+
+  transform: translateY(-1px);
+
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.14);
+}
+
+.menu-button.open .mb-bar:nth-child(1) {
+  transform: translateY(7.9px) rotate(45deg);
+}
+
+.menu-button.open .mb-bar:nth-child(3) {
+  transform: translateY(-7.9px) rotate(-45deg);
+}
+
+/* --- MOBILE --- */
+
+@media (max-width: 700px) {
+
+  .top {
+    height: 68px;
+
+    padding: 0 14px;
+  }
+
+  .brand {
+    gap: 10px;
+  }
+
+  .brand-icon {
+    width: 44px;
+    height: 44px;
+
+    border-radius: 14px;
+
+    border-width: 2px;
+  }
+
+  .brand-icon svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .brand-text strong {
+    font-size: 15px;
+  }
+
+  .header-right {
+    gap: 9px;
+  }
+
+  .sync-button,
+  .menu-button {
+    width: 42px;
+    height: 42px;
+  }
+
+  .sync-button .sync-icon svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .user-avatar-btn {
+    height: 42px;
+
+    padding: 4px 10px 4px 4px;
+  }
+
+  .uab-letter {
+    width: 34px;
+    height: 34px;
+
+    font-size: 15px;
+  }
+
+  .menu-button .mb-bar {
+    width: 17px;
+    height: 2.2px;
+  }
+
+  .menu-button.open .mb-bar:nth-child(1) {
+    transform: translateY(6.9px) rotate(45deg);
+  }
+
+  .menu-button.open .mb-bar:nth-child(3) {
+    transform: translateY(-6.9px) rotate(-45deg);
+  }
+
+  .sync-error {
+    top: 74px;
+    right: 12px;
+  }
+
+}
