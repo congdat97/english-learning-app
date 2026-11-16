@@ -1,4 +1,6 @@
-import { Injectable, inject } from '@angular/core';
+﻿import { Injectable, inject } from '@angular/core';
+
+import { AuthService } from './auth.service';
 
 import {
   catchError,
@@ -24,24 +26,34 @@ export interface SyncResult {
   bookmarks: Vocabulary[];
 }
 
-// Prefix riêng cho app tiếng Anh
+// Prefix riÃªng cho app tiáº¿ng Anh
 const PREFIX = 'elf-data.';
 
 @Injectable({ providedIn: 'root' })
 export class OfflineDataService {
 
   private readonly learning = inject(LearningService);
+  private readonly auth = inject(AuthService);
 
   // =====================================================
-  // STORAGE
+  // STORAGE (phÃ¢n theo user â€” user A khÃ´ng Ä‘á»¥ng dá»¯ liá»‡u offline cá»§a user B)
   // =====================================================
+
+  private uidPart(): string {
+    const uid = this.auth.currentUser()?.id;
+    return uid ? `${uid}.` : 'guest.';
+  }
 
   private storageKey(key: OfflineDataKey): string {
-    return `${PREFIX}${key}`;
+    return `${PREFIX}${this.uidPart()}${key}`;
   }
 
   private staleKey(key: OfflineDataKey): string {
-    return `${PREFIX}${key}:stale`;
+    return `${PREFIX}${this.uidPart()}${key}:stale`;
+  }
+
+  private metaKey(): string {
+    return `${PREFIX}${this.uidPart()}meta`;
   }
 
   get<T>(key: OfflineDataKey): T | null {
@@ -74,12 +86,12 @@ export class OfflineDataService {
         JSON.stringify(data)
       );
 
-      // Có bản mới => xoá bản stale cũ
+      // CÃ³ báº£n má»›i => xoÃ¡ báº£n stale cÅ©
       localStorage.removeItem(this.staleKey(key));
 
     } catch (error) {
 
-      console.warn('Không thể lưu dữ liệu offline:', error);
+      console.warn('KhÃ´ng thá»ƒ lÆ°u dá»¯ liá»‡u offline:', error);
 
     }
 
@@ -107,9 +119,9 @@ export class OfflineDataService {
   }
 
   /**
-   * Vô hiệu hoá cache khi có thao tác ghi.
-   * Giữ bản stale để khi API ngủ
-   * vẫn còn dữ liệu cũ dùng tạm.
+   * VÃ´ hiá»‡u hoÃ¡ cache khi cÃ³ thao tÃ¡c ghi.
+   * Giá»¯ báº£n stale Ä‘á»ƒ khi API ngá»§
+   * váº«n cÃ²n dá»¯ liá»‡u cÅ© dÃ¹ng táº¡m.
    */
   invalidate(key: OfflineDataKey): void {
 
@@ -134,14 +146,12 @@ export class OfflineDataService {
   // META
   // =====================================================
 
-  private static readonly META_KEY = `${PREFIX}meta`;
-
   getMeta(): OfflineDataMeta {
 
     try {
 
       const raw =
-        localStorage.getItem(OfflineDataService.META_KEY);
+        localStorage.getItem(this.metaKey());
 
       if (!raw) {
         return { syncedAt: null, counts: {} };
@@ -169,7 +179,7 @@ export class OfflineDataService {
     try {
 
       localStorage.setItem(
-        OfflineDataService.META_KEY,
+        this.metaKey(),
         JSON.stringify(meta)
       );
 
@@ -186,24 +196,26 @@ export class OfflineDataService {
   /**
    * Tải dữ liệu cần dùng offline về localStorage:
    * khóa học + sổ từ + tiến độ tổng + danh sách lesson mỗi khóa.
-   * Đi qua cache SWR của LearningService (cache hit = không chờ API).
+   *
+   * force=false (mặc định, mở app): cache-first — có cache là xong, không đụng API.
+   * force=true (nút 🔄 Đồng bộ): bỏ cache, luôn gọi API và ghi đè cache.
    */
-  syncAll() {
+  syncAll(force = false) {
 
-    return this.learning.getCourses().pipe(
+    return this.learning.getCourses(force).pipe(
       map(response => response.data || []),
       switchMap(courses => forkJoin({
         courses: of(courses),
 
-        bookmarks: this.learning.getBookmarks()
+        bookmarks: this.learning.getBookmarks(force)
           .pipe(map(r => r.data || []), catchError(() => of([] as Vocabulary[]))),
 
-        progress: this.learning.getAllProgress()
+        progress: this.learning.getAllProgress(force)
           .pipe(map(r => r.data || []), catchError(() => of([] as UserProgress[]))),
 
         lessons: forkJoin(
           courses.map(c =>
-            this.learning.getLessons(c.id)
+            this.learning.getLessons(c.id, force)
               .pipe(map(r => r.data || []), catchError(() => of([] as Lesson[])))
           )
         )
@@ -231,9 +243,9 @@ export class OfflineDataService {
   }
 
   /**
-   * Luôn đồng bộ khi mở app:
-   * - Có cache -> trả tức thì + refresh nền (không chặn UI).
-   * - Chưa có cache -> tải lần đầu (nền, UI vẫn hiện trạng thái chờ riêng).
+   * LuÃ´n Ä‘á»“ng bá»™ khi má»Ÿ app:
+   * - CÃ³ cache -> tráº£ tá»©c thÃ¬ + refresh ná»n (khÃ´ng cháº·n UI).
+   * - ChÆ°a cÃ³ cache -> táº£i láº§n Ä‘áº§u (ná»n, UI váº«n hiá»‡n tráº¡ng thÃ¡i chá» riÃªng).
    */
   ensureData() {
     return this.syncAll()

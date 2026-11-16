@@ -103,7 +103,9 @@ export class LessonComponent implements OnInit, OnDestroy {
       next: () => {
         v.is_bookmarked = !v.is_bookmarked;
         v.is_favorite = v.is_bookmarked;
-        this.learning.invalidateBookmarksCache();
+        // Cập nhật cả localStorage (sổ từ + thẻ từ trong lesson) lẫn DB
+        this.learning.syncBookmarkCache(v, v.is_bookmarked);
+        this.learning.syncVocabularyBookmarkCache(v.id, v.is_bookmarked);
       },
       error: () => window.alert('⚠️ Không lưu được trạng thái từ vựng (API chưa hoạt động) — thử lại sau.')
     });
@@ -198,7 +200,11 @@ export class LessonComponent implements OnInit, OnDestroy {
         return;
       }
       this.learning.saveProgress(this.lesson.id, 'completed', this.score, this.review.length).subscribe({
-        next: () => { this.learning.invalidateProgressCache(); window.alert(`✅ Hoàn thành bài học! Điểm: ${this.score}/${this.review.length} (đã lưu tiến độ).`); },
+        next: (res) => {
+          // Lưu DB xong -> cập nhật luôn cache tiến độ trong localStorage
+          if (res.data) this.learning.syncProgressCache(this.lesson!.id, res.data);
+          window.alert(`✅ Hoàn thành bài học! Điểm: ${this.score}/${this.review.length} (đã lưu tiến độ).`);
+        },
         error: () => window.alert(`⚠️ Không lưu được tiến độ lên server (API chưa hoạt động) — điểm ${this.score}/${this.review.length} chỉ hiển thị tạm thời.`)
       });
     }

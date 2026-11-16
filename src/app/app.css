@@ -1412,3 +1412,43 @@
 @media (max-width: 850px) {
   .menu-button { display: flex; }
 }
+
+/* --- Header actions v2.1 --- */
+.uab-name {
+  font-weight: 700;
+  font-size: 13px;
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width: 640px) {
+  .uab-name { display: none; }
+  .user-avatar-btn { padding: 4px; }
+}
+
+.settings-button {
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, .05);
+  font-size: 17px;
+  transition: border-color .2s ease, box-shadow .2s ease, transform .15s ease;
+}
+.settings-button:hover {
+  border-color: color-mix(in srgb, var(--primary) 45%, var(--border));
+  box-shadow: 0 6px 16px -6px color-mix(in srgb, var(--primary) 40%, transparent);
+  transform: translateY(-1px);
+}
+.settings-button:active { transform: scale(.94); }
+
+.local {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  padding: 0 4px;
+  white-space: nowrap;
+}

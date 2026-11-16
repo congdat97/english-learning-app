@@ -13,16 +13,15 @@ import { tap } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
 
 /**
- * CACHE-FIRST + STALE-WHILE-REVALIDATE
+ * CACHE-FIRST tuyệt đối:
  *
  * GET:
- *  - Có cache -> dùng ngay từ localStorage + tự gọi nền để làm mới cache
- *    (dữ liệu ít thay đổi nên hiển thị tức thì là ưu tiên).
+ *  - Có cache -> dùng ngay từ localStorage, KHÔNG gọi API.
  *  - Chưa có cache -> gọi API, thành công thì lưu vào localStorage.
- *  - API lỗi mà còn cache -> vẫn trả cache cũ (dùng offline được).
+ *  - Cần dữ liệu mới: dùng nút 🔄 Đồng bộ trên header (bỏ cache).
  *
  * Ghi (POST/PUT/DELETE) thành công -> xóa cache cùng nhóm tài nguyên
- * để lần GET sau lấy dữ liệu mới.
+ * (lớp cache của service sẽ tự cập nhật dữ liệu mới sau khi ghi).
  */
 
 const PREFIX = 'http_cache_';
@@ -140,35 +139,6 @@ function invalidateFamily(url: string): void {
 
 }
 
-/** Gọi nền để làm mới cache cũ (người dùng không phải chờ). */
-function revalidate(
-  req: Parameters<HttpInterceptorFn>[0],
-  next: Parameters<HttpInterceptorFn>[1],
-  key: string
-): void {
-
-  next(req)
-    .pipe(
-      tap((event: HttpEvent<unknown>) => {
-
-        if (
-          event instanceof HttpResponse &&
-          event.ok &&
-          (event.body as { success?: boolean } | null)?.success !== false
-        ) {
-          writeEntry(key, event.body);
-        }
-
-      })
-    )
-    .subscribe({
-      error: () => {
-        // API lỗi: giữ nguyên cache cũ, không làm gì thêm
-      }
-    });
-
-}
-
 function toResponse(
   req: Parameters<HttpInterceptorFn>[0],
   body: unknown
@@ -213,9 +183,8 @@ export const cacheInterceptor: HttpInterceptorFn = (req, next) => {
 
   const entry = readEntry(key);
 
-  // 1) Có cache: dùng ngay + làm mới nền
+  // 1) Có cache: dùng ngay, KHÔNG gọi API
   if (entry) {
-    revalidate(req, next, key);
     return of(toResponse(req, entry.body));
   }
 

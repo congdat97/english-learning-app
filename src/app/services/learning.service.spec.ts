@@ -130,42 +130,57 @@ describe('LearningService', () => {
       localStorage.setItem(`api-cache:${url}`, JSON.stringify({ ts, body }));
     }
 
-    it('emits cached data immediately without waiting for API, refreshes cache in background', () => {
+    it('emits cached data immediately and does NOT call the API when cache exists', () => {
       const url = `${base}/courses`;
       seedCache(url, { success: true, data: [{ id: 9, title: 'cached' }] });
       const emissions: any[] = [];
       let completed = false;
       service.getCourses().subscribe({ next: e => emissions.push(e), complete: () => (completed = true) });
 
-      // cache trả ngay, complete ngay -> forkJoin không phải chờ
+      // cache trả ngay, complete ngay -> không chờ API, không phát request nào
       expect(emissions.length).toBe(1);
       expect(emissions[0].data[0].title).toBe('cached');
       expect(completed).toBe(true);
-
-      // refresh nền: khi API trả, chỉ cache được cập nhật (không emit lại)
-      http.expectOne(url).flush({ success: true, data: [{ id: 9, title: 'fresh' }] });
-      const saved = JSON.parse(localStorage.getItem(`api-cache:${url}`) || '{}');
-      expect(saved.body.data[0].title).toBe('fresh');
-      expect(emissions.length).toBe(1);
+      http.expectNone(url);
     });
 
-    it('does not error when API background refresh fails with cache present', () => {
+    it('fetches from API only when there is no cache, then saves the cache', () => {
+      const url = `${base}/courses`;
+      const emissions: any[] = [];
+      service.getCourses().subscribe(e => emissions.push(e));
+      http.expectOne(url).flush({ success: true, data: [{ id: 1, title: 'from-api' }] });
+
+      expect(emissions[0].data[0].title).toBe('from-api');
+      const saved = JSON.parse(localStorage.getItem(`api-cache:${url}`) || '{}');
+      expect(saved.body.data[0].title).toBe('from-api');
+    });
+
+    it('force refresh bypasses the cache and overwrites it', () => {
       const url = `${base}/courses`;
       seedCache(url, { success: true, data: [{ id: 9, title: 'cached' }] });
       const emissions: any[] = [];
-      let errorCaught = false;
-      let completed = false;
-      service.getCourses().subscribe({
-        next: e => emissions.push(e),
-        error: () => (errorCaught = true),
-        complete: () => (completed = true)
-      });
-      http.expectOne(url).flush('boom', { status: 500, statusText: 'Server Error' });
+      service.getCourses(true).subscribe(e => emissions.push(e));
+      http.expectOne(url).flush({ success: true, data: [{ id: 9, title: 'fresh' }] });
 
-      expect(emissions.length).toBe(1);
-      expect(emissions[0].data[0].title).toBe('cached');
-      expect(errorCaught).toBe(false);
-      expect(completed).toBe(true);
+      expect(emissions[0].data[0].title).toBe('fresh');
+      const saved = JSON.parse(localStorage.getItem(`api-cache:${url}`) || '{}');
+      expect(saved.body.data[0].title).toBe('fresh');
+    });
+
+    it('syncProgressCache updates both per-lesson and bulk progress caches', () => {
+      const lessonUrl = `api-cache:${base}/lessons/7/progress`;
+      const allUrl = `api-cache:${base}/lessons/progress/all`;
+      localStorage.setItem(lessonUrl, JSON.stringify({ ts: Date.now(), body: { success: true, data: null } }));
+      localStorage.setItem(allUrl, JSON.stringify({ ts: Date.now(), body: { success: true, data: [] } }));
+
+      const row = { lesson_id: 7, status: 'completed', score: 3 } as any;
+      service.syncProgressCache(7, row);
+
+      expect(JSON.parse(localStorage.getItem(lessonUrl)!).body.data).toEqual(row);
+
+      const list = JSON.parse(localStorage.getItem(allUrl)!).body.data;
+      expect(list.length).toBe(1);
+      expect(list[0].score).toBe(3);
     });
 
     it('errors when there is no cache and the API fails', () => {
@@ -181,15 +196,14 @@ describe('LearningService', () => {
       expect(completed).toBe(false);
     });
 
-    it('ignores stale cache beyond max age', () => {
+    it('serves cache regardless of age — cache persists until updated or cleared', () => {
       const url = `${base}/courses`;
-      seedCache(url, { success: true, data: [{ id: 9, title: 'stale' }] }, Date.now() - 25 * 60 * 60 * 1000);
+      seedCache(url, { success: true, data: [{ id: 9, title: 'old-but-valid' }] }, Date.now() - 30 * 24 * 60 * 60 * 1000);
       const emissions: any[] = [];
       service.getCourses().subscribe(e => emissions.push(e));
-      http.expectOne(url).flush({ success: true, data: [{ id: 9, title: 'fresh' }] });
 
-      expect(emissions.length).toBe(1);
-      expect(emissions[0].data[0].title).toBe('fresh');
+      expect(emissions[0].data[0].title).toBe('old-but-valid');
+      http.expectNone(url);
     });
 
     it('clearCache removes all api-cache entries', () => {

@@ -17,7 +17,6 @@ interface CacheEntry<T> {
 export class LearningService {
   private base = environment.apiUrl;
   private headers = new HttpHeaders({ 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' });
-  private readonly maxAgeMs = 24 * 60 * 60 * 1000;
 
   /** Các GET đang chạy: nhiều nơi gọi cùng lúc thì share 1 kết nối. */
   private inflight = new Map<string, Observable<ApiResult<unknown>>>();
@@ -50,12 +49,14 @@ export class LearningService {
   }
 
   /**
-   * Cache-first + revalidate:
-   * - Nếu có cache hợp lệ -> phát cache ngay lập tức (UI không phải chờ).
-   * - Vẫn gọi API nền; thành công -> lưu cache và phát data mới (UI tự cập nhật).
-   * - API lỗi mà có cache -> dùng cache, không throw (dữ liệu tĩnh nên vẫn dùng được).
+   * CACHE-FIRST tuyệt đối:
+   * - Có cache (dù cũ bao lâu) -> phát cache ngay, KHÔNG gọi API.
+   * - Chưa có cache -> gọi API, lưu cache rồi mới phát.
+   * - force=true (nút 🔄 Đồng bộ): bỏ cache, luôn gọi API và ghi đè cache.
    */
-  private cachedGet<T>(url: string): Observable<ApiResult<T>> {
+  private cachedGet<T>(url: string, force = false): Observable<ApiResult<T>> {
+    if (force) return this.fetchAndCache<T>(url);
+
     return new Observable<ApiResult<T>>(observer => {
       const key = this.cacheKey(url);
       let cached: CacheEntry<T> | null = null;
@@ -63,19 +64,13 @@ export class LearningService {
         const raw = localStorage.getItem(key);
         if (raw) {
           const parsed = JSON.parse(raw) as CacheEntry<T>;
-          if (parsed?.body) {
-            if (Date.now() - parsed.ts < this.maxAgeMs) cached = parsed;
-            else localStorage.removeItem(key);
-          }
+          if (parsed?.body) cached = parsed;
         }
       } catch {}
 
-      // Có cache hợp lệ -> trả ngay lập tức (không chờ API),
-      // refresh nền âm thầm để lần sau có data mới.
       if (cached) {
         observer.next(cached.body);
         observer.complete();
-        this.fetchAndCache<T>(url).subscribe({ error: () => {} });
         return () => {};
       }
 
@@ -88,6 +83,18 @@ export class LearningService {
     });
   }
 
+  /** Ghi đè phần data của 1 cache nếu cache đó đang tồn tại. */
+  private writeCacheData(url: string, data: unknown): void {
+    const key = this.cacheKey(url);
+    try {
+      const raw = localStorage.getItem(key);
+      if (!raw) return;
+      const entry = JSON.parse(raw);
+      entry.body = { success: true, data };
+      localStorage.setItem(key, JSON.stringify(entry));
+    } catch {}
+  }
+
   /** Xóa toàn bộ cache API (dùng khi muốn ép load mới). */
   clearCache(): void {
     try {
@@ -97,41 +104,41 @@ export class LearningService {
     } catch {}
   }
 
-  getCourses(): Observable<ApiResult<Course[]>> {
-    return this.cachedGet<Course[]>(`${this.base}/courses`);
+  getCourses(force = false): Observable<ApiResult<Course[]>> {
+    return this.cachedGet<Course[]>(`${this.base}/courses`, force);
   }
 
-  getCourse(id: number): Observable<ApiResult<Course>> {
-    return this.cachedGet<Course>(`${this.base}/courses/${id}`);
+  getCourse(id: number, force = false): Observable<ApiResult<Course>> {
+    return this.cachedGet<Course>(`${this.base}/courses/${id}`, force);
   }
 
-  getLessons(courseId: number): Observable<ApiResult<Lesson[]>> {
-    return this.cachedGet<Lesson[]>(`${this.base}/courses/${courseId}/lessons`);
+  getLessons(courseId: number, force = false): Observable<ApiResult<Lesson[]>> {
+    return this.cachedGet<Lesson[]>(`${this.base}/courses/${courseId}/lessons`, force);
   }
 
-  getLesson(id: number): Observable<ApiResult<Lesson>> {
-    return this.cachedGet<Lesson>(`${this.base}/lessons/${id}`);
+  getLesson(id: number, force = false): Observable<ApiResult<Lesson>> {
+    return this.cachedGet<Lesson>(`${this.base}/lessons/${id}`, force);
   }
 
-  getVocabulary(lessonId: number): Observable<ApiResult<Vocabulary[]>> {
-    return this.cachedGet<Vocabulary[]>(`${this.base}/lessons/${lessonId}/vocabulary`);
+  getVocabulary(lessonId: number, force = false): Observable<ApiResult<Vocabulary[]>> {
+    return this.cachedGet<Vocabulary[]>(`${this.base}/lessons/${lessonId}/vocabulary`, force);
   }
 
-  getListening(lessonId: number): Observable<ApiResult<Listening[]>> {
-    return this.cachedGet<Listening[]>(`${this.base}/lessons/${lessonId}/listening`);
+  getListening(lessonId: number, force = false): Observable<ApiResult<Listening[]>> {
+    return this.cachedGet<Listening[]>(`${this.base}/lessons/${lessonId}/listening`, force);
   }
 
-  getReview(lessonId: number): Observable<ApiResult<ReviewQuestion[]>> {
-    return this.cachedGet<ReviewQuestion[]>(`${this.base}/lessons/${lessonId}/review`);
+  getReview(lessonId: number, force = false): Observable<ApiResult<ReviewQuestion[]>> {
+    return this.cachedGet<ReviewQuestion[]>(`${this.base}/lessons/${lessonId}/review`, force);
   }
 
-  getProgress(lessonId: number): Observable<ApiResult<UserProgress | null>> {
-    return this.cachedGet<UserProgress | null>(`${this.base}/lessons/${lessonId}/progress`);
+  getProgress(lessonId: number, force = false): Observable<ApiResult<UserProgress | null>> {
+    return this.cachedGet<UserProgress | null>(`${this.base}/lessons/${lessonId}/progress`, force);
   }
 
   /** Lấy tiến độ của TẤT CẢ lesson trong 1 request duy nhất. */
-  getAllProgress(): Observable<ApiResult<UserProgress[]>> {
-    return this.cachedGet<UserProgress[]>(`${this.base}/lessons/progress/all`);
+  getAllProgress(force = false): Observable<ApiResult<UserProgress[]>> {
+    return this.cachedGet<UserProgress[]>(`${this.base}/lessons/progress/all`, force);
   }
 
   /** Xóa cache tiến độ tổng (gọi sau khi lưu tiến độ mới). */
@@ -150,12 +157,12 @@ export class LearningService {
     });
   }
 
-  getBookmarks(): Observable<ApiResult<Vocabulary[]>> {
-    return this.cachedGet<Vocabulary[]>(`${this.base}/vocabulary/bookmarks`);
+  getBookmarks(force = false): Observable<ApiResult<Vocabulary[]>> {
+    return this.cachedGet<Vocabulary[]>(`${this.base}/vocabulary/bookmarks`, force);
   }
 
-  getSettings(): Observable<ApiResult<any>> {
-    return this.cachedGet<any>(`${this.base}/settings`);
+  getSettings(force = false): Observable<ApiResult<any>> {
+    return this.cachedGet<any>(`${this.base}/settings`, force);
   }
 
   /** Admin: tiến độ học của mọi user (không cache — dữ liệu nhạy). */
@@ -200,5 +207,57 @@ export class LearningService {
       entry.body.data = list;
       localStorage.setItem(url, JSON.stringify(entry));
     } catch {}
+  }
+
+  /**
+   * Sau khi lưu/xóa tiến độ: cập nhật ngay cache tiến độ trong localStorage
+   * (cache từng bài + cache tổng) — không cần gọi lại API GET.
+   */
+  syncProgressCache(lessonId: number, row: UserProgress): void {
+    this.writeCacheData(`${this.base}/lessons/${lessonId}/progress`, row);
+
+    const allUrl = `${this.base}/lessons/progress/all`;
+    const key = this.cacheKey(allUrl);
+    try {
+      const raw = localStorage.getItem(key);
+      if (!raw) return;
+      const entry = JSON.parse(raw);
+      const list: UserProgress[] = entry.body?.data ?? [];
+      const idx = list.findIndex(p => p.lesson_id === lessonId);
+      if (idx >= 0) list[idx] = row; else list.push(row);
+      entry.body.data = list;
+      localStorage.setItem(key, JSON.stringify(entry));
+    } catch {}
+  }
+
+  /** Cập nhật cờ đã-lưu của 1 từ trong mọi cache danh sách từ vựng của lesson. */
+  syncVocabularyBookmarkCache(vocabularyId: number, saved: boolean): void {
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (
+          !key ||
+          !key.startsWith('api-cache:') ||
+          !key.includes(`${this.base}/lessons/`) ||
+          !key.includes('/vocabulary')
+        ) continue;
+        const raw = localStorage.getItem(key);
+        if (!raw) continue;
+        const entry = JSON.parse(raw);
+        const list = entry.body?.data;
+        if (!Array.isArray(list)) continue;
+        const item = list.find((v: { id: number }) => v.id === vocabularyId);
+        if (item) {
+          item.is_bookmarked = saved;
+          item.is_favorite = saved;
+          localStorage.setItem(key, JSON.stringify(entry));
+        }
+      }
+    } catch {}
+  }
+
+  /** Sau khi lưu cài đặt: cập nhật cache GET /settings cho khớp với giá trị mới. */
+  syncSettingsCache(data: unknown): void {
+    this.writeCacheData(`${this.base}/settings`, data);
   }
 }

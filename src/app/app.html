@@ -116,6 +116,7 @@
                 [title]="'Tài khoản: ' + auth.currentUser()!.username"
                 aria-label="Menu tài khoản">
           <span class="uab-letter">{{ auth.currentUser()!.username.charAt(0).toUpperCase() }}</span>
+          <span class="uab-name">{{ auth.currentUser()!.username }}</span>
           <span class="uab-caret">▾</span>
         </button>
 
@@ -146,10 +147,6 @@
       <a routerLink="/login" class="login-link">Đăng nhập</a>
     </ng-template>
 
-    <div class="local" [title]="'Đồng bộ gần nhất: ' + syncedAt">
-      <span [class.offline-dot]="!syncing">{{ dataCount ? (syncing ? '🔄' : '🟢') : '🟡' }} {{ dataCount || 'Chưa có' }}</span>
-    </div>
-
     <!-- SYNC -->
     <button
       type="button"
@@ -175,7 +172,7 @@
     </button>
 
 
-    <!-- SETTINGS / THEME -->
+    <!-- SETTINGS / THEME (ngay cạnh nút Đồng bộ) -->
     <button
       type="button"
       class="settings-button"
@@ -186,6 +183,10 @@
       <span>⚙️</span>
 
     </button>
+
+    <div class="local" [title]="'Đồng bộ gần nhất: ' + syncedAt">
+      <span [class.offline-dot]="!syncing">{{ dataCount ? (syncing ? '🔄' : '🟢') : '🟡' }} {{ dataCount || 'Chưa có' }}</span>
+    </div>
 
 
     <div

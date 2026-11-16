@@ -34,7 +34,7 @@ describe('CacheInterceptor', () => {
     expect(entry.body.data).toEqual([1, 2, 3]);
   });
 
-  it('serves cache without waiting for the API, then revalidates in background', () => {
+  it('serves cache without hitting the API at all', () => {
     localStorage.setItem(
       'http_cache_/api/courses',
       JSON.stringify({ body: { success: true, data: ['cached'] } })
@@ -44,11 +44,7 @@ describe('CacheInterceptor', () => {
     http.get('/api/courses').subscribe((r) => (result = r));
     expect(result).toEqual({ success: true, data: ['cached'] });
 
-    // Background revalidate request happens
-    httpMock.expectOne('/api/courses').flush({ success: true, data: ['fresh'] });
-
-    const entry = JSON.parse(localStorage.getItem('http_cache_/api/courses')!);
-    expect(entry.body.data).toEqual(['fresh']);
+    httpMock.expectNone('/api/courses');
   });
 
   it('caches on first fetch and reuses afterwards', () => {
@@ -61,8 +57,8 @@ describe('CacheInterceptor', () => {
     http.get('/api/settings').subscribe((r) => (second = r));
     expect(second).toEqual({ success: true, data: { theme: 'mac-dinh' } });
 
-    // Second GET is served from cache; a background revalidate still runs
-    httpMock.expectOne('/api/settings').flush({ success: true, data: { theme: 'mac-dinh' } });
+    // Second GET is served purely from cache — no network call
+    httpMock.expectNone('/api/settings');
   });
   it('clears resource family caches after successful POST', () => {
     localStorage.setItem(

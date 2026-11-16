@@ -151,7 +151,7 @@ export class App implements OnInit {
 
     this.syncSubscription = this
       .offlineDataService
-      .syncAll()
+      .syncAll(true)
       .subscribe({
         next: () => {
 

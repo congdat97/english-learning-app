@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core/testing';
+﻿import { TestBed } from '@angular/core/testing';
 import { SettingsService } from './settings.service';
 
 describe('SettingsService', () => {
@@ -23,13 +23,13 @@ describe('SettingsService', () => {
   });
 
   it('falls back to defaults when saved data is corrupted', () => {
-    localStorage.setItem('learning-settings', '{not-json');
+    localStorage.setItem('learning-settings-guest', '{not-json');
     const settings = service.load();
     expect(settings.fontSize).toBe(16);
   });
 
   it('merges partial saved data with defaults', () => {
-    localStorage.setItem('learning-settings', JSON.stringify({ fontSize: 20 }));
+    localStorage.setItem('learning-settings-guest', JSON.stringify({ fontSize: 20 }));
     const settings = service.load();
     expect(settings.fontSize).toBe(20);
     expect(settings.theme).toBe('mac-dinh');
@@ -65,3 +65,4 @@ describe('SettingsService', () => {
     expect(service.showTranslation).toBe(false);
   });
 });
+

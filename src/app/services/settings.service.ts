@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ThemeService } from './theme.service';
 import { LearningService } from './learning.service';
+import { AuthService } from './auth.service';
 
 export interface LearningSettings {
   dailyMinutes: number;
@@ -22,20 +23,24 @@ const DEFAULTS: LearningSettings = {
 
 @Injectable({ providedIn: 'root' })
 export class SettingsService {
-  private key = 'learning-settings';
+  constructor(private themeService: ThemeService, private learning: LearningService, private auth: AuthService) {}
 
-  constructor(private themeService: ThemeService, private learning: LearningService) {}
+  /** Mỗi user một bản cài đặt riêng trong localStorage. */
+  private keyFor(): string {
+    const uid = this.auth.currentUser()?.id;
+    return uid ? `learning-settings-${uid}` : 'learning-settings-guest';
+  }
 
   load(): LearningSettings {
     try {
-      const saved = localStorage.getItem(this.key);
+      const saved = localStorage.getItem(this.keyFor());
       if (saved) return { ...DEFAULTS, ...JSON.parse(saved) };
     } catch {}
     return { ...DEFAULTS };
   }
 
   save(settings: LearningSettings): void {
-    localStorage.setItem(this.key, JSON.stringify(settings));
+    localStorage.setItem(this.keyFor(), JSON.stringify(settings));
     this.applyFontSize(settings.fontSize);
     this.applyTheme(settings.theme);
   }
@@ -68,11 +73,20 @@ export class SettingsService {
 
   /**
    * Lưu một phần cài đặt ngay lập tức:
-   * ghi localStorage + đẩy toàn bộ payload lên DB (lỗi API thì im lặng, local vẫn giữ).
+   * ghi localStorage + đẩy toàn bộ payload lên DB (lỗi API thì im lặng, local vẫn giữ)
+   * + cập nhật cache GET /settings cho khớp.
    */
   savePartial(partial: Partial<LearningSettings>): void {
     const merged = { ...this.load(), ...partial };
     this.save(merged);
+    this.learning.syncSettingsCache({
+      daily_minutes: merged.dailyMinutes,
+      audio_speed: merged.audioSpeed,
+      show_translation: merged.showTranslation,
+      font_size: merged.fontSize,
+      voice: merged.voice,
+      theme: merged.theme
+    });
     this.learning.saveSettings({
       daily_minutes: merged.dailyMinutes,
       audio_speed: merged.audioSpeed,

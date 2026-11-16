@@ -20,6 +20,7 @@ describe('LessonComponent', () => {
   ];
 
   beforeEach(async () => {
+    localStorage.clear();
     await TestBed.configureTestingModule({
       imports: [LessonComponent],
       providers: [
