@@ -70,6 +70,13 @@ describe('LearningService', () => {
     req.flush({ success: true, data: [] });
   });
 
+  it('getAdminUserProgress builds /auth/users/progress', () => {
+    service.getAdminUserProgress().subscribe();
+    const req = http.expectOne(`${base}/auth/users/progress`);
+    expect(req.request.method).toBe('GET');
+    req.flush({ success: true, data: [] });
+  });
+
   it('invalidateProgressCache removes the bulk progress cache', () => {
     localStorage.setItem('api-cache:' + `${base}/lessons/progress/all`, JSON.stringify({ ts: Date.now(), body: { success: true, data: [] } }));
     service.invalidateProgressCache();

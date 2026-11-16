@@ -1,0 +1,43 @@
+<div class="page">
+  <header class="section-head">
+    <div>
+      <h2>📊 Tiến độ học của học viên</h2>
+      <p>Chỉ admin xem được trang này</p>
+    </div>
+    <a routerLink="/admin/users" class="text-btn">← Quản lý tài khoản</a>
+  </header>
+
+  <p *ngIf="loading" class="muted">Đang tải…</p>
+  <p *ngIf="error && !loading" class="muted">⚠️ Không tải được dữ liệu (API chưa phản hồi hoặc bạn không có quyền admin).</p>
+
+  <div *ngFor="let g of groups" class="panel user-progress">
+    <div class="up-head">
+      <div class="up-user">
+        <div class="up-avatar">{{ g.username.charAt(0).toUpperCase() }}</div>
+        <div>
+          <strong>{{ g.username }}</strong>
+          <small>{{ g.role === 'admin' ? 'Quản trị' : 'Học viên' }} · {{ g.rows.length }} hoạt động · hoàn thành {{ g.completed }}</small>
+        </div>
+      </div>
+      <div class="up-stats">
+        <div class="up-stat"><span>Điểm TB</span><b>{{ g.avgScore }}%</b></div>
+        <div class="up-stat"><span>Hoạt động gần nhất</span><b>{{ g.lastActivity ? (g.lastActivity | date:'dd/MM HH:mm') : '—' }}</b></div>
+      </div>
+    </div>
+    <table class="up-table">
+      <thead>
+        <tr><th>Bài học</th><th>Trạng thái</th><th>Điểm</th><th>Cập nhật</th></tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let r of g.rows">
+          <td>{{ r.lesson_title || ('Lesson #' + r.lesson_id) }}</td>
+          <td><span class="status" [class.done]="r.status === 'completed'">{{ r.status === 'completed' ? 'Hoàn thành' : r.status }}</span></td>
+          <td>{{ r.total_questions > 0 ? (r.score + '/' + r.total_questions) : '—' }}</td>
+          <td>{{ r.updated_at | date:'dd/MM HH:mm' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p *ngIf="!loading && !error && groups.length === 0" class="muted">Chưa có học viên nào có tiến độ học.</p>
+</div>

@@ -158,6 +158,11 @@ export class LearningService {
     return this.cachedGet<any>(`${this.base}/settings`);
   }
 
+  /** Admin: tiến độ học của mọi user (không cache — dữ liệu nhạy). */
+  getAdminUserProgress(): Observable<ApiResult<any[]>> {
+    return this.http.get<ApiResult<any[]>>(`${this.base}/auth/users/progress`, { headers: this.headers });
+  }
+
   saveSettings(settings: any): Observable<ApiResult<any>> {
     return this.http.put<ApiResult<any>>(`${this.base}/settings`, settings);
   }

@@ -1,0 +1,16 @@
+<!-- Logo English Step by Step: bậc thang nâng dần + mũi tên đi lên -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" role="img" aria-label="English Step by Step">
+  <defs>
+    <linearGradient id="elsb-step-grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3b82f6"/>
+      <stop offset="1" stop-color="#22c55e"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="44" height="44" rx="13" fill="url(#elsb-step-grad)"/>
+  <g fill="#ffffff">
+    <rect x="11" y="29" width="7" height="8" rx="2.2"/>
+    <rect x="20.5" y="23" width="7" height="14" rx="2.2"/>
+    <rect x="30" y="17" width="7" height="20" rx="2.2"/>
+  </g>
+  <path d="M30.5 12.5l6-5 6 5-2.4 0 0 2.2a1.4 1.4 0 0 1-2.8 0l0-2.2z" fill="#ffffff" transform="translate(0,0)"/>
+</svg>
