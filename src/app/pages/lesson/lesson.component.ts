@@ -151,6 +151,18 @@ export class LessonComponent implements OnInit, OnDestroy {
     this.playQueue(groupId, texts, 0);
   }
 
+  /** Phát từ 1 câu trong hội thoại và TỰ ĐỘNG đọc tiếp các câu sau (nút chuyển sang pause) */
+  speakFrom(groupId: string | number, index: number, texts: string[]): void {
+    const key = `${groupId}:${index}`;
+    if (this.playingGroup === groupId && this.speakingKey === key) {
+      this.stopSpeaking();
+      return;
+    }
+    this.stopSpeaking();
+    this.playingGroup = groupId;
+    this.playQueue(groupId, texts, index);
+  }
+
   private playQueue(groupId: string | number, texts: string[], index: number): void {
     if (this.playingGroup !== groupId || index >= texts.length) {
       this.playingGroup = null;
