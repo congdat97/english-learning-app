@@ -32,12 +32,12 @@
     <div class="vocab-grid">
       <article *ngFor="let v of vocabulary" class="word-card">
         <div class="word-head"><h3>{{ v.word }}</h3><span class="ipa" *ngIf="v.ipa">{{ v.ipa }}</span>
-          <button class="tiny-btn icon-speak" [class.speaking]="speakingKey === v.id + '-w'" title="Nghe từ" aria-label="Nghe từ" (click)="speakOnce(v.id + '-w', v.word)">{{ speakingKey === v.id + '-w' ? '⏸' : '▶' }}</button>
+          <button class="tiny-btn icon-speak" [class.speaking]="speakingKey() === v.id + '-w'" title="Nghe từ" aria-label="Nghe từ" (click)="speakOnce(v.id + '-w', v.word)">{{ speakingKey() === v.id + '-w' ? '⏸' : '▶' }}</button>
         </div>
         <small>{{ v.part_of_speech }}</small>
         <p><b>{{ v.meaning_vi }}</b></p>
         <div *ngFor="let e of v.examples; let ei = index" class="example-row">
-          <button class="tiny-btn icon-speak" [class.speaking]="speakingKey === v.id + ':' + ei" title="Nghe câu" aria-label="Nghe câu" (click)="speakOnce(v.id + ':' + ei, e.sentence)">{{ speakingKey === v.id + ':' + ei ? '⏸' : '▶' }}</button>
+          <button class="tiny-btn icon-speak" [class.speaking]="speakingKey() === v.id + ':' + ei" title="Nghe câu" aria-label="Nghe câu" (click)="speakOnce(v.id + ':' + ei, e.sentence)">{{ speakingKey() === v.id + ':' + ei ? '⏸' : '▶' }}</button>
           <small>Ví dụ: {{ e.sentence }}<br><ng-container *ngIf="showTranslation">{{ e.translation_vi }}</ng-container></small>
         </div>
         <div class="word-actions">
@@ -53,10 +53,10 @@
     <div *ngFor="let l of listening" class="listen-box">
       <b>🎧 {{ l.title }}</b>
       <div class="audio-controls">
-        <button class="play" [class.playing]="playingGroup === l.id && speakingKey !== null"
-                [attr.aria-label]="playingGroup === l.id ? 'Dừng đọc' : 'Phát cả đoạn'"
-                (click)="playGroup(l.id, l.transcript.map(x => x.text))">{{ playingGroup === l.id && speakingKey !== null ? '⏸' : '▶' }}</button>
-        <span class="muted">{{ playingGroup === l.id ? (speakingKey !== null ? 'Đang đọc — bấm để dừng' : 'Nghỉ giữa câu...') : 'Sẵn sàng nghe' }}</span>
+        <button class="play" [class.playing]="playingGroup() === l.id && speakingKey() !== null"
+                [attr.aria-label]="playingGroup() === l.id ? 'Dừng đọc' : 'Phát cả đoạn'"
+                (click)="playGroup(l.id, l.transcript.map(x => x.text))">{{ playingGroup() === l.id && speakingKey() !== null ? '⏸' : '▶' }}</button>
+        <span class="muted">{{ playingGroup() === l.id ? (speakingKey() !== null ? 'Đang đọc — bấm để dừng' : 'Nghỉ giữa câu...') : 'Sẵn sàng nghe' }}</span>
       </div>
       <div class="transcript">
         <div *ngFor="let line of l.transcript; let li = index" class="line" [class.reading]="speakingKey === l.id + ':' + li">

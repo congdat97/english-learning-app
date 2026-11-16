@@ -1,4 +1,4 @@
-﻿import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
+﻿import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { LearningService } from '../../services/learning.service';
@@ -31,9 +31,9 @@ export class LessonComponent implements OnInit, OnDestroy {
   speed = 1;
 
   /** Key cá»§a má»¥c Ä‘ang Ä‘á»c (Ä‘á»•i icon/mÃ u nÃºt tÆ°Æ¡ng á»©ng). */
-  speakingKey: string | number | null = null;
-  /** Id cá»§a Ä‘oáº¡n há»™i thoáº¡i Ä‘ang Ä‘á»c cáº£ nhÃ³m (Ä‘á»•i nÃºt â–¶ thÃ nh â¸). */
-  playingGroup: string | number | null = null;
+  speakingKey = signal<string | number | null>(null);
+  /** Id của đoạn hội thoại đang đọc cả nhóm (đổi nút ▶ thành ⏸). */
+  playingGroup = signal<string | number | null>(null);
 
   private gapTimer: ReturnType<typeof setTimeout> | null = null;
   private speakToken = 0;
@@ -42,7 +42,7 @@ export class LessonComponent implements OnInit, OnDestroy {
 
   /** Chá»‰ alert 1 láº§n má»—i phiÃªn Ä‘á»ƒ khÃ´ng spam. */
 
-  constructor(private route: ActivatedRoute, private learning: LearningService, private settings: SettingsService, private auth: AuthService, private zone: NgZone) {}
+  constructor(private route: ActivatedRoute, private learning: LearningService, private settings: SettingsService, private auth: AuthService) {}
 
   ngOnInit(): void {
     this.speed = this.settings.audioSpeed;
@@ -133,55 +133,50 @@ export class LessonComponent implements OnInit, OnDestroy {
 
   /** Äá»c 1 má»¥c (tá»«/cÃ¢u) â€” báº¥m láº¡i thÃ¬ ngá»«ng. */
   speakOnce(key: string | number, text: string): void {
-    if (this.speakingKey === key) {
+    if (this.speakingKey() === key) {
       this.stopSpeaking();
       return;
     }
     this.stopSpeaking();
-    this.speakingKey = key;
-    this.speakText(text, () => { this.speakingKey = null; });
+    this.speakingKey.set(key);
+    this.speakText(text, () => { this.speakingKey.set(null); });
   }
 
   /** Äá»c cáº£ Ä‘oáº¡n há»™i thoáº¡i, cÃ³ khoáº£ng nghá»‰ giá»¯a cÃ¡c cÃ¢u. Báº¥m láº¡i thÃ¬ ngá»«ng. */
   playGroup(groupId: string | number, texts: string[]): void {
-    if (this.playingGroup === groupId) {
+    if (this.playingGroup() === groupId) {
       this.stopSpeaking();
       return;
     }
     this.stopSpeaking();
-    this.playingGroup = groupId;
+    this.playingGroup.set(groupId);
     this.playQueue(groupId, texts, 0);
   }
 
   /** Phát từ 1 câu trong hội thoại và TỰ ĐỘNG đọc tiếp các câu sau (nút chuyển sang pause) */
   speakFrom(groupId: string | number, index: number, texts: string[]): void {
     const key = `${groupId}:${index}`;
-    if (this.playingGroup === groupId && this.speakingKey === key) {
+    if (this.playingGroup() === groupId && this.speakingKey() === key) {
       this.stopSpeaking();
       return;
     }
     this.stopSpeaking();
-    this.playingGroup = groupId;
+    this.playingGroup.set(groupId);
     this.playQueue(groupId, texts, index);
   }
 
   private playQueue(groupId: string | number, texts: string[], index: number): void {
-    if (this.playingGroup !== groupId || index >= texts.length) {
-      this.playingGroup = null;
-      this.speakingKey = null;
+    if (this.playingGroup() !== groupId || index >= texts.length) {
+      this.playingGroup.set(null);
+      this.speakingKey.set(null);
       return;
     }
     const key = `${groupId}:${index}`;
-    this.speakingKey = key;
+    this.speakingKey.set(key);
     this.speakText(texts[index], () => {
-      if (this.playingGroup !== groupId) return;
-      // Khoáº£ng nghá»‰ giá»¯a cÃ¡c cÃ¢u trÆ°á»›c khi Ä‘á»�c cÃ¢u tiáº¿p theo
-      // (speechSynthesis onend náº±m ngoÃ i zone -> cháº¡y láº¡i trong zone Ä‘á»ƒ UI cáº­p nháº­t)
-      this.zone.run(() => {
-        this.gapTimer = setTimeout(() => {
-          this.zone.run(() => this.playQueue(groupId, texts, index + 1));
-        }, 700);
-      });
+      if (this.playingGroup() !== groupId) return;
+      // Khoảng nghỉ giữa các câu trước khi đọc câu tiếp theo
+      this.gapTimer = setTimeout(() => this.playQueue(groupId, texts, index + 1), 700);
     });
   }
 
@@ -195,8 +190,8 @@ export class LessonComponent implements OnInit, OnDestroy {
       this.speakFallbackTimer = null;
     }
     this.speakToken++;
-    this.speakingKey = null;
-    this.playingGroup = null;
+    this.speakingKey.set(null);
+    this.playingGroup.set(null);
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
     }
@@ -204,7 +199,7 @@ export class LessonComponent implements OnInit, OnDestroy {
 
   private speakText(text: string, onDone: () => void): void {
     if (!('speechSynthesis' in window)) {
-      this.zone.run(onDone);
+      onDone();
       return;
     }
     const token = ++this.speakToken;
@@ -217,7 +212,8 @@ export class LessonComponent implements OnInit, OnDestroy {
       if (voice) utterance.voice = voice;
     }
 
-    // finish(): chạy đúng 1 lần — do onend/onerror BẮN hoặc timer dự phòng BẮN
+    // finish(): chạy đúng 1 lần — do onend/onerror bắn hoặc timer dự phòng bắn.
+    // Callback này nằm NGOÀI Angular (zoneless) nên mọi state dùng signal để UI cập nhật.
     let finished = false;
     const finish = () => {
       if (finished || token !== this.speakToken) return;
@@ -226,7 +222,7 @@ export class LessonComponent implements OnInit, OnDestroy {
         clearTimeout(this.speakFallbackTimer);
         this.speakFallbackTimer = null;
       }
-      this.zone.run(() => onDone());
+      onDone();
     };
     utterance.onend = finish;
     utterance.onerror = finish;
