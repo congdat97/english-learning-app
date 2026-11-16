@@ -395,7 +395,7 @@
 }
 
 
-.sync-dot.empty {
+.sync-dot.no-data {
   background: #f5a623;
 }
 
@@ -1499,8 +1499,8 @@
 .admin-link-btn:active { transform: scale(.94); }
 
 /* =========================================================
-   HEADER v3 — theo ?nh thi?t k? English Step by Step
-   (icon vuông l?n + tiêu d? d?m + nút tròn tr?ng: sync / avatar / menu)
+   HEADER v3 ï¿½ theo ?nh thi?t k? English Step by Step
+   (icon vuï¿½ng l?n + tiï¿½u d? d?m + nï¿½t trï¿½n tr?ng: sync / avatar / menu)
    ========================================================= */
 
 .top {
@@ -1548,7 +1548,7 @@
   gap: 14px;
 }
 
-/* --- SYNC: nút tròn tr?ng + ch?m tr?ng thái xanh nh?p nháy nh? --- */
+/* --- SYNC: nï¿½t trï¿½n tr?ng + ch?m tr?ng thï¿½i xanh nh?p nhï¿½y nh? --- */
 
 .sync-button {
   width: 48px;
@@ -1613,7 +1613,7 @@
 
 }
 
-.sync-dot.empty {
+.sync-dot.no-data {
   background: #f59e0b;
 }
 
@@ -1623,7 +1623,7 @@
   animation: none;
 }
 
-/* --- AVATAR: vòng tròn tr?ng + ch? cái gradient + mui tên --- */
+/* --- AVATAR: vï¿½ng trï¿½n tr?ng + ch? cï¿½i gradient + mui tï¿½n --- */
 
 .user-avatar-btn {
   gap: 6px;
@@ -1655,7 +1655,7 @@
   color: var(--text);
 }
 
-/* --- MENU 3 G?CH: nút tròn tr?ng --- */
+/* --- MENU 3 G?CH: nï¿½t trï¿½n tr?ng --- */
 
 .menu-button {
   width: 48px;
@@ -1801,6 +1801,4 @@
 }
 .umh-avatar { background: #fff; }
 
-/* DEBUG-PROBE */
-.sync-dot { display: none !important; }
 
