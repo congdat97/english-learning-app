@@ -112,18 +112,7 @@
           <a *ngIf="auth.isAdmin()" routerLink="/admin/progress" class="user-menu-item" (click)="closeUserMenu()">
             📊 Tiến độ học viên
           </a>
-
-          <a *ngIf="auth.isAdmin()" routerLink="/admin/users" class="user-menu-item" (click)="closeUserMenu()">
-            🛡️ Quản lý tài khoản
-          </a>
-          <a *ngIf="auth.isAdmin()" routerLink="/admin/progress" class="user-menu-item" (click)="closeUserMenu()">
-            📊 Tiến độ học viên
-          </a>
-
-          <a routerLink="/settings" class="user-menu-item" (click)="closeUserMenu()">
-            ⚙️ Cài đặt
-          </a>
-
+          
           <button type="button" class="user-menu-item logout" (click)="logout()">
             ⏻ Đăng xuất
           </button>
