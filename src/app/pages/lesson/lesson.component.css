@@ -102,9 +102,78 @@ nav button { margin-right: 8px; }
   text-align: center;
 }
 
-/* ===== Dòng hội thoại đang được đọc: highlight nhẹ ===== */
+/* ===== Dòng hội thoại: nút tròn bên trái, như mockup ===== */
 .line {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 11px 4px;
   transition: background .25s ease;
+}
+
+.line-speak {
+  width: 54px;
+  height: 54px;
+  flex: 0 0 54px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background .2s ease, color .2s ease, transform .15s ease;
+}
+
+.line-speak:active {
+  transform: scale(.94);
+}
+
+/* Chỉ câu đang phát mới là nút cam đặc + ⏸ trắng */
+.line-speak.speaking {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.line-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.line-text {
+  font-size: 14px;
+}
+
+.line-text b {
+  color: var(--primary);
+  margin-right: 8px;
+}
+
+.line .translation {
+  margin-top: 3px;
+}
+
+/* Nút phát cả đoạn: tròn to hơn theo mockup */
+.audio-controls .play {
+  width: 62px;
+  height: 62px;
+  font-size: 25px;
+}
+
+@media (max-width: 560px) {
+  .line-speak {
+    width: 46px;
+    height: 46px;
+    flex: 0 0 46px;
+    font-size: 17px;
+  }
+  .audio-controls .play {
+    width: 54px;
+    height: 54px;
+    font-size: 22px;
+  }
 }
 
 .line.reading {
