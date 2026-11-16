@@ -1,9 +1,11 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
 import { Subscription } from 'rxjs';
 
+import { environment } from '../environments/environment';
 import { ThemeService } from './services/theme.service';
 import { OfflineDataService } from './services/offline-data.service';
 import { ReminderService } from './services/reminder.service';
@@ -16,7 +18,9 @@ import { AuthService } from './services/auth.service';
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
-export class App implements OnInit {
+export class App implements OnInit, OnDestroy {
+
+  private readonly http = inject(HttpClient);
 
   private offlineDataService =
     inject(OfflineDataService);
@@ -33,6 +37,9 @@ export class App implements OnInit {
   readonly auth = inject(AuthService);
 
   private syncSubscription?: Subscription;
+
+  /** Đánh thức Render API (free tier ngủ sau ~15 phút) + giữ ấm khi app đang mở. */
+  private keepAliveTimer?: ReturnType<typeof setInterval>;
 
   mobileMenuOpen = false;
 
@@ -60,6 +67,10 @@ export class App implements OnInit {
       this.settings.load().fontSize
     );
 
+    // Đánh thức API (tránh trang admin/quản lý load chờ Render khởi động lại)
+    this.warmUpApi();
+    this.keepAliveTimer = setInterval(() => this.warmUpApi(), 10 * 60 * 1000);
+
     // Tự động tải dữ liệu về
     // localStorage nếu chưa có
     this.offlineDataService
@@ -70,6 +81,18 @@ export class App implements OnInit {
     // nếu đang bật từ trước
     this.reminderService.initFromStorage();
 
+  }
+
+  ngOnDestroy(): void {
+    if (this.keepAliveTimer) clearInterval(this.keepAliveTimer);
+    if (this.syncSubscription) this.syncSubscription.unsubscribe();
+  }
+
+  /** Ping nền im lặng — chỉ để API không ngủ. */
+  private warmUpApi(): void {
+    this.http
+      .get(`${environment.apiUrl}/courses?warm=${Date.now()}`)
+      .subscribe({ error: () => {} });
   }
 
 

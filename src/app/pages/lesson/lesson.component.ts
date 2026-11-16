@@ -235,7 +235,7 @@ export class LessonComponent implements OnInit, OnDestroy {
 
     // Dự phòng: nếu onend không bao giờ bắn (bug Chrome) -> ước lượng thời gian đọc rồi trả icon ▶
     if (this.speakFallbackTimer) clearTimeout(this.speakFallbackTimer);
-    this.speakFallbackTimer = setTimeout(finish, Math.max(2500, (text.length * 150) / this.speed));
+    this.speakFallbackTimer = setTimeout(finish, Math.max(2000, (text.length * 75) / this.speed + 1200));
   }
 
   submitReview(): void {
