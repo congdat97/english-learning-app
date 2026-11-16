@@ -37,6 +37,8 @@ export class LessonComponent implements OnInit, OnDestroy {
 
   private gapTimer: ReturnType<typeof setTimeout> | null = null;
   private speakToken = 0;
+  private currentUtterance: SpeechSynthesisUtterance | null = null;
+  private speakFallbackTimer: ReturnType<typeof setTimeout> | null = null;
 
   /** Chá»‰ alert 1 láº§n má»—i phiÃªn Ä‘á»ƒ khÃ´ng spam. */
 
@@ -188,6 +190,10 @@ export class LessonComponent implements OnInit, OnDestroy {
       clearTimeout(this.gapTimer);
       this.gapTimer = null;
     }
+    if (this.speakFallbackTimer) {
+      clearTimeout(this.speakFallbackTimer);
+      this.speakFallbackTimer = null;
+    }
     this.speakToken++;
     this.speakingKey = null;
     this.playingGroup = null;
@@ -198,7 +204,7 @@ export class LessonComponent implements OnInit, OnDestroy {
 
   private speakText(text: string, onDone: () => void): void {
     if (!('speechSynthesis' in window)) {
-      onDone();
+      this.zone.run(onDone);
       return;
     }
     const token = ++this.speakToken;
@@ -210,10 +216,30 @@ export class LessonComponent implements OnInit, OnDestroy {
       const voice = speechSynthesis.getVoices().find(v => v.name === s.voice);
       if (voice) utterance.voice = voice;
     }
-    utterance.onend = () => { if (token === this.speakToken) this.zone.run(() => onDone()); };
-    utterance.onerror = () => { if (token === this.speakToken) this.zone.run(() => onDone()); };
+
+    // finish(): chạy đúng 1 lần — do onend/onerror BẮN hoặc timer dự phòng BẮN
+    let finished = false;
+    const finish = () => {
+      if (finished || token !== this.speakToken) return;
+      finished = true;
+      if (this.speakFallbackTimer) {
+        clearTimeout(this.speakFallbackTimer);
+        this.speakFallbackTimer = null;
+      }
+      this.zone.run(() => onDone());
+    };
+    utterance.onend = finish;
+    utterance.onerror = finish;
+
+    // Giữ tham chiếu utterance (tránh GC làm mất sự kiện onend trên một số trình duyệt)
+    this.currentUtterance = utterance;
+
     window.speechSynthesis.cancel();
     window.speechSynthesis.speak(utterance);
+
+    // Dự phòng: nếu onend không bao giờ bắn (bug Chrome) -> ước lượng thời gian đọc rồi trả icon ▶
+    if (this.speakFallbackTimer) clearTimeout(this.speakFallbackTimer);
+    this.speakFallbackTimer = setTimeout(finish, Math.max(2500, (text.length * 150) / this.speed));
   }
 
   submitReview(): void {
