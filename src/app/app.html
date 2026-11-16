@@ -137,12 +137,17 @@
         <button type="button" class="user-avatar-btn" (click)="toggleUserMenu()"
                 [title]="'Tài khoản: ' + auth.currentUser()!.username"
                 aria-label="Menu tài khoản">
-          <span class="uab-letter">{{ auth.currentUser()!.username.charAt(0).toUpperCase() }}</span>
+          <img *ngIf="auth.currentUser()!.avatar; else noAvatar" class="uab-avatar" [src]="auth.currentUser()!.avatar" [alt]="auth.currentUser()!.username" />
+          <ng-template #noAvatar>
+            <span class="uab-letter">{{ auth.currentUser()!.username.charAt(0).toUpperCase() }}</span>
+          </ng-template>
           <span class="uab-caret">▾</span>
         </button>
 
         <div class="user-menu" *ngIf="userMenuOpen">
           <div class="user-menu-head">
+            <img *ngIf="auth.currentUser()!.avatar; else headNoAvatar" class="umh-avatar" [src]="auth.currentUser()!.avatar" [alt]="auth.currentUser()!.username" />
+            <ng-template #headNoAvatar><span class="umh-letter">{{ auth.currentUser()!.username.charAt(0).toUpperCase() }}</span></ng-template>
             <strong>{{ auth.currentUser()!.username }}</strong>
             <em>{{ auth.currentUser()!.role === 'admin' ? 'Quản trị' : 'Học viên' }}</em>
           </div>

@@ -7,11 +7,17 @@ export interface AuthUser {
   id: number;
   username: string;
   role: string;
+  avatar?: string | null;
 }
 
 interface AuthResponse {
   success: boolean;
   data: { token: string; user: AuthUser };
+}
+
+interface MeResponse {
+  success: boolean;
+  data: AuthUser;
 }
 
 const TOKEN_KEY = 'elf-auth-token';
@@ -55,6 +61,27 @@ export class AuthService {
     return this.http
       .post<AuthResponse>(`${this.base}/auth/register`, { username, password })
       .pipe(tap(res => this.accept(res.data)), map(res => res.data.user));
+  }
+
+  /** Lưu avatar lên server và cập nhật user hiện tại trong localStorage */
+  updateAvatar(avatar: string): Observable<AuthUser> {
+    return this.http
+      .put<MeResponse>(`${this.base}/auth/me`, { avatar })
+      .pipe(
+        map(res => res.data),
+        tap(user => this.patchUser(user))
+      );
+  }
+
+  /** Gộp dữ liệu user mới vào signal hiện tại (giữ nguyên token) */
+  private patchUser(user: AuthUser): void {
+    const merged = { ...this.userSignal(), ...user };
+    try {
+      localStorage.setItem(USER_KEY, JSON.stringify(merged));
+    } catch {
+      /* ignore */
+    }
+    this.userSignal.set(merged);
   }
 
   logout(): void {

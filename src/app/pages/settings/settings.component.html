@@ -5,6 +5,28 @@
   </header>
 
   <div class="settings-grid">
+    <div class="card avatar-card">
+      <h3>Ảnh đại diện</h3>
+      <p class="hint">Chọn avatar cho tài khoản — ảnh lấy từ DiceBear (nguồn miễn phí)</p>
+
+      <div class="avatar-grid">
+        <button *ngFor="let a of avatarOptions" type="button"
+                class="avatar-option"
+                [class.active]="selectedAvatar === a.url"
+                [style.animation-delay]="''"
+                (click)="chooseAvatar(a.url)"
+                [title]="'Phong cách ' + a.style">
+          <img [src]="a.url" [alt]="a.style + ' ' + a.seed" loading="lazy" />
+          <span class="avatar-check">✓</span>
+        </button>
+      </div>
+
+      <div class="avatar-actions">
+        <button type="button" class="text-btn" (click)="randomAvatar()">🎲 Ngẫu nhiên</button>
+        <button type="button" class="text-btn" (click)="clearAvatar()">↺ Về chữ cái đầu</button>
+      </div>
+    </div>
+
     <div class="card">
       <h3>Giọng đọc</h3>
       <p class="hint">Chỉ hiện giọng tiếng Anh khả dụng trên máy bạn</p>

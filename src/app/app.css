@@ -1777,3 +1777,30 @@
   }
 
 }
+
+/* --- AVATAR user --- */
+.uab-avatar,
+.umh-avatar,
+.umh-letter {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #fff;
+  flex: none;
+  display: block;
+}
+.umh-avatar,
+.umh-letter {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: #fff;
+  font-weight: 900;
+  font-size: 15px;
+  text-align: center;
+  line-height: 34px;
+}
+.umh-avatar { background: #fff; }
+
+/* DEBUG-PROBE */
+.sync-dot { display: none !important; }
+
