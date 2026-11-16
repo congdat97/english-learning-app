@@ -100,15 +100,22 @@ export class BookmarksComponent implements OnInit, OnDestroy {
   }
 
   unbookmark(v: Vocabulary): void {
+    // Optimistic: gỡ khỏi danh sách ngay khi bấm, lỗi thì hoàn tác
+    const idx = this.bookmarks.findIndex(b => b.id === v.id);
+    const removed = this.bookmarks[idx];
+    this.bookmarks = this.bookmarks.filter(b => b.id !== v.id);
+    this.learning.updateCachedBookmarks(this.bookmarks);
+    this.learning.syncVocabularyBookmarkCache(v.id, false);
+    this.applyFilter();
+
     this.learning.unbookmark(v.id).subscribe({
-      next: () => {
-        this.bookmarks = this.bookmarks.filter(b => b.id !== v.id);
-        // Cập nhật cả localStorage (sổ từ + thẻ từ trong lesson) lẫn DB
+      error: () => {
+        this.bookmarks.splice(Math.min(idx, this.bookmarks.length), 0, removed);
         this.learning.updateCachedBookmarks(this.bookmarks);
-        this.learning.syncVocabularyBookmarkCache(v.id, false);
+        this.learning.syncVocabularyBookmarkCache(v.id, true);
         this.applyFilter();
-      },
-      error: () => window.alert('⚠️ Không xóa được từ khỏi sổ từ vựng (API chưa hoạt động) — thử lại sau.')
+        window.alert('⚠️ Không xóa được từ khỏi sổ từ vựng (API chưa hoạt động) — thử lại sau.');
+      }
     });
   }
 

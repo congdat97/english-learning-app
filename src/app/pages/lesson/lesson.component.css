@@ -2,6 +2,33 @@
 button.selected { font-weight: bold; }
 nav button { margin-right: 8px; }
 
+/* ===== Nút phát nằm ngay cạnh từ và cạnh câu ===== */
+.word-head {
+  justify-content: flex-start;
+  gap: 9px;
+}
+
+.word-head .icon-speak {
+  margin-left: 2px;
+}
+
+.example-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 5px;
+}
+
+.example-row small {
+  flex: 1;
+  min-width: 0;
+}
+
+.example-row .icon-speak {
+  flex-shrink: 0;
+  transform: translateY(-1px);
+}
+
 /* ===== Hàng chọn tốc độ đọc (ngay trong bài học) ===== */
 .speed-row {
   display: flex;

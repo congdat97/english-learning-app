@@ -96,18 +96,26 @@ export class LessonComponent implements OnInit, OnDestroy {
       window.alert('🔐 Cần đăng nhập để lưu từ vào sổ từ vựng. Bấm "Đăng nhập" trên đầu trang.');
       return;
     }
+
+    // Optimistic: đổi icon NGAY khi bấm, đợi API ở nền; lỗi thì hoàn tác
+    const newState = !v.is_bookmarked;
     const req$ = v.is_bookmarked
       ? this.learning.unbookmark(v.id)
       : this.learning.bookmark(v.id);
+
+    v.is_bookmarked = newState;
+    v.is_favorite = newState;
+    this.learning.syncBookmarkCache(v, newState);
+    this.learning.syncVocabularyBookmarkCache(v.id, newState);
+
     req$.subscribe({
-      next: () => {
-        v.is_bookmarked = !v.is_bookmarked;
+      error: () => {
+        v.is_bookmarked = !newState;
         v.is_favorite = v.is_bookmarked;
-        // Cập nhật cả localStorage (sổ từ + thẻ từ trong lesson) lẫn DB
         this.learning.syncBookmarkCache(v, v.is_bookmarked);
         this.learning.syncVocabularyBookmarkCache(v.id, v.is_bookmarked);
-      },
-      error: () => window.alert('⚠️ Không lưu được trạng thái từ vựng (API chưa hoạt động) — thử lại sau.')
+        window.alert('⚠️ Không lưu được trạng thái từ vựng (API chưa hoạt động) — thử lại sau.');
+      }
     });
   }
 
