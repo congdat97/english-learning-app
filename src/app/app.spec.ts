@@ -1,16 +1,33 @@
 import { TestBed } from '@angular/core/testing';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideRouter } from '@angular/router';
 import { App } from './app';
 import { routes } from './app.routes';
 import { ThemeService } from './services/theme.service';
+import { authInterceptor } from './interceptors/auth.interceptor';
+import { cacheInterceptor } from './interceptors/cache.interceptor';
 
 describe('App', () => {
   beforeEach(async () => {
     localStorage.clear();
     await TestBed.configureTestingModule({
       imports: [App],
-      providers: [provideRouter(routes)],
+      providers: [
+        provideRouter(routes),
+        provideHttpClient(withInterceptors([authInterceptor, cacheInterceptor])),
+        provideHttpClientTesting(),
+      ],
     }).compileComponents();
+  });
+
+  afterEach(() => {
+    const httpMock = TestBed.inject(HttpTestingController);
+    for (let i = 0; i < 5; i++) {
+      const reqs = httpMock.match(() => true);
+      if (reqs.length === 0) break;
+      reqs.forEach(req => req.flush({ success: true, data: [] }));
+    }
   });
 
   it('should create the app', () => {
