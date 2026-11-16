@@ -1,28 +1,61 @@
 import { Routes } from '@angular/router';
-import { DashboardComponent } from './pages/dashboard/dashboard.component';
-import { CoursesComponent } from './pages/courses/courses.component';
-import { CourseDetailComponent } from './pages/course-detail/course-detail.component';
-import { LessonComponent } from './pages/lesson/lesson.component';
-import { BookmarksComponent } from './pages/bookmarks/bookmarks.component';
-import { ProgressComponent } from './pages/progress/progress.component';
-import { SettingsComponent } from './pages/settings/settings.component';
-import { LoginComponent } from './pages/login/login.component';
-import { AdminUsersComponent } from './pages/admin-users/admin-users.component';
-import { AdminProgressComponent } from './pages/admin-progress/admin-progress.component';
 import { adminGuard } from './guards/admin.guard';
 import { authGuard } from './guards/auth.guard';
 
+/**
+ * Lazy-load từng trang: chỉ tải code trang khi người dùng vào trang đó
+ * -> bundle khởi động nhỏ hơn, mở app nhanh hơn.
+ */
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-  { path: 'login', component: LoginComponent },
-  { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
-  { path: 'courses', component: CoursesComponent, canActivate: [authGuard] },
-  { path: 'courses/:id', component: CourseDetailComponent, canActivate: [authGuard] },
-  { path: 'lessons/:id', component: LessonComponent, canActivate: [authGuard] },
-  { path: 'bookmarks', component: BookmarksComponent, canActivate: [authGuard] },
-  { path: 'progress', component: ProgressComponent, canActivate: [authGuard] },
-  { path: 'settings', component: SettingsComponent, canActivate: [authGuard] },
-  { path: 'admin/users', component: AdminUsersComponent, canActivate: [authGuard, adminGuard] },
-  { path: 'admin/progress', component: AdminProgressComponent, canActivate: [authGuard, adminGuard] },
+  {
+    path: 'login',
+    loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent)
+  },
+  {
+    path: 'dashboard',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/dashboard/dashboard.component').then(m => m.DashboardComponent)
+  },
+  {
+    path: 'courses',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/courses/courses.component').then(m => m.CoursesComponent)
+  },
+  {
+    path: 'courses/:id',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/course-detail/course-detail.component').then(m => m.CourseDetailComponent)
+  },
+  {
+    path: 'lessons/:id',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/lesson/lesson.component').then(m => m.LessonComponent)
+  },
+  {
+    path: 'bookmarks',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/bookmarks/bookmarks.component').then(m => m.BookmarksComponent)
+  },
+  {
+    path: 'progress',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/progress/progress.component').then(m => m.ProgressComponent)
+  },
+  {
+    path: 'settings',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/settings/settings.component').then(m => m.SettingsComponent)
+  },
+  {
+    path: 'admin/users',
+    canActivate: [authGuard, adminGuard],
+    loadComponent: () => import('./pages/admin-users/admin-users.component').then(m => m.AdminUsersComponent)
+  },
+  {
+    path: 'admin/progress',
+    canActivate: [authGuard, adminGuard],
+    loadComponent: () => import('./pages/admin-progress/admin-progress.component').then(m => m.AdminProgressComponent)
+  },
   { path: '**', redirectTo: 'dashboard' }
 ];

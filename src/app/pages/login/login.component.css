@@ -16,7 +16,8 @@
 }
 
 .auth-logo {
-  font-size: 40px;
+  display: block;
+  margin: 0 auto 6px;
 }
 
 .auth-card h2 {
