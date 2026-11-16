@@ -30,7 +30,7 @@
 
     <div class="card admin-list">
       <h3>Danh sách tài khoản ({{ users.length }})</h3>
-      <p *ngIf="loading" class="hint">Đang tải...</p>
+      <div class="page-loader" *ngIf="loading"><span class="spinner"></span> Đang tải danh sách tài khoản...</div>
       <div *ngFor="let u of users" class="admin-row">
         <div class="admin-id">{{ u.id }}</div>
         <div class="admin-name">

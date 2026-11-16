@@ -7,7 +7,7 @@
     <a routerLink="/admin/users" class="text-btn">← Quản lý tài khoản</a>
   </header>
 
-  <p *ngIf="loading" class="muted">Đang tải…</p>
+  <div class="page-loader" *ngIf="loading"><span class="spinner"></span> Đang tải tiến độ học viên...</div>
   <p *ngIf="error && !loading" class="muted">⚠️ Không tải được dữ liệu (API chưa phản hồi hoặc bạn không có quyền admin).</p>
 
   <div *ngFor="let g of groups" class="panel user-progress">

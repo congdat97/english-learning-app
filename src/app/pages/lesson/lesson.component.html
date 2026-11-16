@@ -45,7 +45,7 @@
         </div>
       </article>
     </div>
-    <p *ngIf="vocabulary.length === 0">No vocabulary.</p>
+    <div *ngIf="vocabulary.length === 0" class="empty">Bài này chưa có từ vựng.</div>
   </section>
 
   <section *ngIf="section === 'listening'">
@@ -101,4 +101,4 @@
     </div>
   </section>
 </div>
-<ng-template #loadingTpl><p>Loading...</p></ng-template>
+<ng-template #loadingTpl><div class="page-loader"><span class="spinner"></span> Đang tải bài học...</div></ng-template>

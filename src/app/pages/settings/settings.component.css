@@ -1,6 +1,7 @@
 .settings { display: grid; gap: 1rem; }
 .settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1rem; color: var(--text); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1rem; color: var(--text); grid-column: 1 / -1; }
+.card select { max-width: 440px; }
 .hint { color: var(--muted); font-size: 12px; }
 .value { font-weight: 700; color: var(--primary); margin-top: .5rem; }
 .switch { position: relative; display: inline-block; width: 46px; height: 24px; }

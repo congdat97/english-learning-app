@@ -1,0 +1,4 @@
+.course-progress-line { display: flex; align-items: center; gap: 12px; padding: 2px 0 12px; }
+.course-progress-line span { color: var(--muted); font-size: 12px; font-weight: 700; white-space: nowrap; }
+.course-progress-line .bar { flex: 1; }
+.status { flex: none; }

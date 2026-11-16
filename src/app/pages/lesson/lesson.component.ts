@@ -1,4 +1,4 @@
-﻿import { Component, OnDestroy, OnInit } from '@angular/core';
+﻿import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { LearningService } from '../../services/learning.service';
@@ -40,7 +40,7 @@ export class LessonComponent implements OnInit, OnDestroy {
 
   /** Chá»‰ alert 1 láº§n má»—i phiÃªn Ä‘á»ƒ khÃ´ng spam. */
 
-  constructor(private route: ActivatedRoute, private learning: LearningService, private settings: SettingsService, private auth: AuthService) {}
+  constructor(private route: ActivatedRoute, private learning: LearningService, private settings: SettingsService, private auth: AuthService, private zone: NgZone) {}
 
   ngOnInit(): void {
     this.speed = this.settings.audioSpeed;
@@ -173,8 +173,13 @@ export class LessonComponent implements OnInit, OnDestroy {
     this.speakingKey = key;
     this.speakText(texts[index], () => {
       if (this.playingGroup !== groupId) return;
-      // Khoáº£ng nghá»‰ giá»¯a cÃ¡c cÃ¢u trÆ°á»›c khi Ä‘á»c cÃ¢u tiáº¿p theo
-      this.gapTimer = setTimeout(() => this.playQueue(groupId, texts, index + 1), 700);
+      // Khoáº£ng nghá»‰ giá»¯a cÃ¡c cÃ¢u trÆ°á»›c khi Ä‘á»�c cÃ¢u tiáº¿p theo
+      // (speechSynthesis onend náº±m ngoÃ i zone -> cháº¡y láº¡i trong zone Ä‘á»ƒ UI cáº­p nháº­t)
+      this.zone.run(() => {
+        this.gapTimer = setTimeout(() => {
+          this.zone.run(() => this.playQueue(groupId, texts, index + 1));
+        }, 700);
+      });
     });
   }
 
@@ -205,8 +210,8 @@ export class LessonComponent implements OnInit, OnDestroy {
       const voice = speechSynthesis.getVoices().find(v => v.name === s.voice);
       if (voice) utterance.voice = voice;
     }
-    utterance.onend = () => { if (token === this.speakToken) onDone(); };
-    utterance.onerror = () => { if (token === this.speakToken) onDone(); };
+    utterance.onend = () => { if (token === this.speakToken) this.zone.run(() => onDone()); };
+    utterance.onerror = () => { if (token === this.speakToken) this.zone.run(() => onDone()); };
     window.speechSynthesis.cancel();
     window.speechSynthesis.speak(utterance);
   }
