@@ -1560,14 +1560,6 @@
   margin-bottom: 5px;
   border-bottom: 1px solid var(--border);
 }
-.user-menu-head::before {
-  content: "";
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  flex: none;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-}
 .user-menu-head strong { font-size: 14px; }
 .user-menu-head em {
   font-style: normal;
