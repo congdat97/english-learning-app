@@ -44,29 +44,29 @@ export class App implements OnInit, OnDestroy {
   /** Popup chọn avatar. */
   avatarPickerOpen = false;
 
-  /** Bộ avatar hoạt hình từ các API free (tapback.co, navii.dev, kodama.sh). */
+  /** Bộ avatar đẹp từ DiceBear v10 — nền pastel tròn, 3 style minh họa xinh. */
   readonly avatarChoices: string[] = [
-    // Tapback — Memoji kiểu Apple (webp)
-    'https://tapback.co/api/avatar/leo.webp',
-    'https://tapback.co/api/avatar/mai.webp',
-    'https://tapback.co/api/avatar/son.webp',
-    'https://tapback.co/api/avatar/hoa.webp',
-    'https://tapback.co/api/avatar/kai.webp',
-    'https://tapback.co/api/avatar/yen.webp',
-    // Navii — nhân vật mascot hoạt hình
-    'https://api.navii.dev/avatar/leo?size=96&tileBg=auto',
-    'https://api.navii.dev/avatar/mai?size=96&tileBg=auto',
-    'https://api.navii.dev/avatar/son?size=96&tileBg=auto',
-    'https://api.navii.dev/avatar/hoa?size=96&tileBg=auto',
-    'https://api.navii.dev/avatar/kai?size=96&tileBg=auto',
-    'https://api.navii.dev/avatar/yen?size=96&tileBg=auto',
-    // Kodama — mặt hoạt hình anime vui nhộn
-    'https://api.kodama.sh/leo',
-    'https://api.kodama.sh/mai',
-    'https://api.kodama.sh/son',
-    'https://api.kodama.sh/hoa',
-    'https://api.kodama.sh/kai',
-    'https://api.kodama.sh/yen'
+    // Lorelei — vẽ tay dịu dàng (CC0)
+    'https://api.dicebear.com/10.x/lorelei/svg?seed=Felix&radius=50&backgroundColor=b6e3f4',
+    'https://api.dicebear.com/10.x/lorelei/svg?seed=Aneka&radius=50&backgroundColor=c0aede',
+    'https://api.dicebear.com/10.x/lorelei/svg?seed=Jocelyn&radius=50&backgroundColor=d1d4f9',
+    'https://api.dicebear.com/10.x/lorelei/svg?seed=Kassandra&radius=50&backgroundColor=ffd5dc',
+    'https://api.dicebear.com/10.x/lorelei/svg?seed=Lionel&radius=50&backgroundColor=ffdfbf',
+    'https://api.dicebear.com/10.x/lorelei/svg?seed=Noah&radius=50&backgroundColor=d3d4dd',
+    // Notionists — phong cách Notion (CC0)
+    'https://api.dicebear.com/10.x/notionists/svg?seed=Nova&radius=50&backgroundColor=ffd5dc',
+    'https://api.dicebear.com/10.x/notionists/svg?seed=Orion&radius=50&backgroundColor=b6e3f4',
+    'https://api.dicebear.com/10.x/notionists/svg?seed=Ivy&radius=50&backgroundColor=c0aede',
+    'https://api.dicebear.com/10.x/notionists/svg?seed=Sage&radius=50&backgroundColor=ffdfbf',
+    'https://api.dicebear.com/10.x/notionists/svg?seed=Luna&radius=50&backgroundColor=d1d4f9',
+    'https://api.dicebear.com/10.x/notionists/svg?seed=Milo&radius=50&backgroundColor=d3d4dd',
+    // Avataaars — cartoon bán thân (Pablo Stanley)
+    'https://api.dicebear.com/10.x/avataaars/svg?seed=Leo&radius=50&backgroundColor=b6e3f4',
+    'https://api.dicebear.com/10.x/avataaars/svg?seed=Emma&radius=50&backgroundColor=ffd5dc',
+    'https://api.dicebear.com/10.x/avataaars/svg?seed=Aiden&radius=50&backgroundColor=c0aede',
+    'https://api.dicebear.com/10.x/avataaars/svg?seed=Sophia&radius=50&backgroundColor=ffdfbf',
+    'https://api.dicebear.com/10.x/avataaars/svg?seed=Jack&radius=50&backgroundColor=d1d4f9',
+    'https://api.dicebear.com/10.x/avataaars/svg?seed=Mia&radius=50&backgroundColor=d3d4dd'
   ];
 
   get currentAvatar(): string | null {
