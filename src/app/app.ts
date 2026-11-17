@@ -44,29 +44,26 @@ export class App implements OnInit, OnDestroy {
   /** Popup chọn avatar. */
   avatarPickerOpen = false;
 
-  /** Bộ avatar đẹp từ DiceBear v10 — nền pastel tròn, 3 style minh họa xinh. */
+  /** Avatar render sẵn từ npm (@dicebear/core + @dicebear/styles) — local, không cần API ngoài. */
   readonly avatarChoices: string[] = [
     // Lorelei — vẽ tay dịu dàng (CC0)
-    'https://api.dicebear.com/10.x/lorelei/svg?seed=Felix&radius=50&backgroundColor=b6e3f4',
-    'https://api.dicebear.com/10.x/lorelei/svg?seed=Aneka&radius=50&backgroundColor=c0aede',
-    'https://api.dicebear.com/10.x/lorelei/svg?seed=Jocelyn&radius=50&backgroundColor=d1d4f9',
-    'https://api.dicebear.com/10.x/lorelei/svg?seed=Kassandra&radius=50&backgroundColor=ffd5dc',
-    'https://api.dicebear.com/10.x/lorelei/svg?seed=Lionel&radius=50&backgroundColor=ffdfbf',
-    'https://api.dicebear.com/10.x/lorelei/svg?seed=Noah&radius=50&backgroundColor=d3d4dd',
+    '/avatars/lorelei-leo.svg', '/avatars/lorelei-mai.svg', '/avatars/lorelei-son.svg', '/avatars/lorelei-hoa.svg',
+    '/avatars/lorelei-kai.svg', '/avatars/lorelei-yen.svg', '/avatars/lorelei-luna.svg', '/avatars/lorelei-orion.svg',
     // Notionists — phong cách Notion (CC0)
-    'https://api.dicebear.com/10.x/notionists/svg?seed=Nova&radius=50&backgroundColor=ffd5dc',
-    'https://api.dicebear.com/10.x/notionists/svg?seed=Orion&radius=50&backgroundColor=b6e3f4',
-    'https://api.dicebear.com/10.x/notionists/svg?seed=Ivy&radius=50&backgroundColor=c0aede',
-    'https://api.dicebear.com/10.x/notionists/svg?seed=Sage&radius=50&backgroundColor=ffdfbf',
-    'https://api.dicebear.com/10.x/notionists/svg?seed=Luna&radius=50&backgroundColor=d1d4f9',
-    'https://api.dicebear.com/10.x/notionists/svg?seed=Milo&radius=50&backgroundColor=d3d4dd',
+    '/avatars/notionists-leo.svg', '/avatars/notionists-mai.svg', '/avatars/notionists-son.svg', '/avatars/notionists-hoa.svg',
+    '/avatars/notionists-kai.svg', '/avatars/notionists-yen.svg', '/avatars/notionists-luna.svg', '/avatars/notionists-orion.svg',
     // Avataaars — cartoon bán thân (Pablo Stanley)
-    'https://api.dicebear.com/10.x/avataaars/svg?seed=Leo&radius=50&backgroundColor=b6e3f4',
-    'https://api.dicebear.com/10.x/avataaars/svg?seed=Emma&radius=50&backgroundColor=ffd5dc',
-    'https://api.dicebear.com/10.x/avataaars/svg?seed=Aiden&radius=50&backgroundColor=c0aede',
-    'https://api.dicebear.com/10.x/avataaars/svg?seed=Sophia&radius=50&backgroundColor=ffdfbf',
-    'https://api.dicebear.com/10.x/avataaars/svg?seed=Jack&radius=50&backgroundColor=d1d4f9',
-    'https://api.dicebear.com/10.x/avataaars/svg?seed=Mia&radius=50&backgroundColor=d3d4dd'
+    '/avatars/avataaars-leo.svg', '/avatars/avataaars-mai.svg', '/avatars/avataaars-son.svg', '/avatars/avataaars-hoa.svg',
+    '/avatars/avataaars-kai.svg', '/avatars/avataaars-yen.svg', '/avatars/avataaars-luna.svg', '/avatars/avataaars-orion.svg',
+    // Open Peeps — chân dung người doodle (CC0)
+    '/avatars/open-peeps-leo.svg', '/avatars/open-peeps-mai.svg', '/avatars/open-peeps-son.svg', '/avatars/open-peeps-hoa.svg',
+    '/avatars/open-peeps-kai.svg', '/avatars/open-peeps-yen.svg', '/avatars/open-peeps-luna.svg', '/avatars/open-peeps-orion.svg',
+    // Bottts — robot hoạt hình (Pablo Stanley)
+    '/avatars/bottts-leo.svg', '/avatars/bottts-mai.svg', '/avatars/bottts-son.svg', '/avatars/bottts-hoa.svg',
+    '/avatars/bottts-kai.svg', '/avatars/bottts-yen.svg', '/avatars/bottts-luna.svg', '/avatars/bottts-orion.svg',
+    // Thumbs — mặt doodle tròn (CC0)
+    '/avatars/thumbs-leo.svg', '/avatars/thumbs-mai.svg', '/avatars/thumbs-son.svg', '/avatars/thumbs-hoa.svg',
+    '/avatars/thumbs-kai.svg', '/avatars/thumbs-yen.svg', '/avatars/thumbs-luna.svg', '/avatars/thumbs-orion.svg'
   ];
 
   get currentAvatar(): string | null {
