@@ -5,11 +5,6 @@ import { RouterLink } from '@angular/router';
 import { LearningService } from '../../services/learning.service';
 import { SettingsService } from '../../services/settings.service';
 import { ThemeService } from '../../services/theme.service';
-import { AuthService } from '../../services/auth.service';
-
-/** Nguồn avatar: DiceBear (miễn phí, nhiều phong cách, không cần API key) */
-const AVATAR_STYLES = ['adventurer', 'big-smile', 'lorelei', 'micah', 'fun-emoji', 'bottts'];
-const AVATAR_SEEDS = ['felix', 'sunny', 'nova', 'bolt'];
 
 @Component({
   selector: 'app-settings',
@@ -26,17 +21,11 @@ export class SettingsComponent implements OnInit {
   saving = false;
   saveMsg = '';
 
-  /** Avatar: danh sách lựa chọn + lựa chọn hiện tại */
-  avatarOptions: { url: string; style: string; seed: string }[] = [];
-  selectedAvatar = '';
-
   readonly themeService = inject(ThemeService);
 
-  constructor(private learning: LearningService, private settings: SettingsService, private auth: AuthService) {}
+  constructor(private learning: LearningService, private settings: SettingsService) {}
 
   ngOnInit(): void {
-    this.selectedAvatar = this.auth.currentUser()?.avatar || '';
-    this.buildAvatarOptions();
     const saved = this.settings.load();
     this.voice = saved.voice;
     this.theme = saved.theme;
@@ -128,49 +117,6 @@ export class SettingsComponent implements OnInit {
 
   onVoiceChange(): void {
     this.settings.savePartial({ voice: this.voice });
-  }
-
-  /** Tạo danh sách avatar từ DiceBear: 6 phong cách x 4 seed */
-  private buildAvatarOptions(): void {
-    const options: { url: string; style: string; seed: string }[] = [];
-    for (const style of AVATAR_STYLES) {
-      for (const seed of AVATAR_SEEDS) {
-        options.push({
-          url: `https://api.dicebear.com/9.x/${style}/svg?seed=${seed}&backgroundType=gradientLinear`,
-          style,
-          seed
-        });
-      }
-    }
-    this.avatarOptions = options;
-  }
-
-  /** 🎲 Ngẫu nhiên: sinh avatar mới theo seed bất kỳ */
-  randomAvatar(): void {
-    const style = AVATAR_STYLES[Math.floor(Math.random() * AVATAR_STYLES.length)];
-    const seed = Math.random().toString(36).slice(2, 8);
-    this.selectedAvatar = `https://api.dicebear.com/9.x/${style}/svg?seed=${seed}&backgroundType=gradientLinear`;
-    this.saveAvatar();
-  }
-
-  /** Chọn 1 avatar trong lưới -> lưu ngay */
-  chooseAvatar(url: string): void {
-    this.selectedAvatar = url;
-    this.saveAvatar();
-  }
-
-  /** Bỏ avatar -> về chữ cái đầu */
-  clearAvatar(): void {
-    this.selectedAvatar = '';
-    this.saveAvatar();
-  }
-
-  private saveAvatar(): void {
-    this.saveMsg = '';
-    this.auth.updateAvatar(this.selectedAvatar).subscribe({
-      next: () => { this.saveMsg = '✅ Đã cập nhật ảnh đại diện.'; },
-      error: () => { this.saveMsg = '⚠️ Không lưu được ảnh đại diện (API chưa phản hồi).'; }
-    });
   }
 
   private persistLocal(): void {

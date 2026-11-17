@@ -44,28 +44,29 @@ export class App implements OnInit, OnDestroy {
   /** Popup chọn avatar. */
   avatarPickerOpen = false;
 
-  /** Bộ avatar từ link ngoài (bắt mắt, có sẵn nhiều phong cách). */
+  /** Bộ avatar hoạt hình từ các API free (tapback.co, navii.dev, kodama.sh). */
   readonly avatarChoices: string[] = [
-    // DiceBear — hoạt hình vui nhộn
-    'https://api.dicebear.com/9.x/adventurer/png?seed=Leo&size=96',
-    'https://api.dicebear.com/9.x/adventurer/png?seed=Mia&size=96',
-    'https://api.dicebear.com/9.x/big-smile/png?seed=Sunny&size=96',
-    'https://api.dicebear.com/9.x/big-smile/png?seed=Coco&size=96',
-    'https://api.dicebear.com/9.x/fun-emoji/png?seed=Blast&size=96',
-    'https://api.dicebear.com/9.x/fun-emoji/png?seed=Star&size=96',
-    'https://api.dicebear.com/9.x/bottts/png?seed=Robo&size=96',
-    'https://api.dicebear.com/9.x/bottts/png?seed=Bolt&size=96',
-    'https://api.dicebear.com/9.x/pixel-art/png?seed=Nova&size=96',
-    'https://api.dicebear.com/9.x/pixel-art/png?seed=Echo&size=96',
-    'https://api.dicebear.com/9.x/micah/png?seed=Finn&size=96',
-    'https://api.dicebear.com/9.x/notionists/png?seed=Ivy&size=96',
-    // Ảnh người thật — i.pravatar.cc
-    'https://i.pravatar.cc/96?img=12',
-    'https://i.pravatar.cc/96?img=20',
-    'https://i.pravatar.cc/96?img=32',
-    'https://i.pravatar.cc/96?img=36',
-    'https://i.pravatar.cc/96?img=47',
-    'https://i.pravatar.cc/96?img=56'
+    // Tapback — Memoji kiểu Apple (webp)
+    'https://tapback.co/api/avatar/leo.webp',
+    'https://tapback.co/api/avatar/mai.webp',
+    'https://tapback.co/api/avatar/son.webp',
+    'https://tapback.co/api/avatar/hoa.webp',
+    'https://tapback.co/api/avatar/kai.webp',
+    'https://tapback.co/api/avatar/yen.webp',
+    // Navii — nhân vật mascot hoạt hình
+    'https://api.navii.dev/avatar/leo?size=96&tileBg=auto',
+    'https://api.navii.dev/avatar/mai?size=96&tileBg=auto',
+    'https://api.navii.dev/avatar/son?size=96&tileBg=auto',
+    'https://api.navii.dev/avatar/hoa?size=96&tileBg=auto',
+    'https://api.navii.dev/avatar/kai?size=96&tileBg=auto',
+    'https://api.navii.dev/avatar/yen?size=96&tileBg=auto',
+    // Kodama — mặt hoạt hình anime vui nhộn
+    'https://api.kodama.sh/leo',
+    'https://api.kodama.sh/mai',
+    'https://api.kodama.sh/son',
+    'https://api.kodama.sh/hoa',
+    'https://api.kodama.sh/kai',
+    'https://api.kodama.sh/yen'
   ];
 
   get currentAvatar(): string | null {
