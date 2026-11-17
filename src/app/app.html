@@ -326,12 +326,17 @@
     </div>
     <p class="ap-sub">Chọn 1 avatar bạn thích — lưu ngay vào tài khoản</p>
 
-    <div class="ap-grid">
-      <button *ngFor="let url of avatarChoices" type="button" class="ap-option"
-              [class.active]="currentAvatar === url" (click)="pickAvatar(url)">
-        <img [src]="url" alt="avatar" loading="lazy" />
-        <span class="ap-check">✓</span>
-      </button>
+    <div class="ap-scroll">
+      <section *ngFor="let g of avatarGroups" class="ap-section">
+        <h4 class="ap-section-title">{{ g.label }}</h4>
+        <div class="ap-grid">
+          <button *ngFor="let url of g.items" type="button" class="ap-option"
+                  [class.active]="currentAvatar === url" (click)="pickAvatar(url)">
+            <img [src]="url" alt="avatar" loading="lazy" />
+            <span class="ap-check">✓</span>
+          </button>
+        </div>
+      </section>
     </div>
 
     <button type="button" class="ap-reset" (click)="resetAvatar()">

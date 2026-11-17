@@ -44,26 +44,32 @@ export class App implements OnInit, OnDestroy {
   /** Popup chọn avatar. */
   avatarPickerOpen = false;
 
-  /** Avatar render sẵn từ npm (@dicebear/core + @dicebear/styles) — local, không cần API ngoài. */
-  readonly avatarChoices: string[] = [
-    // Lorelei — vẽ tay dịu dàng (CC0)
-    '/avatars/lorelei-leo.svg', '/avatars/lorelei-mai.svg', '/avatars/lorelei-son.svg', '/avatars/lorelei-hoa.svg',
-    '/avatars/lorelei-kai.svg', '/avatars/lorelei-yen.svg', '/avatars/lorelei-luna.svg', '/avatars/lorelei-orion.svg',
-    // Notionists — phong cách Notion (CC0)
-    '/avatars/notionists-leo.svg', '/avatars/notionists-mai.svg', '/avatars/notionists-son.svg', '/avatars/notionists-hoa.svg',
-    '/avatars/notionists-kai.svg', '/avatars/notionists-yen.svg', '/avatars/notionists-luna.svg', '/avatars/notionists-orion.svg',
-    // Avataaars — cartoon bán thân (Pablo Stanley)
-    '/avatars/avataaars-leo.svg', '/avatars/avataaars-mai.svg', '/avatars/avataaars-son.svg', '/avatars/avataaars-hoa.svg',
-    '/avatars/avataaars-kai.svg', '/avatars/avataaars-yen.svg', '/avatars/avataaars-luna.svg', '/avatars/avataaars-orion.svg',
-    // Open Peeps — chân dung người doodle (CC0)
-    '/avatars/open-peeps-leo.svg', '/avatars/open-peeps-mai.svg', '/avatars/open-peeps-son.svg', '/avatars/open-peeps-hoa.svg',
-    '/avatars/open-peeps-kai.svg', '/avatars/open-peeps-yen.svg', '/avatars/open-peeps-luna.svg', '/avatars/open-peeps-orion.svg',
-    // Bottts — robot hoạt hình (Pablo Stanley)
-    '/avatars/bottts-leo.svg', '/avatars/bottts-mai.svg', '/avatars/bottts-son.svg', '/avatars/bottts-hoa.svg',
-    '/avatars/bottts-kai.svg', '/avatars/bottts-yen.svg', '/avatars/bottts-luna.svg', '/avatars/bottts-orion.svg',
-    // Thumbs — mặt doodle tròn (CC0)
-    '/avatars/thumbs-leo.svg', '/avatars/thumbs-mai.svg', '/avatars/thumbs-son.svg', '/avatars/thumbs-hoa.svg',
-    '/avatars/thumbs-kai.svg', '/avatars/thumbs-yen.svg', '/avatars/thumbs-luna.svg', '/avatars/thumbs-orion.svg'
+  /** Bộ avatar động vật từ CentBot (SVG animal icons + PNG kawaii/cutevat) — local, nhóm theo phong cách. */
+  readonly avatarGroups: { label: string; items: string[] }[] = [
+    {
+      label: '🐾 Động vật (SVG)',
+      items: [
+        '/avatars/animals/meo.svg', '/avatars/animals/cun.svg', '/avatars/animals/gau.svg', '/avatars/animals/tho.svg',
+        '/avatars/animals/chimcanhcut.svg', '/avatars/animals/vit.svg', '/avatars/animals/heo.svg', '/avatars/animals/cao.svg',
+        '/avatars/animals/sutu.svg', '/avatars/animals/cuu.svg', '/avatars/animals/ech.svg', '/avatars/animals/rua.svg',
+        '/avatars/animals/kylan.svg', '/avatars/animals/caheo.svg', '/avatars/animals/gautrang.svg', '/avatars/animals/cumo.svg'
+      ]
+    },
+    {
+      label: '🐱 Cute Vật',
+      items: Array.from({ length: 20 }, (_, i) => `/avatars/animals/cutevat_${String(i + 1).padStart(2, '0')}.png`)
+    },
+    {
+      label: '🌸 Kawaii',
+      items: [
+        '/avatars/animals/kawaii_01a.png',
+        ...Array.from({ length: 23 }, (_, i) => `/avatars/animals/kawaii_${String(i + 2).padStart(2, '0')}.png`)
+      ]
+    },
+    {
+      label: '🦊 Thú Vật',
+      items: ['/avatars/animals/thuvat_00.png', '/avatars/animals/thuvat_01.png', '/avatars/animals/thuvat_02.png']
+    }
   ];
 
   get currentAvatar(): string | null {
