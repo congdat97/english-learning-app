@@ -44,31 +44,15 @@ export class App implements OnInit, OnDestroy {
   /** Popup chọn avatar. */
   avatarPickerOpen = false;
 
-  /** Bộ avatar động vật từ CentBot (SVG animal icons + PNG kawaii/cutevat) — local, nhóm theo phong cách. */
+  /** Bộ avatar động vật (Cute Vật + Kawaii) từ CentBot — local, gộp thành 1 nhóm. */
   readonly avatarGroups: { label: string; items: string[] }[] = [
     {
-      label: '🐾 Động vật (SVG)',
+      label: '🐾 Động vật',
       items: [
-        '/avatars/animals/meo.svg', '/avatars/animals/cun.svg', '/avatars/animals/gau.svg', '/avatars/animals/tho.svg',
-        '/avatars/animals/chimcanhcut.svg', '/avatars/animals/vit.svg', '/avatars/animals/heo.svg', '/avatars/animals/cao.svg',
-        '/avatars/animals/sutu.svg', '/avatars/animals/cuu.svg', '/avatars/animals/ech.svg', '/avatars/animals/rua.svg',
-        '/avatars/animals/kylan.svg', '/avatars/animals/caheo.svg', '/avatars/animals/gautrang.svg', '/avatars/animals/cumo.svg'
-      ]
-    },
-    {
-      label: '🐱 Cute Vật',
-      items: Array.from({ length: 20 }, (_, i) => `/avatars/animals/cutevat_${String(i + 1).padStart(2, '0')}.png`)
-    },
-    {
-      label: '🌸 Kawaii',
-      items: [
+        ...Array.from({ length: 20 }, (_, i) => `/avatars/animals/cutevat_${String(i + 1).padStart(2, '0')}.png`),
         '/avatars/animals/kawaii_01a.png',
         ...Array.from({ length: 23 }, (_, i) => `/avatars/animals/kawaii_${String(i + 2).padStart(2, '0')}.png`)
       ]
-    },
-    {
-      label: '🦊 Thú Vật',
-      items: ['/avatars/animals/thuvat_00.png', '/avatars/animals/thuvat_01.png', '/avatars/animals/thuvat_02.png']
     }
   ];
 
