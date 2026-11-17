@@ -170,25 +170,35 @@ export class App implements OnInit, OnDestroy {
     if (event.target === event.currentTarget) this.closeAvatarPicker();
   }
 
-  /** Chọn avatar từ bộ gợi ý và lưu lên server. */
+  /** Chọn avatar từ bộ gợi ý — cập nhật UI ngay, lưu server nền (optimistic). */
   pickAvatar(url: string): void {
+    if (!this.auth.isLoggedIn()) {
+      this.toast.info('🔐 Cần đăng nhập để đổi avatar.');
+      return;
+    }
+    const prev = this.currentAvatar;
+    this.closeAvatarPicker();
+    this.auth.setLocalAvatar(url);
     this.auth.updateAvatar(url).subscribe({
-      next: () => {
-        this.avatarPickerOpen = false;
-        this.toast.success('Đã cập nhật avatar của bạn!');
-      },
-      error: () => this.toast.error('Không lưu được avatar — thử lại sau.')
+      next: () => this.toast.success('Đã cập nhật avatar của bạn!'),
+      error: () => {
+        this.auth.setLocalAvatar(prev);
+        this.toast.error('Không lưu được avatar — thử lại sau.');
+      }
     });
   }
 
-  /** Bỏ avatar, quay lại chữ cái đầu. */
+  /** Bỏ avatar, quay lại chữ cái đầu (optimistic). */
   resetAvatar(): void {
+    const prev = this.currentAvatar;
+    this.closeAvatarPicker();
+    this.auth.setLocalAvatar(null);
     this.auth.updateAvatar('').subscribe({
-      next: () => {
-        this.avatarPickerOpen = false;
-        this.toast.info('Đã dùng lại chữ cái đầu làm avatar.');
-      },
-      error: () => this.toast.error('Không lưu được avatar — thử lại sau.')
+      next: () => this.toast.info('Đã dùng lại chữ cái đầu làm avatar.'),
+      error: () => {
+        this.auth.setLocalAvatar(prev);
+        this.toast.error('Không lưu được avatar — thử lại sau.');
+      }
     });
   }
 

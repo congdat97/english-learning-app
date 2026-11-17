@@ -73,6 +73,19 @@ export class AuthService {
       );
   }
 
+  /** Cập nhật avatar cục bộ ngay lập tức (optimistic) — không gọi server */
+  setLocalAvatar(avatar: string | null): void {
+    const current = this.userSignal();
+    if (!current) return;
+    const merged = { ...current, avatar };
+    try {
+      localStorage.setItem(USER_KEY, JSON.stringify(merged));
+    } catch {
+      /* ignore */
+    }
+    this.userSignal.set(merged);
+  }
+
   /** Gộp dữ liệu user mới vào signal hiện tại (giữ nguyên token) */
   private patchUser(user: AuthUser): void {
     const merged = { ...this.userSignal(), ...user };
