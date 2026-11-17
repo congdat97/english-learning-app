@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { LearningService } from '../../services/learning.service';
 import { ReminderService } from '../../services/reminder.service';
 import { SettingsService } from '../../services/settings.service';
+import { ToastService } from '../../services/toast.service';
 import { Vocabulary } from '../../models/learning.model';
 
 @Component({
@@ -43,7 +44,8 @@ export class BookmarksComponent implements OnInit, OnDestroy {
     private learning: LearningService,
     private reminderService: ReminderService,
     private settings: SettingsService,
-    private zone: NgZone
+    private zone: NgZone,
+    private toast: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -134,7 +136,7 @@ export class BookmarksComponent implements OnInit, OnDestroy {
         this.learning.updateCachedBookmarks(this.bookmarks);
         this.learning.syncVocabularyBookmarkCache(v.id, true);
         this.applyFilter();
-        window.alert('⚠️ Không xóa được từ khỏi sổ từ vựng (API chưa hoạt động) — thử lại sau.');
+        this.toast.error('⚠️ Không xóa được từ khỏi sổ từ vựng — thử lại sau.');
       }
     });
   }

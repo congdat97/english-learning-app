@@ -11,6 +11,7 @@ import { OfflineDataService } from './services/offline-data.service';
 import { ReminderService } from './services/reminder.service';
 import { SettingsService } from './services/settings.service';
 import { AuthService } from './services/auth.service';
+import { ToastService } from './services/toast.service';
 
 @Component({
   selector: 'app-root',
@@ -36,7 +37,40 @@ export class App implements OnInit, OnDestroy {
 
   readonly auth = inject(AuthService);
 
+  readonly toast = inject(ToastService);
+
   private syncSubscription?: Subscription;
+
+  /** Popup chọn avatar. */
+  avatarPickerOpen = false;
+
+  /** Bộ avatar từ link ngoài (bắt mắt, có sẵn nhiều phong cách). */
+  readonly avatarChoices: string[] = [
+    // DiceBear — hoạt hình vui nhộn
+    'https://api.dicebear.com/9.x/adventurer/png?seed=Leo&size=96',
+    'https://api.dicebear.com/9.x/adventurer/png?seed=Mia&size=96',
+    'https://api.dicebear.com/9.x/big-smile/png?seed=Sunny&size=96',
+    'https://api.dicebear.com/9.x/big-smile/png?seed=Coco&size=96',
+    'https://api.dicebear.com/9.x/fun-emoji/png?seed=Blast&size=96',
+    'https://api.dicebear.com/9.x/fun-emoji/png?seed=Star&size=96',
+    'https://api.dicebear.com/9.x/bottts/png?seed=Robo&size=96',
+    'https://api.dicebear.com/9.x/bottts/png?seed=Bolt&size=96',
+    'https://api.dicebear.com/9.x/pixel-art/png?seed=Nova&size=96',
+    'https://api.dicebear.com/9.x/pixel-art/png?seed=Echo&size=96',
+    'https://api.dicebear.com/9.x/micah/png?seed=Finn&size=96',
+    'https://api.dicebear.com/9.x/notionists/png?seed=Ivy&size=96',
+    // Ảnh người thật — i.pravatar.cc
+    'https://i.pravatar.cc/96?img=12',
+    'https://i.pravatar.cc/96?img=20',
+    'https://i.pravatar.cc/96?img=32',
+    'https://i.pravatar.cc/96?img=36',
+    'https://i.pravatar.cc/96?img=47',
+    'https://i.pravatar.cc/96?img=56'
+  ];
+
+  get currentAvatar(): string | null {
+    return this.auth.currentUser()?.avatar || null;
+  }
 
   /** Đánh thức Render API (free tier ngủ sau ~15 phút) + giữ ấm khi app đang mở. */
   private keepAliveTimer?: ReturnType<typeof setInterval>;
@@ -133,6 +167,41 @@ export class App implements OnInit, OnDestroy {
 
   closeUserMenu(): void {
     this.userMenuOpen = false;
+  }
+
+  openAvatarPicker(): void {
+    this.userMenuOpen = false;
+    this.avatarPickerOpen = true;
+  }
+
+  closeAvatarPicker(): void {
+    this.avatarPickerOpen = false;
+  }
+
+  closeAvatarPickerOnBackdrop(event: MouseEvent): void {
+    if (event.target === event.currentTarget) this.closeAvatarPicker();
+  }
+
+  /** Chọn avatar từ bộ gợi ý và lưu lên server. */
+  pickAvatar(url: string): void {
+    this.auth.updateAvatar(url).subscribe({
+      next: () => {
+        this.avatarPickerOpen = false;
+        this.toast.success('Đã cập nhật avatar của bạn!');
+      },
+      error: () => this.toast.error('Không lưu được avatar — thử lại sau.')
+    });
+  }
+
+  /** Bỏ avatar, quay lại chữ cái đầu. */
+  resetAvatar(): void {
+    this.auth.updateAvatar('').subscribe({
+      next: () => {
+        this.avatarPickerOpen = false;
+        this.toast.info('Đã dùng lại chữ cái đầu làm avatar.');
+      },
+      error: () => this.toast.error('Không lưu được avatar — thử lại sau.')
+    });
   }
 
 

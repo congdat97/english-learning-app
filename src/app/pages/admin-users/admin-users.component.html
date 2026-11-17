@@ -48,3 +48,18 @@
     <a routerLink="/dashboard" class="text-btn">← Quay lại</a>
   </div>
 </div>
+
+<!-- XÁC NHẬN XÓA TÀI KHOẢN -->
+<div class="confirm-overlay" [class.open]="pendingDelete !== null" (click)="cancelRemove()">
+  <div class="confirm-card" *ngIf="pendingDelete as u" (click)="$event.stopPropagation()">
+    <div class="confirm-icon">🗑️</div>
+    <h3>Xóa tài khoản?</h3>
+    <p>Tài khoản <strong>"{{ u.username }}"</strong> cùng toàn bộ tiến độ và từ đã lưu sẽ bị xóa vĩnh viễn.</p>
+    <div class="confirm-actions">
+      <button type="button" class="confirm-cancel" (click)="cancelRemove()">Hủy</button>
+      <button type="button" class="confirm-danger" (click)="confirmRemove()">
+        {{ deleting ? 'Đang xóa...' : 'Xóa tài khoản' }}
+      </button>
+    </div>
+  </div>
+</div>

@@ -29,6 +29,10 @@ export class AdminUsersComponent implements OnInit {
   creating = false;
   message = '';
 
+  /** User đang chờ xác nhận xóa (popup xác nhận đẹp thay window.confirm). */
+  pendingDelete: UserRow | null = null;
+  deleting = false;
+
   private base = environment.apiUrl;
   private http = inject(HttpClient);
   readonly auth = inject(AuthService);
@@ -81,10 +85,28 @@ export class AdminUsersComponent implements OnInit {
 
   removeUser(u: UserRow): void {
     if (u.id === this.auth.currentUser()?.id) return;
-    if (!window.confirm(`Xóa tài khoản "${u.username}"?`)) return;
+    this.pendingDelete = u;
+  }
+
+  confirmRemove(): void {
+    const u = this.pendingDelete;
+    if (!u) return;
+    this.deleting = true;
     this.http.delete<{ success: boolean }>(`${this.base}/auth/users/${u.id}`).subscribe({
-      next: () => this.loadUsers(),
-      error: (e) => this.message = e?.error?.message || '⚠️ Không xóa được tài khoản.'
+      next: () => {
+        this.deleting = false;
+        this.pendingDelete = null;
+        this.loadUsers();
+      },
+      error: (e) => {
+        this.deleting = false;
+        this.pendingDelete = null;
+        this.message = e?.error?.message || '⚠️ Không xóa được tài khoản.';
+      }
     });
+  }
+
+  cancelRemove(): void {
+    this.pendingDelete = null;
   }
 }

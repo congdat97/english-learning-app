@@ -141,7 +141,6 @@
           <ng-template #noAvatar>
             <span class="uab-letter">{{ auth.currentUser()!.username.charAt(0).toUpperCase() }}</span>
           </ng-template>
-          <span class="uab-caret">▾</span>
         </button>
 
         <div class="user-menu" *ngIf="userMenuOpen">
@@ -151,6 +150,10 @@
             <strong>{{ auth.currentUser()!.username }}</strong>
             <em>{{ auth.currentUser()!.role === 'admin' ? 'Quản trị' : 'Học viên' }}</em>
           </div>
+
+          <button type="button" class="user-menu-item" (click)="openAvatarPicker()">
+            🎨 Đổi avatar
+          </button>
 
           <a *ngIf="auth.isAdmin()" routerLink="/admin/users" class="user-menu-item" (click)="closeUserMenu()">
             🛡️ Quản trị tài khoản
@@ -308,4 +311,44 @@
 
   </div>
 
+</div>
+
+
+<!-- ============================================= -->
+<!-- AVATAR PICKER                                 -->
+<!-- ============================================= -->
+
+<div class="settings-overlay" [class.open]="avatarPickerOpen" (click)="closeAvatarPickerOnBackdrop($event)">
+  <div class="avatar-picker" role="dialog" aria-label="Chọn avatar">
+    <div class="ap-head">
+      <h3>🎨 Chọn avatar</h3>
+      <button type="button" class="ap-close" aria-label="Đóng" (click)="closeAvatarPicker()">✕</button>
+    </div>
+    <p class="ap-sub">Chọn 1 avatar bạn thích — lưu ngay vào tài khoản</p>
+
+    <div class="ap-grid">
+      <button *ngFor="let url of avatarChoices" type="button" class="ap-option"
+              [class.active]="currentAvatar === url" (click)="pickAvatar(url)">
+        <img [src]="url" alt="avatar" loading="lazy" />
+        <span class="ap-check">✓</span>
+      </button>
+    </div>
+
+    <button type="button" class="ap-reset" (click)="resetAvatar()">
+      ⭕ Dùng lại chữ cái đầu
+    </button>
+  </div>
+</div>
+
+
+<!-- ============================================= -->
+<!-- TOASTS                                        -->
+<!-- ============================================= -->
+
+<div class="toast-stack" aria-live="polite">
+  <div *ngFor="let t of toast.toasts()" class="toast" [class]="'toast-' + t.type" (click)="toast.dismiss(t.id)">
+    <span class="toast-icon">{{ toast.icon(t.type) }}</span>
+    <span class="toast-msg">{{ t.message }}</span>
+    <button type="button" class="toast-close" aria-label="Đóng">✕</button>
+  </div>
 </div>

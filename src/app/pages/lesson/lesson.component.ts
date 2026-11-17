@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { LearningService } from '../../services/learning.service';
 import { SettingsService } from '../../services/settings.service';
 import { AuthService } from '../../services/auth.service';
+import { ToastService } from '../../services/toast.service';
 import { Lesson, Vocabulary, Listening, ReviewQuestion } from '../../models/learning.model';
 
 @Component({
@@ -42,7 +43,7 @@ export class LessonComponent implements OnInit, OnDestroy {
 
   /** Chá»‰ alert 1 láº§n má»—i phiÃªn Ä‘á»ƒ khÃ´ng spam. */
 
-  constructor(private route: ActivatedRoute, private learning: LearningService, private settings: SettingsService, private auth: AuthService) {}
+  constructor(private route: ActivatedRoute, private learning: LearningService, private settings: SettingsService, private auth: AuthService, private toast: ToastService) {}
 
   ngOnInit(): void {
     this.speed = this.settings.audioSpeed;
@@ -95,7 +96,7 @@ export class LessonComponent implements OnInit, OnDestroy {
 
   toggleFavorite(v: Vocabulary): void {
     if (!this.auth.isLoggedIn()) {
-      window.alert('🔐 Cần đăng nhập để lưu từ vào sổ từ vựng. Bấm "Đăng nhập" trên đầu trang.');
+      this.toast.info('🔐 Cần đăng nhập để lưu từ vào sổ từ vựng. Bấm "Đăng nhập" trên đầu trang.');
       return;
     }
 
@@ -116,7 +117,7 @@ export class LessonComponent implements OnInit, OnDestroy {
         v.is_favorite = v.is_bookmarked;
         this.learning.syncBookmarkCache(v, v.is_bookmarked);
         this.learning.syncVocabularyBookmarkCache(v.id, v.is_bookmarked);
-        window.alert('⚠️ Không lưu được trạng thái từ vựng (API chưa hoạt động) — thử lại sau.');
+        this.toast.error('⚠️ Không lưu được trạng thái từ vựng — thử lại sau.');
       }
     });
   }
@@ -243,16 +244,16 @@ export class LessonComponent implements OnInit, OnDestroy {
     this.score = this.review.filter(q => this.answers[q.id] === q.answer).length;
     if (this.lesson) {
       if (!this.auth.isLoggedIn()) {
-        window.alert(`✅ Hoàn thành bài học! Điểm: ${this.score}/${this.review.length}. Đăng nhập để lưu tiến độ vào tài khoản.`);
+        this.toast.info(`✅ Hoàn thành bài học! Điểm: ${this.score}/${this.review.length}. Đăng nhập để lưu tiến độ vào tài khoản.`);
         return;
       }
       this.learning.saveProgress(this.lesson.id, 'completed', this.score, this.review.length).subscribe({
         next: (res) => {
           // Lưu DB xong -> cập nhật luôn cache tiến độ trong localStorage
           if (res.data) this.learning.syncProgressCache(this.lesson!.id, res.data);
-          window.alert(`✅ Hoàn thành bài học! Điểm: ${this.score}/${this.review.length} (đã lưu tiến độ).`);
+          this.toast.success(`🎉 Hoàn thành bài học! Điểm: ${this.score}/${this.review.length} (đã lưu tiến độ).`);
         },
-        error: () => window.alert(`⚠️ Không lưu được tiến độ lên server (API chưa hoạt động) — điểm ${this.score}/${this.review.length} chỉ hiển thị tạm thời.`)
+        error: () => this.toast.error(`⚠️ Không lưu được tiến độ lên server — điểm ${this.score}/${this.review.length} chỉ hiển thị tạm thời.`)
       });
     }
   }
