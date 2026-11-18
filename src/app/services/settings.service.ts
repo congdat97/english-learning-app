@@ -42,7 +42,10 @@ export class SettingsService {
   save(settings: LearningSettings): void {
     localStorage.setItem(this.keyFor(), JSON.stringify(settings));
     this.applyFontSize(settings.fontSize);
-    this.applyTheme(settings.theme);
+    // CHỈ áp theme khi khác theme đang dùng — tránh đổi tốc độ/font reset mất theme hiện tại
+    if (settings.theme && this.themeService.currentTheme?.id !== settings.theme) {
+      this.applyTheme(settings.theme);
+    }
   }
 
   applyTheme(theme: string): void {
