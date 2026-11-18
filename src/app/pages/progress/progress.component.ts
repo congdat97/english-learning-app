@@ -29,6 +29,21 @@ export class ProgressComponent implements OnInit, OnDestroy {
 
   constructor(private learning: LearningService) {}
 
+  /** Emoji theo cấp độ khóa học (đồng bộ với dashboard) */
+  courseEmoji(course: Course): string {
+    const key = `${course.title} ${course.level}`.toLowerCase();
+    if (key.includes('nền tảng') || key.includes('beginner')) return '🌱';
+    if (key.includes('mở rộng') || key.includes('pre')) return '🌳';
+    if (key.includes('giao tiếp') || key.includes('elementary')) return '🌿';
+    return '📘';
+  }
+
+  /** Tên khóa hiển thị: bỏ tiền tố cấp độ trước dấu ":" */
+  courseName(course: Course): string {
+    const idx = course.title.indexOf(':');
+    return idx > 0 ? course.title.slice(idx + 1).trim() : course.title;
+  }
+
   ngOnInit(): void {
     this.slowTimer = setTimeout(() => { if (this.loading) this.slowApi = true; }, 8000);
     // 1 request tiến độ tổng + N request danh sách lesson (thay vì 1 request/lesson)

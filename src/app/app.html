@@ -1,7 +1,18 @@
 <header class="top">
 
   <!-- ============================================= -->
-  <!-- BRAND -->
+  <!-- MENU BUTTON (trái cùng, kiểu app)             -->
+  <!-- ============================================= -->
+
+  <button type="button" class="menu-button" [class.open]="mobileMenuOpen" aria-label="Mở menu"
+          (click)="toggleMobileMenu(); $event.stopPropagation()">
+    <span class="mb-bar"></span>
+    <span class="mb-bar"></span>
+    <span class="mb-bar"></span>
+  </button>
+
+  <!-- ============================================= -->
+  <!-- BRAND                                         -->
   <!-- ============================================= -->
 
   <a routerLink="/dashboard" class="brand">
@@ -133,7 +144,7 @@
 
     <!-- TAI KHOAN: avatar tròn + mũi tên ẩn menu (đăng xuất nằm trong menu) -->
     <ng-container *ngIf="auth.isLoggedIn(); else loginLink">
-      <div class="user-area">
+      <div class="user-area" (click)="$event.stopPropagation()">
         <button type="button" class="user-avatar-btn" (click)="toggleUserMenu()"
                 [title]="'Tài khoản: ' + auth.currentUser()!.username"
                 aria-label="Menu tài khoản">
@@ -150,6 +161,26 @@
             <strong>{{ auth.currentUser()!.username }}</strong>
             <em>{{ auth.currentUser()!.role === 'admin' ? 'Quản trị' : 'Học viên' }}</em>
           </div>
+
+          <a routerLink="/dashboard" routerLinkActive="active" class="user-menu-item" (click)="closeUserMenu()">
+            🏠 Trang chủ
+          </a>
+
+          <a routerLink="/courses" routerLinkActive="active" class="user-menu-item" (click)="closeUserMenu()">
+            📚 Khóa học
+          </a>
+
+          <a routerLink="/bookmarks" routerLinkActive="active" class="user-menu-item" (click)="closeUserMenu()">
+            ⭐ Sổ từ vựng
+          </a>
+
+          <a routerLink="/progress" routerLinkActive="active" class="user-menu-item" (click)="closeUserMenu()">
+            📊 Tiến độ
+          </a>
+
+          <a routerLink="/settings" routerLinkActive="active" class="user-menu-item" (click)="closeUserMenu()">
+            ⚙️ Cài đặt
+          </a>
 
           <button type="button" class="user-menu-item" (click)="openAvatarPicker()">
             🎨 Đổi avatar
@@ -172,13 +203,6 @@
     <ng-template #loginLink>
       <a routerLink="/login" class="login-link">Đăng nhập</a>
     </ng-template>
-
-    <!-- MOBILE MENU: nút tròn trắng 3 gạch -->
-    <button type="button" class="menu-button" [class.open]="mobileMenuOpen" aria-label="Mở menu" (click)="toggleMobileMenu()">
-      <span class="mb-bar"></span>
-      <span class="mb-bar"></span>
-      <span class="mb-bar"></span>
-    </button>
 
   </div>
 

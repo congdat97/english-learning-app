@@ -1,0 +1,59 @@
+/* ===== Thẻ tiến độ từng khóa — giống card khóa học ở dashboard ===== */
+
+.progress-card-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.progress-emoji {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+  background: var(--primary-soft);
+}
+
+.progress-card-title {
+  flex: 1;
+  min-width: 0;
+}
+
+.progress-card-title strong {
+  display: block;
+  font-size: 15px;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.progress-card-title small {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.progress-card .text-btn {
+  flex: none;
+  white-space: nowrap;
+}
+
+.progress-card .bar span {
+  transition: width .7s cubic-bezier(.22, 1, .36, 1);
+}
+
+.progress-hint {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.progress-hint.ok {
+  color: #22a06b;
+  font-weight: 700;
+}

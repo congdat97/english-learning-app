@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -136,7 +136,16 @@ export class App implements OnInit, OnDestroy {
 
 
   toggleMobileMenu(): void {
+    this.userMenuOpen = false;
+
     this.mobileMenuOpen = !this.mobileMenuOpen;
+  }
+
+  /** Bấm ra ngoài (document) → đóng mọi menu đang mở. */
+  @HostListener('document:click')
+  onDocumentClick(): void {
+    this.mobileMenuOpen = false;
+    this.userMenuOpen = false;
   }
 
   closeMobileMenu(): void {
@@ -150,6 +159,8 @@ export class App implements OnInit, OnDestroy {
   }
 
   toggleUserMenu(): void {
+    this.mobileMenuOpen = false;
+
     this.userMenuOpen = !this.userMenuOpen;
   }
 
