@@ -23,7 +23,15 @@ export class LearningService {
 
   private auth = inject(AuthService);
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    try {
+      const version = '2026-11-18';
+      if (localStorage.getItem('api-cache-version') !== version) {
+        Object.keys(localStorage).filter(k => k.startsWith('api-cache:')).forEach(k => localStorage.removeItem(k));
+        localStorage.setItem('api-cache-version', version);
+      }
+    } catch {}
+  }
 
   /** Cache phân theo user — user A không thấy cache của user B. */
   private cacheKey(url: string): string {
