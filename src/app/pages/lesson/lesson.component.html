@@ -1,19 +1,8 @@
 <div *ngIf="lesson; else loadingTpl">
-  <div class="lesson-intro">
-    <div>
-      <div class="eyebrow">LESSON {{ lesson.sort_order }}</div>
-      <h2>{{ lesson.title }}</h2>
-      <p>{{ lesson.topic }}</p>
-      <p style="margin-top:9px">⏱ {{ lesson.duration_minutes }} phút</p>
-    </div>
-    <div class="lesson-emoji">👋</div>
-  </div>
-
   <div class="subnav">
-    <button [class.active]="section === 'intro'" (click)="setSection('intro')">1. Giới thiệu</button>
-    <button [class.active]="section === 'vocabulary'" (click)="setSection('vocabulary')">2. Từ vựng</button>
-    <button [class.active]="section === 'listening'" (click)="setSection('listening')">3. Luyện nghe</button>
-    <button [class.active]="section === 'review'" (click)="setSection('review')">4. Ôn tập</button>
+    <button [class.active]="section === 'vocabulary'" (click)="setSection('vocabulary')">📚 Từ vựng</button>
+    <button [class.active]="section === 'listening'" (click)="setSection('listening')">💬 Luyện nghe</button>
+    <button [class.active]="section === 'review'" (click)="setSection('review')">📝 Ôn tập</button>
   </div>
 
   <div class="speed-row">
@@ -21,11 +10,6 @@
     <button *ngFor="let r of speeds" type="button" class="speed-chip"
             [class.active]="speed === r" (click)="setSpeed(r)">{{ r }}x</button>
   </div>
-
-  <section *ngIf="section === 'intro'" class="panel">
-    <h3>🎯 Mục tiêu bài học</h3>
-    <ul><li *ngFor="let o of lesson.objectives">{{ o }}</li></ul>
-  </section>
 
   <section *ngIf="section === 'vocabulary'">
     <div class="section-head"><div><h2>📚 Từ vựng trong bài</h2><p>Học từng từ một — nghe phát âm, đọc ví dụ rồi chuyển từ tiếp theo</p></div></div>
@@ -115,9 +99,9 @@
     <div class="result-actions" *ngIf="listening.length > 0 && allListeningQuestions.length > 0">
       <button class="primary" (click)="submitListening()" *ngIf="!listeningSubmitted">Kiểm tra đáp án nghe</button>
       <button class="primary" (click)="resetListening()" *ngIf="listeningSubmitted">Làm lại</button>
-      <p *ngIf="listeningSubmitted" class="feedback">Score: {{ listeningScore }} / {{ allListeningQuestions.length }}</p>
+      <p *ngIf="listeningSubmitted" class="feedback">Điểm: {{ listeningScore }} / {{ allListeningQuestions.length }}</p>
     </div>
-    <p *ngIf="listening.length === 0">No listening.</p>
+    <div *ngIf="listening.length === 0" class="empty">Bài này chưa có phần luyện nghe.</div>
   </section>
 
   <section *ngIf="section === 'review'">

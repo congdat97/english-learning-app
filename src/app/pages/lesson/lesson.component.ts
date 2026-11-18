@@ -19,7 +19,7 @@ export class LessonComponent implements OnInit, OnDestroy {
   listening: Listening[] = [];
   review: ReviewQuestion[] = [];
   loading = true;
-  section: 'intro' | 'vocabulary' | 'listening' | 'review' = 'intro';
+  section: 'vocabulary' | 'listening' | 'review' = 'vocabulary';
   answers: Record<number, string> = {};
   submitted = false;
   score = 0;
@@ -63,7 +63,7 @@ export class LessonComponent implements OnInit, OnDestroy {
     this.stopSpeaking();
   }
 
-  setSection(s: 'intro' | 'vocabulary' | 'listening' | 'review'): void {
+  setSection(s: 'vocabulary' | 'listening' | 'review'): void {
     this.stopSpeaking();
     this.section = s;
   }

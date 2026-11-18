@@ -29,20 +29,27 @@ nav button { margin-right: 8px; }
   transform: translateY(-1px);
 }
 
-/* ===== Hàng chọn tốc độ đọc (ngay trong bài học) ===== */
+/* ===== Hàng chọn tốc độ đọc — trượt ngang như subnav, không rơi dòng ===== */
 .speed-row {
   display: flex;
   align-items: center;
   gap: 7px;
-  flex-wrap: wrap;
-  margin: 10px 0 2px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+  margin: 12px 0 2px;
+  padding: 2px;
 }
+
+.speed-row::-webkit-scrollbar { display: none; }
 
 .speed-label {
   font-size: 12px;
   font-weight: 800;
   color: var(--muted);
   margin-right: 2px;
+  white-space: nowrap;
+  flex: none;
 }
 
 .speed-chip {
