@@ -43,14 +43,12 @@
       </div>
 
       <div class="word-actions">
-        <button class="btn-ghost" [disabled]="vocabIndex() === 0" (click)="prevVocab()">â† Tá»« trÆ°á»›c</button>
-        <button class="tiny-btn" [class.saved]="v.is_bookmarked" (click)="toggleFavorite(v)">{{ v.is_bookmarked ? 'â˜… ÄÃ£ lÆ°u' : 'â˜† LÆ°u tá»«' }}</button>
-        <button class="tiny-btn mic-btn" [class.listening]="pronState() === v.id" (click)="startPronounce(v)">
-          {{ pronState() === v.id ? 'ðŸŽ§ Äang nghe...' : 'ðŸŽ™ PhÃ¡t Ã¢m' }}
-        </button>
-        <span *ngIf="pronBest()[v.id]" class="pron-best">ðŸ† {{ pronBest()[v.id] }}%</span>
-        <button class="btn-primary" (click)="nextVocab()">{{ vocabIndex() === vocabulary.length - 1 ? 'Há»c láº¡i tá»« Ä‘áº§u â†»' : 'Tá»« tiáº¿p theo â†’' }}</button>
-      </div>
+         <button class="btn-ghost" [disabled]="vocabIndex() === 0" (click)="prevVocab()">&#9664; Từ trước</button>
+         <button class="tiny-btn" [class.saved]="v.is_bookmarked" (click)="toggleFavorite(v)">{{ v.is_bookmarked ? '★ Đã lưu' : '☆ Lưu từ' }}</button>
+         <button class="tiny-btn mic-btn" [class.listening]="pronState() === v.id" (click)="startPronounce(v)">{{ pronState() === v.id ? '⏹ Dừng' : '🎤 Phát âm' }}</button>
+         <span *ngIf="pronBest()[v.id]" class="pron-best">⭐ {{ pronBest()[v.id] }}%</span>
+         <button class="btn-primary" (click)="nextVocab()">{{ vocabIndex() === vocabulary.length - 1 ? '🔄 Học lại từ đầu' : 'Từ tiếp theo ▶' }}</button>
+       </div>
       <div *ngIf="pronState() !== v.id && pronResult() !== 'none'" class="pron-result"
            [class.ok]="pronResult() === 'ok'" [class.mid]="pronResult() === 'mid'">
         <div class="pron-bar"><span [style.width.%]="pronScore()"></span></div>
