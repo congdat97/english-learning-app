@@ -121,18 +121,17 @@ export class LessonComponent implements OnInit, OnDestroy {
     }
   }
 
-  handleSwipe(): void {
+  private handleSwipe(): void {
     const deltaX = this.touchEndX - this.touchStartX;
     const swipeThreshold = 30;
     if (Math.abs(deltaX) < swipeThreshold) return;
 
     if (deltaX > 0) {
-      this.nextVocab();
-    } else {
       this.prevVocab();
+    } else {
+      this.nextVocab();
     }
   }
-
   // ===== Ôn tập: 1 câu / lượt + Kiểm tra đáp án (theo mockup) =====
   quizIndex = signal(0);
   quizChecked = signal(false);
@@ -468,6 +467,7 @@ export class LessonComponent implements OnInit, OnDestroy {
     this.quizCorrect.set(false);
   }
 }
+
 
 
 
