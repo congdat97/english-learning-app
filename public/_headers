@@ -2,11 +2,10 @@
   Cache-Control: public, max-age=0, must-revalidate
 /index.html
   Cache-Control: no-cache, no-store, must-revalidate
+  Content-Type: text/html; charset=utf-8
 /*.js
   Cache-Control: public, max-age=31536000, immutable
+  Content-Type: application/javascript; charset=utf-8
 /*.css
   Cache-Control: public, max-age=31536000, immutable
-/*.ico
-  Cache-Control: public, max-age=31536000, immutable
-/*.png
-  Cache-Control: public, max-age=31536000, immutable
+  Content-Type: text/css; charset=utf-8
