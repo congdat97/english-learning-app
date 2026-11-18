@@ -154,50 +154,22 @@
           </ng-template>
         </button>
 
-        <div class="user-menu" *ngIf="userMenuOpen">
-          <div class="user-menu-head">
-            <img *ngIf="auth.currentUser()!.avatar; else headNoAvatar" class="umh-avatar" [src]="auth.currentUser()!.avatar" [alt]="auth.currentUser()!.username" />
-            <ng-template #headNoAvatar><span class="umh-letter">{{ auth.currentUser()!.username.charAt(0).toUpperCase() }}</span></ng-template>
-            <strong>{{ auth.currentUser()!.username }}</strong>
-            <em>{{ auth.currentUser()!.role === 'admin' ? 'Quản trị' : 'Học viên' }}</em>
+<div class="user-menu" *ngIf="userMenuOpen">
+            <div class="user-menu-head">
+              <img *ngIf="auth.currentUser()!.avatar; else headNoAvatar" class="umh-avatar" [src]="auth.currentUser()!.avatar" [alt]="auth.currentUser()!.username" />
+              <ng-template #headNoAvatar><span class="umh-letter">{{ auth.currentUser()!.username.charAt(0).toUpperCase() }}</span></ng-template>
+              <strong>{{ auth.currentUser()!.username }}</strong>
+              <em>{{ auth.currentUser()!.role === 'admin' ? 'Quản trị' : 'Học viên' }}</em>
+            </div>
+
+            <button type="button" class="user-menu-item" (click)="openAvatarPicker()">
+              🎨 Đổi avatar
+            </button>
+
+            <button type="button" class="user-menu-item logout" (click)="logout()">
+              ⏻ Đăng xuất
+            </button>
           </div>
-
-          <a routerLink="/dashboard" routerLinkActive="active" class="user-menu-item" (click)="closeUserMenu()">
-            🏠 Trang chủ
-          </a>
-
-          <a routerLink="/courses" routerLinkActive="active" class="user-menu-item" (click)="closeUserMenu()">
-            📚 Khóa học
-          </a>
-
-          <a routerLink="/bookmarks" routerLinkActive="active" class="user-menu-item" (click)="closeUserMenu()">
-            ⭐ Sổ từ vựng
-          </a>
-
-          <a routerLink="/progress" routerLinkActive="active" class="user-menu-item" (click)="closeUserMenu()">
-            📊 Tiến độ
-          </a>
-
-          <a routerLink="/settings" routerLinkActive="active" class="user-menu-item" (click)="closeUserMenu()">
-            ⚙️ Cài đặt
-          </a>
-
-          <button type="button" class="user-menu-item" (click)="openAvatarPicker()">
-            🎨 Đổi avatar
-          </button>
-
-          <a *ngIf="auth.isAdmin()" routerLink="/admin/users" class="user-menu-item" (click)="closeUserMenu()">
-            🛡️ Quản trị tài khoản
-          </a>
-
-          <a *ngIf="auth.isAdmin()" routerLink="/admin/progress" class="user-menu-item" (click)="closeUserMenu()">
-            📊 Tiến độ học viên
-          </a>
-
-          <button type="button" class="user-menu-item logout" (click)="logout()">
-            ⏻ Đăng xuất
-          </button>
-        </div>
       </div>
     </ng-container>
     <ng-template #loginLink>

@@ -704,40 +704,43 @@
 }
 
 .user-avatar-btn {
-  width: 38px;
-  height: 38px;
-  border-radius: 12px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
   border: 1px solid var(--border);
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  color: #fff;
-  font-weight: 900;
-  font-size: 15px;
-  cursor: pointer;
-  transition: .2s ease;
-  box-shadow: 0 2px 6px var(--primary-soft);
+  background: var(--surface);
+
+  gap: 6px;
+
+  box-shadow:
+    0 4px 14px rgba(15, 23, 42, 0.10),
+    0 1px 3px rgba(15, 23, 42, 0.06);
+
+  transition: transform .15s ease, box-shadow .15s ease;
 }
 
 .user-avatar-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 14px var(--primary-soft-2);
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.14);
+  border-color: var(--primary);
 }
 
 .user-menu {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 6px);
   right: 0;
-  min-width: 210px;
+  min-width: 180px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: 12px;
   box-shadow: var(--shadow);
-  padding: 6px;
+  padding: 6px 8px;
   z-index: 60;
-  animation: userMenuIn .18s ease both;
+  animation: userMenuIn .15s ease both;
 }
 
 @keyframes userMenuIn {
-  from { opacity: 0; transform: translateY(-6px); }
+  from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: none; }
 }
 
@@ -768,19 +771,17 @@
 .user-menu-item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   width: 100%;
-  padding: 9px 12px;
+  padding: 6px 10px;
   border: 0;
-  border-radius: 10px;
+  border-radius: 8px;
   background: transparent;
   color: var(--text);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
-  text-decoration: none;
   cursor: pointer;
-  text-align: left;
-  transition: .15s ease;
+  transition: .12s ease;
 }
 
 .user-menu-item:hover {
@@ -790,9 +791,9 @@
 .user-menu-item.logout {
   color: #ef4444;
   border-top: 1px dashed var(--border);
-  border-radius: 0 0 10px 10px;
-  margin-top: 4px;
-  padding-top: 10px;
+  border-radius: 0 0 8px 8px;
+  margin-top: 2px;
+  padding-top: 6px;
 }
 
 .user-menu-item.logout:hover {
@@ -1855,10 +1856,10 @@
 }
 
 .uab-letter {
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
 
-  font-size: 17px;
+  font-size: 19px;
 }
 
 .uab-caret {
