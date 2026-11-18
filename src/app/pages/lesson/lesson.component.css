@@ -263,9 +263,33 @@ nav button { margin-right: 8px; }
 }
 
 .pronounce {
-  font-size: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.ipa-chip {
+  font-family: 'Cambria Math', 'Segoe UI', Georgia, serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--blue);
+  background: color-mix(in srgb, var(--pale) 80%, var(--white));
+  border: 1px solid color-mix(in srgb, var(--blue) 20%, transparent);
+  border-radius: 20px;
+  padding: 5px 12px;
+}
+
+.pos-chip {
+  font-size: 11px;
+  font-weight: 700;
   color: var(--muted);
-  margin-top: 4px;
+  background: color-mix(in srgb, var(--line) 50%, var(--white));
+  border-radius: 20px;
+  padding: 5px 10px;
+  text-transform: capitalize;
 }
 
 .meaning {

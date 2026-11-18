@@ -242,6 +242,12 @@ export class LessonComponent implements OnInit, OnDestroy {
     this.speakingKey.set(key);
     this.speakText(texts[index], () => {
       if (this.playingGroup() !== groupId) return;
+      // Câu cuối -> kết thúc ngay (không nghỉ thêm)
+      if (index >= texts.length - 1) {
+        this.playingGroup.set(null);
+        this.speakingKey.set(null);
+        return;
+      }
       // Khoảng nghỉ giữa các câu trước khi đọc câu tiếp theo
       this.gapTimer = setTimeout(() => this.playQueue(groupId, texts, index + 1), 700);
     });
