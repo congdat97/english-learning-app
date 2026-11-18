@@ -14,11 +14,13 @@
   <section *ngIf="section === 'vocabulary'">
     <div class="section-head"><div><h2>📚 Từ vựng trong bài</h2><p>Học từng từ một — nghe phát âm, đọc ví dụ rồi chuyển từ tiếp theo</p></div></div>
 
-    <article *ngIf="currentVocab as v" class="word-card carousel-card"
-  (touchstart)="onTouchStart($event)"
-  (touchend)="onTouchEnd($event)"
-  (touchmove)="onTouchMove($event)">
-      <div class="word-top">
+     <article *ngIf="currentVocab as v" class="word-card carousel-card"
+   (touchstart)="onTouchStart($event)"
+   (touchend)="onTouchEnd($event)"
+   (touchmove)="onTouchMove($event)">
+       <button class="nav-btn prev" title="Từ trước" aria-label="Từ trước" [disabled]="vocabIndex() === 0" (click)="prevVocab()">◀</button>
+       <button class="nav-btn next" title="Từ tiếp theo" aria-label="Từ tiếp theo" (click)="nextVocab()">{{ vocabIndex() === vocabulary.length - 1 ? '↻' : '▶' }}</button>
+       <div class="word-top">
         <span class="vocab-tag">Từ vựng</span>
         <span class="counter">{{ vocabCounter }}</span>
       </div>
@@ -43,19 +45,19 @@
       </div>
  
        <div class="word-actions">
-          <button class="btn-ghost" title="Từ trước" aria-label="Từ trước" [disabled]="vocabIndex() === 0" (click)="prevVocab()">◀</button>
           <button class="tiny-btn" title="Lưu từ" aria-label="Lưu từ" [class.saved]="v.is_bookmarked" (click)="toggleFavorite(v)">{{ v.is_bookmarked ? '★' : '☆' }}</button>
           <button class="tiny-btn mic-btn" title="Phát âm" aria-label="Phát âm" [class.listening]="pronState() === v.id" (click)="startPronounce(v)">{{ pronState() === v.id ? '⏹' : '🎤' }}</button>
           <span *ngIf="pronBest()[v.id]" class="pron-best">★ {{ pronBest()[v.id] }}%</span>
-          <button class="btn-primary" title="Từ tiếp theo" aria-label="Từ tiếp theo" (click)="nextVocab()">{{ vocabIndex() === vocabulary.length - 1 ? '↻' : '▶' }}</button>
         </div>
-      <div *ngIf="pronState() !== v.id && pronResult() !== 'none'" class="pron-result"
+      <div *ngIf="pronState() === v.id || pronResult() !== 'none'" class="pron-result"
            [class.ok]="pronResult() === 'ok'" [class.mid]="pronResult() === 'mid'">
-        <div class="pron-bar"><span [style.width.%]="pronScore()"></span></div>
+        <div class="pron-bar" *ngIf="pronState() === v.id || pronScore() > 0"><span [style.width.%]="pronScore()"></span></div>
         <div class="pron-score-line">
-          <b>{{ pronScore() }}%</b> giống
+          <ng-container *ngIf="pronState() === v.id || pronScore() > 0">
+            <b>{{ pronScore() }}%</b> giống
+          </ng-container>
           <span class="pron-verdict">
-            {{ pronResult() === 'ok' ? '— phát âm chuẩn! 🎉' : pronResult() === 'mid' ? '— khá đấy, thử lại cho chuẩn hơn 👍' : '— nghe được: "' + pronHeard() + '" — thử lại nhé' }}
+            {{ pronState() === v.id ? '— đang nghe...' : pronResult() === 'ok' ? '— phát âm chuẩn! 🎉' : pronResult() === 'mid' ? '— khá đấy, thử lại cho chuẩn hơn 👍' : '— nghe được: "' + pronHeard() + '" — thử lại nhé' }}
           </span>
         </div>
       </div>

@@ -1832,23 +1832,23 @@
   animation: none;
 }
 
-/* --- AVATAR: v�ng tr�n tr?ng + ch? c�i gradient + mui t�n --- */
+/* --- AVATAR: không khung tròn ngoài, chỉ avatar --- */
 
 .user-avatar-btn {
-  gap: 6px;
+  gap: 0;
 
-  height: 48px;
+  width: auto;
+  height: auto;
 
-  padding: 5px 12px 5px 5px;
+  padding: 0;
 
-  border-radius: 999px;
+  border-radius: 50%;
   border: 0;
 
-  background: var(--surface);
+  background: transparent;
 
-  box-shadow:
-    0 4px 14px rgba(15, 23, 42, 0.10),
-    0 1px 3px rgba(15, 23, 42, 0.06);
+  box-shadow: none;
+  cursor: pointer;
 }
 
 .uab-letter {
@@ -1955,9 +1955,9 @@
   }
 
   .user-avatar-btn {
-    height: 42px;
+    height: auto;
 
-    padding: 4px 10px 4px 4px;
+    padding: 0;
   }
 
   .uab-letter {

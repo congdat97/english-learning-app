@@ -142,7 +142,7 @@ export class LessonComponent implements OnInit, OnDestroy {
   }
 
   get quizCount(): string {
-    return 'C�u ' + (this.quizIndex() + 1) + ' / ' + this.review.length;
+    return 'Câu ' + (this.quizIndex() + 1) + ' / ' + this.review.length;
   }
 
   get quizPercent(): number {
@@ -193,7 +193,7 @@ export class LessonComponent implements OnInit, OnDestroy {
 
   toggleFavorite(v: Vocabulary): void {
     if (!this.auth.isLoggedIn()) {
-      this.toast.info('?? C?n dang nh?p d? luu t? v�o s? t? v?ng. B?m "�ang nh?p" tr�n d?u trang.');
+        this.toast.info('⚠️ Cần đăng nhập để lưu từ vào sổ từ vựng. Bấm "Đăng nhập" trên đầu trang.');
       return;
     }
 
@@ -214,7 +214,7 @@ export class LessonComponent implements OnInit, OnDestroy {
         v.is_favorite = v.is_bookmarked;
         this.learning.syncBookmarkCache(v, v.is_bookmarked);
         this.learning.syncVocabularyBookmarkCache(v.id, v.is_bookmarked);
-        this.toast.error('?? Kh�ng luu du?c tr?ng th�i t? v?ng � th? l?i sau.');
+        this.toast.error('❌ Không lưu được trạng thái từ vựng — thử lại sau.');
       }
     });
   }
@@ -400,7 +400,7 @@ export class LessonComponent implements OnInit, OnDestroy {
   startPronounce(v: Vocabulary): void {
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SR) {
-      window.alert('Tr�nh duy?t kh�ng h? tr? nh?n di?n gi?ng n�i. H�y d�ng Chrome ho?c Edge.');
+      window.alert('Trình duyệt không hỗ trợ nhận diện giọng nói. Hãy dùng Chrome hoặc Edge.');
       return;
     }
     this.pronResult.set('none');
@@ -431,7 +431,7 @@ export class LessonComponent implements OnInit, OnDestroy {
     rec.onerror = () => {
       this.pronResult.set('miss');
       this.pronScore.set(0);
-      this.pronHeard.set('(kh�ng nghe du?c � h�y th? l?i)');
+      this.pronHeard.set('(không nghe được — hãy thử lại)');
       this.pronState.set(null);
     };
     rec.onend = () => { if (this.pronState() === v.id) this.pronState.set(null); };
@@ -444,16 +444,16 @@ export class LessonComponent implements OnInit, OnDestroy {
     this.score = this.review.filter(q => this.answers[q.id] === q.answer).length;
     if (this.lesson) {
       if (!this.auth.isLoggedIn()) {
-        this.toast.info(`? Ho�n th�nh b�i h?c! �i?m: ${this.score}/${this.review.length}. �ang nh?p d? luu ti?n d? v�o t�i kho?n.`);
+        this.toast.info(`⚠️ Hoàn thành bài học! Điểm: ${this.score}/${this.review.length}. Đang đăng nhập để lưu tiến độ vào tài khoản.`);
         return;
       }
       this.learning.saveProgress(this.lesson.id, 'completed', this.score, this.review.length).subscribe({
         next: (res) => {
           // Luu DB xong -> c?p nh?t lu�n cache ti?n d? trong localStorage
           if (res.data) this.learning.syncProgressCache(this.lesson!.id, res.data);
-          this.toast.success(`?? Ho�n th�nh b�i h?c! �i?m: ${this.score}/${this.review.length} (d� luu ti?n d?).`);
+          this.toast.success(`🎉 Hoàn thành bài học! Điểm: ${this.score}/${this.review.length} (đã lưu tiến độ).`);
         },
-        error: () => this.toast.error(`?? Kh�ng luu du?c ti?n d? l�n server � di?m ${this.score}/${this.review.length} ch? hi?n th? t?m th?i.`)
+        error: () => this.toast.error(`❌ Không lưu được tiến độ lên server — điểm ${this.score}/${this.review.length} chỉ hiển thị tạm thời.`)
       });
     }
   }

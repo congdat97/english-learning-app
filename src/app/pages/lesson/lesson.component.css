@@ -227,9 +227,35 @@ nav button { margin-right: 8px; }
 .carousel-card {
   max-width: 100%;
   margin: 0 auto;
-  padding: 24px 28px 20px;
+  padding: 24px 52px 20px;
   text-align: center;
+  position: relative;
 }
+
+.nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--pale) 75%, var(--white));
+  color: var(--blue);
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(36, 59, 99, .10);
+  transition: transform .12s ease, background .12s ease;
+  z-index: 2;
+}
+.nav-btn:hover:not(:disabled) { transform: translateY(-50%) scale(1.06); }
+.nav-btn:disabled { opacity: .35; cursor: not-allowed; }
+.nav-btn.prev { left: 10px; }
+.nav-btn.next { right: 10px; }
 
 .word-top {
   display: flex;

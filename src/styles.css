@@ -855,14 +855,16 @@ html { scroll-behavior: smooth; }
 
 /* Tabs bài học → segmented control (mockup .tabs) */
 .subnav {
-  display: inline-flex;
+  display: flex;
   gap: 4px;
   background: color-mix(in srgb, var(--pale) 70%, var(--line));
   padding: 5px;
   border-radius: 13px;
   max-width: 100%;
+  width: 100%;
 }
 .subnav button, .subnav a {
+  flex: 1 1 0;
   border: 0;
   background: transparent;
   color: var(--muted);
@@ -871,6 +873,7 @@ html { scroll-behavior: smooth; }
   font-size: 13px;
   font-weight: 700;
   box-shadow: none;
+  text-align: center;
 }
 .subnav button:hover, .subnav a:hover { color: var(--ink); transform: none; }
 .subnav button.active, .subnav a.active {
