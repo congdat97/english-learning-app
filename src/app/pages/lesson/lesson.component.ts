@@ -101,6 +101,68 @@ export class LessonComponent implements OnInit, OnDestroy {
       : 0;
   }
 
+  // ===== Lướt từ bằng tay =====
+  private onTouchStart(event: TouchEvent): void {
+    this.touchStartX = event.touch.pageX;
+  }
+
+  private onTouchEnd(event: TouchEvent): void {
+    this.touchEndX = event.changedTouches[0].pageX;
+    this.handleSwipe();
+  }
+
+  private onTouchMove(event: TouchEvent): void {
+    // Ngăn chặn scroll khi di chuyển ngang
+    const deltaX = event.changedTouches[0].pageX - this.touchStartX;
+    if (Math.abs(deltaX) > 10) {
+      event.preventDefault();
+    }
+  }
+
+  private handleSwipe(): void {
+    const deltaX = this.touchEndX - this.touchStartX;
+    const swipeThreshold = 30;
+    if (Math.abs(deltaX) < swipeThreshold) return;
+
+    if (deltaX > 0) {
+      this.nextVocab();
+    } else {
+      this.prevVocab();
+    }
+  }
+
+  // ===== Lướt từ bằng tay =====
+  private onTouchStart(event: TouchEvent): void {
+    this.touchStartX = event.touch0.pageX;
+  }
+
+  private onTouchEnd(event: TouchEvent): void {
+    this.touchEndX = event.changedTouches[0].pageX;
+    this.handleSwipe();
+  }
+
+  private onTouchMove(event: TouchEvent): event.preventDefault() {
+    // Ngăn chặn scroll khi di chuyển ngang
+    const deltaX = event.changedTouches[0].pageX - this.touchStartX;
+    if (Math.abs(deltaX) > 10) {
+      event.preventDefault();
+    }
+  }
+
+  private handleSwipe(): void {
+    const deltaX = this.touchEndX - this.touchStartX;
+    const swipeThreshold = 30; // px di chuyển tối thiểu để coi là swipe
+    if (Math.abs(deltaX) < swipeThreshold) return;
+
+    if (deltaX > 0) {
+      // swipe right → từ tiếp theo
+      this.nextVocab();
+    } else {
+      // swipe left → từ trước
+      this.prevVocab();
+    }
+  }
+
   // ===== Ôn tập: 1 câu / lượt + Kiểm tra đáp án (theo mockup) =====
   quizIndex = signal(0);
   quizChecked = signal(false);

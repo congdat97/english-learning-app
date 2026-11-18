@@ -14,7 +14,11 @@
   <section *ngIf="section === 'vocabulary'">
     <div class="section-head"><div><h2>📚 Từ vựng trong bài</h2><p>Học từng từ một — nghe phát âm, đọc ví dụ rồi chuyển từ tiếp theo</p></div></div>
 
-    <article *ngIf="currentVocab as v" class="word-card carousel-card">
+    <article *ngIf="currentVocab as v" class="word-card carousel-card"
+  (touchstart)="onTouchStart($event)"
+  (touchend)="onTouchEnd($event)"
+  (touchmove)="onTouchMove($event)">
+</article>
       <div class="word-top">
         <span class="vocab-tag">Từ vựng</span>
         <span class="counter">{{ vocabCounter }}</span>
