@@ -42,13 +42,13 @@
         <small>Ví dụ: {{ e.sentence }}<br><ng-container *ngIf="showTranslation">{{ e.translation_vi }}</ng-container></small>
       </div>
  
-      <div class="word-actions">
-         <button class="btn-ghost" [disabled]="vocabIndex() === 0" (click)="prevVocab()">&#9664; T? tru?c</button>
-         <button class="tiny-btn" [class.saved]="v.is_bookmarked" (click)="toggleFavorite(v)">{{ v.is_bookmarked ? '? �� luu' : '? Luu t?' }}</button>
-         <button class="tiny-btn mic-btn" [class.listening]="pronState() === v.id" (click)="startPronounce(v)">{{ pronState() === v.id ? '? D?ng' : '?? Ph�t �m' }}</button>
-         <span *ngIf="pronBest()[v.id]" class="pron-best">? {{ pronBest()[v.id] }}%</span>
-         <button class="btn-primary" (click)="nextVocab()">{{ vocabIndex() === vocabulary.length - 1 ? '?? H?c l?i t? d?u' : 'T? ti?p theo ?' }}</button>
-       </div>
+       <div class="word-actions">
+          <button class="btn-ghost" title="Từ trước" aria-label="Từ trước" [disabled]="vocabIndex() === 0" (click)="prevVocab()">◀</button>
+          <button class="tiny-btn" title="Lưu từ" aria-label="Lưu từ" [class.saved]="v.is_bookmarked" (click)="toggleFavorite(v)">{{ v.is_bookmarked ? '★' : '☆' }}</button>
+          <button class="tiny-btn mic-btn" title="Phát âm" aria-label="Phát âm" [class.listening]="pronState() === v.id" (click)="startPronounce(v)">{{ pronState() === v.id ? '⏹' : '🎤' }}</button>
+          <span *ngIf="pronBest()[v.id]" class="pron-best">★ {{ pronBest()[v.id] }}%</span>
+          <button class="btn-primary" title="Từ tiếp theo" aria-label="Từ tiếp theo" (click)="nextVocab()">{{ vocabIndex() === vocabulary.length - 1 ? '↻' : '▶' }}</button>
+        </div>
       <div *ngIf="pronState() !== v.id && pronResult() !== 'none'" class="pron-result"
            [class.ok]="pronResult() === 'ok'" [class.mid]="pronResult() === 'mid'">
         <div class="pron-bar"><span [style.width.%]="pronScore()"></span></div>
