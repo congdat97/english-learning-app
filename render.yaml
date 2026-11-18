@@ -1,0 +1,18 @@
+﻿services:
+  - type: web
+    name: english-learning-app
+    env: static
+    buildCommand: npm run build
+    staticPublishPath: dist/english-learning-app/browser
+    headers:
+      - path: /index.html
+        name: Content-Type
+        value: text/html; charset=utf-8
+      - path: /index.html
+        name: Cache-Control
+        value: no-cache, no-store, must-revalidate
+
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
