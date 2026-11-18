@@ -589,3 +589,17 @@ nav button { margin-right: 8px; }
 .pron-result:not(.ok):not(.mid) .pron-score-line b { color: #a34b4b; }
 
 .pron-verdict { color: var(--muted); font-weight: 500; }
+
+/* ===== Badge điểm cao nhất kế bên nút Phát âm (xanh lá) ===== */
+.pron-best {
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 800;
+  color: #15803d;
+  background: #eaf8f1;
+  border: 1px solid rgba(85, 184, 141, .55);
+  border-radius: 20px;
+  padding: 5px 10px;
+  animation: fadeIn .3s cubic-bezier(.2, .9, .3, 1.2) both;
+}

@@ -325,6 +325,8 @@ export class LessonComponent implements OnInit, OnDestroy {
   pronHeard = signal('');
   /** Điểm giống (% 0-100) giữa phát âm nghe được và từ cần đọc */
   pronScore = signal(0);
+  /** Điểm cao nhất từng đạt được cho mỗi từ (id từ -> %) */
+  pronBest = signal<Record<number, number>>({});
   private recognition: any = null;
 
   /** Khoảng cách Levenshtein — dùng để tính % giống phát âm */
@@ -387,6 +389,10 @@ export class LessonComponent implements OnInit, OnDestroy {
       const target = v.word.toLowerCase().replace(/[^a-z' ]/g, '').trim();
       const score = this.bestSimilarity(target, alts);
       this.pronScore.set(score);
+      // Lưu điểm cao nhất của từ này để hiện badge bên cạnh nút Phát âm
+      if (score > (this.pronBest()[v.id] || 0)) {
+        this.pronBest.update(m => ({ ...m, [v.id]: score }));
+      }
       // Điểm: >=85 chuẩn, 55-84 khá, <55 cần thử lại
       this.pronResult.set(score >= 85 ? 'ok' : score >= 55 ? 'mid' : 'miss');
       this.pronState.set(null);

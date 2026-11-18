@@ -45,6 +45,7 @@
         <button class="tiny-btn mic-btn" [class.listening]="pronState() === v.id" (click)="startPronounce(v)">
           {{ pronState() === v.id ? '🎧 Đang nghe...' : '🎙 Phát âm' }}
         </button>
+        <span *ngIf="pronBest()[v.id]" class="pron-best">🏆 {{ pronBest()[v.id] }}%</span>
         <button class="btn-primary" (click)="nextVocab()">{{ vocabIndex() === vocabulary.length - 1 ? 'Học lại từ đầu ↻' : 'Từ tiếp theo →' }}</button>
       </div>
       <div *ngIf="pronState() !== v.id && pronResult() !== 'none'" class="pron-result"
