@@ -41,7 +41,7 @@
                 (click)="speakOnce(v.id + ':' + ei, e.sentence)">{{ speakingKey() === v.id + ':' + ei ? '⏸' : '▶' }}</button>
         <small>Ví dụ: {{ e.sentence }}<br><ng-container *ngIf="showTranslation">{{ e.translation_vi }}</ng-container></small>
       </div>
-
+ 
       <div class="word-actions">
          <button class="btn-ghost" [disabled]="vocabIndex() === 0" (click)="prevVocab()">&#9664; T? tru?c</button>
          <button class="tiny-btn" [class.saved]="v.is_bookmarked" (click)="toggleFavorite(v)">{{ v.is_bookmarked ? '? �� luu' : '? Luu t?' }}</button>
