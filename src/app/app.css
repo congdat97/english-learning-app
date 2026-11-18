@@ -2014,6 +2014,40 @@
 }
 .umh-avatar { background: #fff; }
 
+/* --- SUBNAV: 3 nút chuyển section (vocabulary / listening / review) --- */
+
+.subnav {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border);
+}
+
+.subnav button {
+  flex: 1;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 20px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .12s ease, color .12s ease;
+  white-space: nowrap;
+}
+
+.subnav button.active {
+  background: var(--primary);
+  color: #fff;
+}
+
+.subnav button:hover:not(.active) {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
 /* =========================================================
    HEADER v4 — menu ☰ trái cùng, sync + avatar phải cùng
    ========================================================= */
