@@ -6,6 +6,7 @@
     "start": "ng serve",
     "serve": "node server.js",
     "build": "ng build",
+    "postbuild": "node scripts/add-bom.js",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
@@ -42,4 +43,5 @@
     "vitest": "^4.0.8"
   }
 }
+
 
