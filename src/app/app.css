@@ -2010,7 +2010,7 @@
 }
 .umh-avatar { background: #fff; }
 
-/* --- SUBNAV: 3 nút icon (vocabulary / listening / review) --- */
+/* --- SUBNAV: 3 tab có icon + chữ, full width --- */
 
 .subnav {
   display: flex;
@@ -2018,23 +2018,27 @@
   margin-top: 8px;
   padding-top: 6px;
   border-top: 1px solid var(--border);
+  width: 100%;
 }
 
 .subnav button {
-  flex: 0 0 44px;  /* kích thước cố định cho icon */
+  flex: 1 1 0;
   height: 44px;
-  padding: 0;
+  padding: 0 8px;
   border: 0;
-  border-radius: 50%;
+  border-radius: 12px;
   background: var(--surface);
   color: var(--muted);
-  font-size: 20px;           /* to emoji to lớn */
+  font-size: 14px;
+  font-weight: 700;
   line-height: 1;
   cursor: pointer;
   transition: transform .12s ease, background .12s ease, color .12s ease;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 6px;
+  white-space: nowrap;
 }
 
 .subnav button.active {

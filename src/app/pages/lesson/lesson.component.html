@@ -1,8 +1,8 @@
 ﻿<div *ngIf="lesson; else loadingTpl">
   <div class="subnav">
-    <button [class.active]="section === 'vocabulary'" (click)="setSection('vocabulary')">📚</button>
-    <button [class.active]="section === 'listening'" (click)="setSection('listening')">💬</button>
-    <button [class.active]="section === 'review'" (click)="setSection('review')">📝</button>
+    <button [class.active]="section === 'vocabulary'" (click)="setSection('vocabulary')">📚 Từ vựng</button>
+    <button [class.active]="section === 'listening'" (click)="setSection('listening')">💬 Luyện nghe</button>
+    <button [class.active]="section === 'review'" (click)="setSection('review')">📝 Ôn tập</button>
   </div>
 
   <div class="speed-row">
@@ -36,10 +36,10 @@
       <div class="meaning">{{ v.meaning_vi }}</div>
 
       <div *ngFor="let e of v.examples; let ei = index" class="example-row">
+        <small>Ví dụ: {{ e.sentence }}<br><ng-container *ngIf="showTranslation">{{ e.translation_vi }}</ng-container></small>
         <button class="tiny-btn icon-speak" [class.speaking]="speakingKey() === v.id + ':' + ei"
                 title="Nghe câu" aria-label="Nghe câu"
                 (click)="speakOnce(v.id + ':' + ei, e.sentence)">{{ speakingKey() === v.id + ':' + ei ? '⏸' : '▶' }}</button>
-        <small>Ví dụ: {{ e.sentence }}<br><ng-container *ngIf="showTranslation">{{ e.translation_vi }}</ng-container></small>
       </div>
  
        <div class="word-actions">

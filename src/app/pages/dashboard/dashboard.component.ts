@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { catchError, forkJoin, of } from 'rxjs';
 import { LearningService } from '../../services/learning.service';
 import { Course, UserProgress, Vocabulary } from '../../models/learning.model';
@@ -27,7 +27,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   slowApi = false;
   private slowTimer?: ReturnType<typeof setTimeout>;
 
-  constructor(private learning: LearningService) {}
+  constructor(private learning: LearningService, private router: Router) {}
 
   ngOnInit(): void {
     this.load();
@@ -79,6 +79,49 @@ export class DashboardComponent implements OnInit, OnDestroy {
       cursor.setDate(cursor.getDate() - 1);
     }
     return streak;
+  }
+
+  /** Mở bài học tiếp theo theo tiến độ đã lưu. */
+  continueLearning(): void {
+    forkJoin({
+      courses: this.learning.getCourses().pipe(catchError(() => of(null))),
+      progress: this.learning.getAllProgress().pipe(catchError(() => of(null)))
+    }).subscribe(({ courses, progress }) => {
+      const courseList = ((courses as { data?: any[] } | null)?.data || []).slice()
+        .sort((a: any, b: any) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+      const progressRows = ((progress as { data?: any[] } | null)?.data || []) as any[];
+      if (courseList.length === 0) {
+        this.router.navigate(['/courses']);
+        return;
+      }
+      forkJoin(
+        courseList.map((c: any) => this.learning.getLessons(c.id).pipe(catchError(() => of({ success: true, data: [] } as any))))
+      ).subscribe((lessonResults: any[]) => {
+        const allLessons: any[] = [];
+        courseList.forEach((c: any, i: number) => {
+          const lessons = ((lessonResults[i]?.data || []) as any[]).slice()
+            .sort((a: any, b: any) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+          lessons.forEach((l: any) => allLessons.push(l));
+        });
+        if (allLessons.length === 0) {
+          this.router.navigate(['/courses']);
+          return;
+        }
+        const inProgress = progressRows
+          .filter((p: any) => p?.status && p.status !== 'completed' && p.lesson_id != null)
+          .sort((a: any, b: any) => new Date(b.updated_at || b.created_at || 0).getTime() - new Date(a.updated_at || a.created_at || 0).getTime());
+        let target: any = null;
+        if (inProgress.length) {
+          target = allLessons.find((l: any) => l.id === inProgress[0].lesson_id) || null;
+        }
+        if (!target) {
+          const completed = new Set(progressRows.filter((p: any) => p?.status === 'completed').map((p: any) => p.lesson_id));
+          target = allLessons.find((l: any) => !completed.has(l.id)) || allLessons[allLessons.length - 1];
+        }
+        if (target?.id != null) this.router.navigate(['/lessons', target.id]);
+        else this.router.navigate(['/courses']);
+      });
+    });
   }
 
   /** Icon theo lộ trình học: cây lớn dần, thống nhất một bộ cho mọi khóa. */

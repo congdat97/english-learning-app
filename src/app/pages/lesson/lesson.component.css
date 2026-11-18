@@ -14,7 +14,7 @@ nav button { margin-right: 8px; }
 
 .example-row {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 8px;
   margin-top: 5px;
 }
@@ -22,11 +22,11 @@ nav button { margin-right: 8px; }
 .example-row small {
   flex: 1;
   min-width: 0;
+  text-align: left;
 }
 
 .example-row .icon-speak {
   flex-shrink: 0;
-  transform: translateY(-1px);
 }
 
 /* ===== Hàng chọn tốc độ đọc — trượt ngang như subnav, không rơi dòng ===== */
