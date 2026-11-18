@@ -234,7 +234,7 @@ nav button { margin-right: 8px; }
 
 .nav-btn {
   position: absolute;
-  top: 50%;
+  top: 38%;
   transform: translateY(-50%);
   width: 40px;
   height: 40px;
