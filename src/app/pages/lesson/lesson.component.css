@@ -2,7 +2,7 @@
 button.selected { font-weight: bold; }
 nav button { margin-right: 8px; }
 
-/* ===== NÃºt phÃ¡t náº±m ngay cáº¡nh tá»« vÃ  cáº¡nh cÃ¢u ===== */
+/* ===== Nút phát nằm ngay cạnh từ và cạnh câu ===== */
 .word-head {
   justify-content: flex-start;
   gap: 9px;
@@ -29,7 +29,7 @@ nav button { margin-right: 8px; }
   transform: translateY(-1px);
 }
 
-/* ===== HÃ ng chá»n tá»‘c Ä‘á»™ Ä‘á»c â€” trÆ°á»£t ngang nhÆ° subnav, khÃ´ng rÆ¡i dÃ²ng ===== */
+/* ===== Hàng chọn tốc độ đọc — trượt ngang như subnav, không rơi dòng ===== */
 .speed-row {
   display: flex;
   align-items: center;
@@ -75,7 +75,7 @@ nav button { margin-right: 8px; }
   color: #fff;
 }
 
-/* ===== NÃºt phÃ¡t cáº£ Ä‘oáº¡n: Ä‘á»•i icon + mÃ u khi Ä‘ang Ä‘á»c ===== */
+/* ===== Nút phát cả đoạn: đổi icon + màu khi đang đọc ===== */
 .play {
   transition: .2s ease;
 }
@@ -92,14 +92,14 @@ nav button { margin-right: 8px; }
   50% { box-shadow: 0 0 0 8px transparent; }
 }
 
-/* ===== NÃºt "Nghe" tá»«ng cÃ¢u: Ä‘á»•i icon + mÃ u khi cÃ¢u Ä‘Ã³ Ä‘ang Ä‘á»c ===== */
+/* ===== Nút "Nghe" từng câu: đổi icon + màu khi câu đó đang đọc ===== */
 .tiny-btn.speaking {
   background: #ef4444;
   border-color: #ef4444;
   color: #fff;
 }
 
-/* ===== NÃºt icon (ðŸ”Š / â¹) thay chá»¯ "Nghe" ===== */
+/* ===== Nút icon (🔊 / ⏹) thay chữ "Nghe" ===== */
 .icon-speak,
 .icon-btn {
   min-width: 34px;
@@ -109,7 +109,7 @@ nav button { margin-right: 8px; }
   text-align: center;
 }
 
-/* ===== DÃ²ng há»™i thoáº¡i: nÃºt trÃ²n bÃªn trÃ¡i, nhÆ° mockup ===== */
+/* ===== Dòng hội thoại: nút tròn bên trái, như mockup ===== */
 .line {
   display: flex;
   align-items: center;
@@ -138,7 +138,7 @@ nav button { margin-right: 8px; }
   transform: scale(.94);
 }
 
-/* Chá»‰ cÃ¢u Ä‘ang phÃ¡t má»›i lÃ  nÃºt cam Ä‘áº·c + â¸ tráº¯ng */
+/* Chỉ câu đang phát mới là nút cam đặc + ⏸ trắng */
 .line-speak.speaking {
   background: var(--primary);
   color: var(--on-primary);
@@ -162,7 +162,7 @@ nav button { margin-right: 8px; }
   margin-top: 3px;
 }
 
-/* NÃºt phÃ¡t cáº£ Ä‘oáº¡n: trÃ²n to hÆ¡n theo mockup */
+/* Nút phát cả đoạn: tròn to hơn theo mockup */
 .audio-controls .play {
   width: 62px;
   height: 62px;
@@ -192,7 +192,7 @@ nav button { margin-right: 8px; }
   .play.playing { animation: none; }
 }
 
-/* ===== CÃ¢u há»i Ã´n táº­p má»›i ===== */
+/* ===== Câu hỏi ôn tập mới ===== */
 .q-type {
   display: inline-block;
   font-size: 11px;
@@ -218,12 +218,12 @@ nav button { margin-right: 8px; }
   background: color-mix(in srgb, var(--primary) 5%, transparent);
 }
 
-/* ===== PhÃ¡t Ã¢m báº±ng mic ===== */
+/* ===== Phát âm bằng mic ===== */
 .mic-btn.listening { background: var(--primary-soft); border-color: var(--primary); }
 .pron-result { font-size: 12px; font-weight: 700; color: #b45309; }
 .pron-result.ok { color: #15803d; }
 
-/* ===== Tá»ª Vá»°NG CAROUSEL (theo mockup word-card) ===== */
+/* ===== TỪ VỰNG CAROUSEL (theo mockup word-card) ===== */
 .carousel-card {
   max-width: 100%;
   margin: 0 auto;
@@ -320,7 +320,7 @@ nav button { margin-right: 8px; }
   flex-wrap: wrap;
 }
 
-/* NÃºt kiá»ƒu mockup */
+/* Nút kiểu mockup */
 .btn-ghost {
   border: 0;
   border-radius: 12px;
@@ -352,7 +352,7 @@ nav button { margin-right: 8px; }
 .btn-primary:hover:not(:disabled) { filter: brightness(1.07); transform: translateY(-1px); }
 .btn-primary:disabled { opacity: .45; cursor: not-allowed; }
 
-/* Dots tiáº¿n Ä‘á»™ tá»« */
+/* Dots tiến độ từ */
 .dots {
   display: flex;
   justify-content: center;
@@ -410,7 +410,7 @@ nav button { margin-right: 8px; }
   margin-top: 16px;
 }
 
-/* ===== Ã”N Táº¬P QUIZ (theo mockup) ===== */
+/* ===== ÔN TẬP QUIZ (theo mockup) ===== */
 .quiz-box {
   max-width: 100%;
   margin: 0 auto;
@@ -540,7 +540,7 @@ nav button { margin-right: 8px; }
   .quiz-box { padding: 18px 15px; }
 }
 
-/* ===== Káº¾T QUáº¢ PHÃT Ã‚M: Ä‘iá»ƒm % giá»‘ng + thanh ===== */
+/* ===== KẾT QUẢ PHÁT ÂM: điểm % giống + thanh ===== */
 .pron-result {
   max-width: 420px;
   margin: 12px auto 0;
@@ -590,7 +590,7 @@ nav button { margin-right: 8px; }
 
 .pron-verdict { color: var(--muted); font-weight: 500; }
 
-/* ===== Badge Ä‘iá»ƒm cao nháº¥t káº¿ bÃªn nÃºt PhÃ¡t Ã¢m (xanh lÃ¡) ===== */
+/* ===== Badge điểm cao nhất kế bên nút Phát âm (xanh lá) ===== */
 .pron-best {
   display: inline-flex;
   align-items: center;

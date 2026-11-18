@@ -1,33 +1,33 @@
 ﻿<div *ngIf="lesson; else loadingTpl">
   <div class="subnav">
-    <button [class.active]="section === 'vocabulary'" (click)="setSection('vocabulary')">Tá»« vá»±ng</button>
-    <button [class.active]="section === 'listening'" (click)="setSection('listening')">Luyá»‡n nghe</button>
-    <button [class.active]="section === 'review'" (click)="setSection('review')">Ã”n táº­p</button>
+    <button [class.active]="section === 'vocabulary'" (click)="setSection('vocabulary')">📚</button>
+    <button [class.active]="section === 'listening'" (click)="setSection('listening')">💬</button>
+    <button [class.active]="section === 'review'" (click)="setSection('review')">📝</button>
   </div>
 
   <div class="speed-row">
-    <span class="speed-label">ðŸŽš Tá»‘c Ä‘á»™ Ä‘á»c</span>
+    <span class="speed-label">🎚 Tốc độ đọc</span>
     <button *ngFor="let r of speeds" type="button" class="speed-chip"
             [class.active]="speed === r" (click)="setSpeed(r)">{{ r }}x</button>
   </div>
 
   <section *ngIf="section === 'vocabulary'">
-    <div class="section-head"><div><h2>ðŸ“š Tá»« vá»±ng trong bÃ i</h2><p>Há»c tá»«ng tá»« má»™t â€” nghe phÃ¡t Ã¢m, Ä‘á»c vÃ­ dá»¥ rá»“i chuyá»ƒn tá»« tiáº¿p theo</p></div></div>
+    <div class="section-head"><div><h2>📚 Từ vựng trong bài</h2><p>Học từng từ một — nghe phát âm, đọc ví dụ rồi chuyển từ tiếp theo</p></div></div>
 
     <article *ngIf="currentVocab as v" class="word-card carousel-card"
   (touchstart)="onTouchStart($event)"
   (touchend)="onTouchEnd($event)"
   (touchmove)="onTouchMove($event)">
       <div class="word-top">
-        <span class="vocab-tag">Tá»« vá»±ng</span>
+        <span class="vocab-tag">Từ vựng</span>
         <span class="counter">{{ vocabCounter }}</span>
       </div>
 
       <div class="word-title-row">
         <h2 class="word-title">{{ v.word }}</h2>
         <button class="tiny-btn icon-speak" [class.speaking]="speakingKey() === v.id + '-w'"
-                title="Nghe tá»«" aria-label="Nghe tá»«"
-                (click)="speakOnce(v.id + '-w', v.word)">{{ speakingKey() === v.id + '-w' ? 'â¸' : 'â–¶' }}</button>
+                title="Nghe từ" aria-label="Nghe từ"
+                (click)="speakOnce(v.id + '-w', v.word)">{{ speakingKey() === v.id + '-w' ? '⏸' : '▶' }}</button>
       </div>
       <div class="pronounce" *ngIf="v.ipa">
         <span class="ipa-chip">{{ v.ipa }}</span>
@@ -37,25 +37,25 @@
 
       <div *ngFor="let e of v.examples; let ei = index" class="example-row">
         <button class="tiny-btn icon-speak" [class.speaking]="speakingKey() === v.id + ':' + ei"
-                title="Nghe cÃ¢u" aria-label="Nghe cÃ¢u"
-                (click)="speakOnce(v.id + ':' + ei, e.sentence)">{{ speakingKey() === v.id + ':' + ei ? 'â¸' : 'â–¶' }}</button>
-        <small>VÃ­ dá»¥: {{ e.sentence }}<br><ng-container *ngIf="showTranslation">{{ e.translation_vi }}</ng-container></small>
+                title="Nghe câu" aria-label="Nghe câu"
+                (click)="speakOnce(v.id + ':' + ei, e.sentence)">{{ speakingKey() === v.id + ':' + ei ? '⏸' : '▶' }}</button>
+        <small>Ví dụ: {{ e.sentence }}<br><ng-container *ngIf="showTranslation">{{ e.translation_vi }}</ng-container></small>
       </div>
 
       <div class="word-actions">
-         <button class="btn-ghost" [disabled]="vocabIndex() === 0" (click)="prevVocab()">&#9664; Từ trước</button>
-         <button class="tiny-btn" [class.saved]="v.is_bookmarked" (click)="toggleFavorite(v)">{{ v.is_bookmarked ? '★ Đã lưu' : '☆ Lưu từ' }}</button>
-         <button class="tiny-btn mic-btn" [class.listening]="pronState() === v.id" (click)="startPronounce(v)">{{ pronState() === v.id ? '⏹ Dừng' : '🎤 Phát âm' }}</button>
-         <span *ngIf="pronBest()[v.id]" class="pron-best">⭐ {{ pronBest()[v.id] }}%</span>
-         <button class="btn-primary" (click)="nextVocab()">{{ vocabIndex() === vocabulary.length - 1 ? '🔄 Học lại từ đầu' : 'Từ tiếp theo ▶' }}</button>
+         <button class="btn-ghost" [disabled]="vocabIndex() === 0" (click)="prevVocab()">&#9664; T? tru?c</button>
+         <button class="tiny-btn" [class.saved]="v.is_bookmarked" (click)="toggleFavorite(v)">{{ v.is_bookmarked ? '? �� luu' : '? Luu t?' }}</button>
+         <button class="tiny-btn mic-btn" [class.listening]="pronState() === v.id" (click)="startPronounce(v)">{{ pronState() === v.id ? '? D?ng' : '?? Ph�t �m' }}</button>
+         <span *ngIf="pronBest()[v.id]" class="pron-best">? {{ pronBest()[v.id] }}%</span>
+         <button class="btn-primary" (click)="nextVocab()">{{ vocabIndex() === vocabulary.length - 1 ? '?? H?c l?i t? d?u' : 'T? ti?p theo ?' }}</button>
        </div>
       <div *ngIf="pronState() !== v.id && pronResult() !== 'none'" class="pron-result"
            [class.ok]="pronResult() === 'ok'" [class.mid]="pronResult() === 'mid'">
         <div class="pron-bar"><span [style.width.%]="pronScore()"></span></div>
         <div class="pron-score-line">
-          <b>{{ pronScore() }}%</b> giá»‘ng
+          <b>{{ pronScore() }}%</b> giống
           <span class="pron-verdict">
-            {{ pronResult() === 'ok' ? 'â€” phÃ¡t Ã¢m chuáº©n! ðŸŽ‰' : pronResult() === 'mid' ? 'â€” khÃ¡ Ä‘áº¥y, thá»­ láº¡i cho chuáº©n hÆ¡n ðŸ‘' : 'â€” nghe Ä‘Æ°á»£c: "' + pronHeard() + '" â€” thá»­ láº¡i nhÃ©' }}
+            {{ pronResult() === 'ok' ? '— phát âm chuẩn! 🎉' : pronResult() === 'mid' ? '— khá đấy, thử lại cho chuẩn hơn 👍' : '— nghe được: "' + pronHeard() + '" — thử lại nhé' }}
           </span>
         </div>
       </div>
@@ -70,23 +70,23 @@
       <span class="percent">{{ vocabPercent }}%</span>
     </div>
 
-    <div *ngIf="vocabulary.length === 0" class="empty">BÃ i nÃ y chÆ°a cÃ³ tá»« vá»±ng.</div>
-    <div class="tip">ðŸ’¡ Há»c má»™t tá»«, nghe phÃ¡t Ã¢m, Ä‘á»c vÃ­ dá»¥ rá»“i báº¥m "Tá»« tiáº¿p theo".</div>
+    <div *ngIf="vocabulary.length === 0" class="empty">Bài này chưa có từ vựng.</div>
+    <div class="tip">💡 Học một từ, nghe phát âm, đọc ví dụ rồi bấm "Từ tiếp theo".</div>
   </section>
 
   <section *ngIf="section === 'listening'">
-    <div class="section-head"><div><h2>Listening</h2><p>Nghe Ä‘oáº¡n há»™i thoáº¡i vÃ  tráº£ lá»i</p></div></div>
+    <div class="section-head"><div><h2>Listening</h2><p>Nghe đoạn hội thoại và trả lời</p></div></div>
     <div *ngFor="let l of listening" class="listen-box">
-      <b>ðŸŽ§ {{ l.title }}</b>
+      <b>🎧 {{ l.title }}</b>
       <div class="audio-controls">
         <button class="play" [class.playing]="playingGroup() === l.id && speakingKey() !== null"
-                [attr.aria-label]="playingGroup() === l.id ? 'Dá»«ng Ä‘á»c' : 'PhÃ¡t cáº£ Ä‘oáº¡n'"
-                (click)="playGroup(l.id, l.transcript.map(x => x.text))">{{ playingGroup() === l.id && speakingKey() !== null ? 'â¸' : 'â–¶' }}</button>
-        <span class="muted">{{ playingGroup() === l.id ? (speakingKey() !== null ? 'Äang Ä‘á»c â€” báº¥m Ä‘á»ƒ dá»«ng' : 'Nghá»‰ giá»¯a cÃ¢u...') : 'Sáºµn sÃ ng nghe' }}</span>
+                [attr.aria-label]="playingGroup() === l.id ? 'Dừng đọc' : 'Phát cả đoạn'"
+                (click)="playGroup(l.id, l.transcript.map(x => x.text))">{{ playingGroup() === l.id && speakingKey() !== null ? '⏸' : '▶' }}</button>
+        <span class="muted">{{ playingGroup() === l.id ? (speakingKey() !== null ? 'Đang đọc — bấm để dừng' : 'Nghỉ giữa câu...') : 'Sẵn sàng nghe' }}</span>
       </div>
       <div class="transcript">
         <div *ngFor="let line of l.transcript; let li = index" class="line" [class.reading]="speakingKey() === l.id + ':' + li">
-          <button class="line-speak" [class.speaking]="speakingKey() === l.id + ':' + li" title="Nghe cÃ¢u nÃ y" aria-label="Nghe cÃ¢u nÃ y" (click)="speakFrom(l.id, li, l.transcript.map(x => x.text))">{{ speakingKey() === l.id + ':' + li ? 'â¸' : 'â–¶' }}</button>
+          <button class="line-speak" [class.speaking]="speakingKey() === l.id + ':' + li" title="Nghe câu này" aria-label="Nghe câu này" (click)="speakFrom(l.id, li, l.transcript.map(x => x.text))">{{ speakingKey() === l.id + ':' + li ? '⏸' : '▶' }}</button>
           <div class="line-body">
             <div class="line-text"><b>{{ line.speaker }}:</b> {{ line.text }}</div>
             <span class="translation" *ngIf="showTranslation">{{ line.translation_vi }}</span>
@@ -101,42 +101,42 @@
                 [class.wrong]="listeningSubmitted && listeningAnswers[q.id] === opt && opt !== q.answer"
                 (click)="pickListening(q, opt)">{{ opt }}</button>
         <p *ngIf="listeningSubmitted && listeningAnswers[q.id] !== q.answer" class="feedback">
-          ÄÃ¡p Ã¡n Ä‘Ãºng: <b>{{ q.answer }}</b>. {{ q.explanation_vi }}
+          Đáp án đúng: <b>{{ q.answer }}</b>. {{ q.explanation_vi }}
         </p>
       </div>
     </div>
     <div class="result-actions" *ngIf="listening.length > 0 && allListeningQuestions.length > 0">
-      <button class="primary" (click)="submitListening()" *ngIf="!listeningSubmitted">Kiá»ƒm tra Ä‘Ã¡p Ã¡n nghe</button>
-      <button class="primary" (click)="resetListening()" *ngIf="listeningSubmitted">LÃ m láº¡i</button>
-      <p *ngIf="listeningSubmitted" class="feedback">Äiá»ƒm: {{ listeningScore }} / {{ allListeningQuestions.length }}</p>
+      <button class="primary" (click)="submitListening()" *ngIf="!listeningSubmitted">Kiểm tra đáp án nghe</button>
+      <button class="primary" (click)="resetListening()" *ngIf="listeningSubmitted">Làm lại</button>
+      <p *ngIf="listeningSubmitted" class="feedback">Điểm: {{ listeningScore }} / {{ allListeningQuestions.length }}</p>
     </div>
-    <div *ngIf="listening.length === 0" class="empty">BÃ i nÃ y chÆ°a cÃ³ pháº§n luyá»‡n nghe.</div>
+    <div *ngIf="listening.length === 0" class="empty">Bài này chưa có phần luyện nghe.</div>
   </section>
 
   <section *ngIf="section === 'review'">
-    <div class="section-head"><div><h2>ðŸ“ Ã”n táº­p kiáº¿n thá»©c</h2><p>Kiá»ƒm tra nhanh sau bÃ i há»c</p></div></div>
+    <div class="section-head"><div><h2>📝 Ôn tập kiến thức</h2><p>Kiểm tra nhanh sau bài học</p></div></div>
 
     <div class="quiz-box" *ngIf="!submitted; else quizSummaryTpl">
-      <div class="quiz-head"><h3>ðŸ§  Kiá»ƒm tra tá»« vá»±ng</h3><span>{{ quizCount }}</span></div>
+      <div class="quiz-head"><h3>🧠 Kiểm tra từ vựng</h3><span>{{ quizCount }}</span></div>
       <div class="review-progress"><span [style.width.%]="quizPercent"></span></div>
 
       <div class="quiz-card" *ngIf="currentQuiz as q">
         <div class="quiz-type">
-          <span *ngIf="q.type === 'fill_blank'">âœï¸ CHá»ŒN ÄÃP ÃN ÄÃšNG</span>
-          <span *ngIf="q.type === 'listen'">ðŸŽ§ NGHE VÃ€ CHá»ŒN</span>
+          <span *ngIf="q.type === 'fill_blank'">✏️ CHỌN ĐÁP ÁN ĐÚNG</span>
+          <span *ngIf="q.type === 'listen'">🎧 NGHE VÀ CHỌN</span>
         </div>
         <div class="quiz-word">{{ q.question }}</div>
 
-        <!-- Nghe vÃ  chá»n: nÃºt phÃ¡t tá»« (TTS) -->
+        <!-- Nghe và chọn: nút phát từ (TTS) -->
         <div *ngIf="q.type === 'listen'" class="listen-play">
           <button class="tiny-btn icon-speak" [class.speaking]="speakingKey() === 'rv-' + q.id"
-                  title="PhÃ¡t tá»«" (click)="playListenWord(q)">
-            {{ speakingKey() === 'rv-' + q.id ? 'â¸' : 'â–¶' }}
+                  title="Phát từ" (click)="playListenWord(q)">
+            {{ speakingKey() === 'rv-' + q.id ? '⏸' : '▶' }}
           </button>
-          <span class="muted">Báº¥m Ä‘á»ƒ nghe, sau Ä‘Ã³ chá»n tá»« vá»«a nghe</span>
+          <span class="muted">Bấm để nghe, sau đó chọn từ vừa nghe</span>
         </div>
 
-        <p class="quiz-hint" *ngIf="q.type !== 'listen'">Chá»n Ä‘Ã¡p Ã¡n Ä‘Ãºng nháº¥t:</p>
+        <p class="quiz-hint" *ngIf="q.type !== 'listen'">Chọn đáp án đúng nhất:</p>
         <div class="answers">
           <button *ngFor="let opt of q.options" class="answer"
                   [class.selected]="answers[q.id] === opt && !quizChecked()"
@@ -147,14 +147,14 @@
 
         <div class="quiz-feedback" [class.good]="quizChecked() && quizCorrect()" [class.bad]="quizChecked() && !quizCorrect()" aria-live="polite">
           <ng-container *ngIf="quizChecked()">
-            {{ quizCorrect() ? 'âœ… ChÃ­nh xÃ¡c! Báº¡n lÃ m tá»‘t láº¯m.' : 'âŒ ChÆ°a Ä‘Ãºng. ÄÃ¡p Ã¡n lÃ : ' + q.answer + '. ' + (q.explanation_vi || '') }}
+            {{ quizCorrect() ? '✅ Chính xác! Bạn làm tốt lắm.' : '❌ Chưa đúng. Đáp án là: ' + q.answer + '. ' + (q.explanation_vi || '') }}
           </ng-container>
         </div>
 
         <div class="quiz-controls">
-          <button class="btn-primary" [disabled]="!answers[q.id] || quizChecked()" (click)="checkAnswer()">Kiá»ƒm tra Ä‘Ã¡p Ã¡n</button>
+          <button class="btn-primary" [disabled]="!answers[q.id] || quizChecked()" (click)="checkAnswer()">Kiểm tra đáp án</button>
           <button class="btn-ghost" [disabled]="!quizChecked()" (click)="nextQuestion()">
-            {{ quizIndex() === review.length - 1 ? 'Xem káº¿t quáº£ ðŸŽ‰' : 'CÃ¢u tiáº¿p theo â†’' }}
+            {{ quizIndex() === review.length - 1 ? 'Xem kết quả 🎉' : 'Câu tiếp theo →' }}
           </button>
         </div>
       </div>
@@ -162,15 +162,15 @@
 
     <ng-template #quizSummaryTpl>
       <div class="quiz-box summary-box">
-        <div class="summary-icon">ðŸŽ‰</div>
-        <h3>HoÃ n thÃ nh Ã´n táº­p!</h3>
-        <p class="muted">Báº¡n tráº£ lá»i Ä‘Ãºng {{ score }} / {{ review.length }} cÃ¢u.</p>
-        <button class="btn-primary" (click)="resetReview()">LÃ m láº¡i bÃ i Ã´n táº­p</button>
+        <div class="summary-icon">🎉</div>
+        <h3>Hoàn thành ôn tập!</h3>
+        <p class="muted">Bạn trả lời đúng {{ score }} / {{ review.length }} câu.</p>
+        <button class="btn-primary" (click)="resetReview()">Làm lại bài ôn tập</button>
       </div>
     </ng-template>
 
-    <div *ngIf="review.length === 0" class="empty">BÃ i nÃ y chÆ°a cÃ³ cÃ¢u Ã´n táº­p.</div>
-    <div class="tip">ðŸ’¡ Máº¹o há»c: tá»± nhá»› nghÄ©a cá»§a tá»« trÆ°á»›c khi xem Ä‘Ã¡p Ã¡n.</div>
+    <div *ngIf="review.length === 0" class="empty">Bài này chưa có câu ôn tập.</div>
+    <div class="tip">💡 Mẹo học: tự nhớ nghĩa của từ trước khi xem đáp án.</div>
   </section>
 </div>
-<ng-template #loadingTpl><div class="page-loader"><span class="spinner"></span> Äang táº£i bÃ i há»c...</div></ng-template>
+<ng-template #loadingTpl><div class="page-loader"><span class="spinner"></span> Đang tải bài học...</div></ng-template>

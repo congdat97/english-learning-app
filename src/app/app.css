@@ -2010,38 +2010,43 @@
 }
 .umh-avatar { background: #fff; }
 
-/* --- SUBNAV: 3 nút chuyển section (vocabulary / listening / review) --- */
+/* --- SUBNAV: 3 nút icon (vocabulary / listening / review) --- */
 
 .subnav {
   display: flex;
-  gap: 6px;
-  margin-top: 6px;
-  padding-top: 4px;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 6px;
   border-top: 1px solid var(--border);
 }
 
 .subnav button {
-  flex: 1;
-  padding: 4px 6px;
+  flex: 0 0 44px;  /* kích thước cố định cho icon */
+  height: 44px;
+  padding: 0;
   border: 0;
-  border-radius: 16px;
+  border-radius: 50%;
   background: var(--surface);
   color: var(--muted);
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 20px;           /* to emoji to lớn */
+  line-height: 1;
   cursor: pointer;
-  transition: background .12s ease, color .12s ease;
-  white-space: nowrap;
+  transition: transform .12s ease, background .12s ease, color .12s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .subnav button.active {
   background: var(--primary);
   color: #fff;
+  box-shadow: 0 4px 10px rgba(66, 153, 225, 0.3);
 }
 
 .subnav button:hover:not(.active) {
   background: var(--primary-soft);
   color: var(--primary);
+  transform: scale(1.05);
 }
 
 /* =========================================================

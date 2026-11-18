@@ -26,7 +26,7 @@ export interface SyncResult {
   bookmarks: Vocabulary[];
 }
 
-// Prefix riÃªng cho app tiáº¿ng Anh
+// Prefix riêng cho app tiếng Anh
 const PREFIX = 'elf-data.';
 
 @Injectable({ providedIn: 'root' })
@@ -36,7 +36,7 @@ export class OfflineDataService {
   private readonly auth = inject(AuthService);
 
   // =====================================================
-  // STORAGE (phÃ¢n theo user â€” user A khÃ´ng Ä‘á»¥ng dá»¯ liá»‡u offline cá»§a user B)
+  // STORAGE (phân theo user — user A không đụng dữ liệu offline của user B)
   // =====================================================
 
   private uidPart(): string {
@@ -86,12 +86,12 @@ export class OfflineDataService {
         JSON.stringify(data)
       );
 
-      // CÃ³ báº£n má»›i => xoÃ¡ báº£n stale cÅ©
+      // Có bản mới => xoá bản stale cũ
       localStorage.removeItem(this.staleKey(key));
 
     } catch (error) {
 
-      console.warn('KhÃ´ng thá»ƒ lÆ°u dá»¯ liá»‡u offline:', error);
+      console.warn('Không thể lưu dữ liệu offline:', error);
 
     }
 
@@ -119,9 +119,9 @@ export class OfflineDataService {
   }
 
   /**
-   * VÃ´ hiá»‡u hoÃ¡ cache khi cÃ³ thao tÃ¡c ghi.
-   * Giá»¯ báº£n stale Ä‘á»ƒ khi API ngá»§
-   * váº«n cÃ²n dá»¯ liá»‡u cÅ© dÃ¹ng táº¡m.
+   * Vô hiệu hoá cache khi có thao tác ghi.
+   * Giữ bản stale để khi API ngủ
+   * vẫn còn dữ liệu cũ dùng tạm.
    */
   invalidate(key: OfflineDataKey): void {
 
@@ -194,11 +194,11 @@ export class OfflineDataService {
   // =====================================================
 
   /**
-   * Tải dữ liệu cần dùng offline về localStorage:
-   * khóa học + sổ từ + tiến độ tổng + danh sách lesson mỗi khóa.
+   * T?i d? li?u c?n d�ng offline v? localStorage:
+   * kh�a h?c + s? t? + ti?n d? t?ng + danh s�ch lesson m?i kh�a.
    *
-   * force=false (mặc định, mở app): cache-first — có cache là xong, không đụng API.
-   * force=true (nút 🔄 Đồng bộ): bỏ cache, luôn gọi API và ghi đè cache.
+   * force=false (m?c d?nh, m? app): cache-first � c� cache l� xong, kh�ng d?ng API.
+   * force=true (n�t ?? �?ng b?): b? cache, lu�n g?i API v� ghi d� cache.
    */
   syncAll(force = false) {
 
@@ -243,9 +243,9 @@ export class OfflineDataService {
   }
 
   /**
-   * LuÃ´n Ä‘á»“ng bá»™ khi má»Ÿ app:
-   * - CÃ³ cache -> tráº£ tá»©c thÃ¬ + refresh ná»n (khÃ´ng cháº·n UI).
-   * - ChÆ°a cÃ³ cache -> táº£i láº§n Ä‘áº§u (ná»n, UI váº«n hiá»‡n tráº¡ng thÃ¡i chá» riÃªng).
+   * Luôn đồng bộ khi mở app:
+   * - Có cache -> trả tức thì + refresh nền (không chặn UI).
+   * - Chưa có cache -> tải lần đầu (nền, UI vẫn hiện trạng thái chờ riêng).
    */
   ensureData() {
     return this.syncAll()
