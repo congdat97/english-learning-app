@@ -69,8 +69,74 @@ export class LessonComponent implements OnInit, OnDestroy {
   }
 
   selectAnswer(q: ReviewQuestion, option: string): void {
-    if (this.submitted) return;
+    if (this.quizChecked()) return;
     this.answers[q.id] = option;
+  }
+
+  // ===== Từ vựng: carousel 1 từ / lượt (theo mockup) =====
+  vocabIndex = signal(0);
+
+  get currentVocab(): Vocabulary | null {
+    return this.vocabulary[this.vocabIndex()] ?? null;
+  }
+
+  prevVocab(): void {
+    this.stopSpeaking();
+    this.vocabIndex.update(i => Math.max(0, i - 1));
+  }
+
+  nextVocab(): void {
+    this.stopSpeaking();
+    // Từ cuối -> quay lại từ đầu (giống mockup "Học lại từ đầu")
+    this.vocabIndex.update(i => (i + 1) % Math.max(1, this.vocabulary.length));
+  }
+
+  get vocabCounter(): string {
+    return ('0' + (this.vocabIndex() + 1)).slice(-2) + ' / ' + ('0' + this.vocabulary.length).slice(-2);
+  }
+
+  get vocabPercent(): number {
+    return this.vocabulary.length
+      ? Math.round(((this.vocabIndex() + 1) / this.vocabulary.length) * 100)
+      : 0;
+  }
+
+  // ===== Ôn tập: 1 câu / lượt + Kiểm tra đáp án (theo mockup) =====
+  quizIndex = signal(0);
+  quizChecked = signal(false);
+  quizCorrect = signal(false);
+
+  get currentQuiz(): ReviewQuestion | null {
+    return this.review[this.quizIndex()] ?? null;
+  }
+
+  get quizCount(): string {
+    return 'Câu ' + (this.quizIndex() + 1) + ' / ' + this.review.length;
+  }
+
+  get quizPercent(): number {
+    return this.review.length
+      ? Math.round(((this.quizIndex() + 1) / this.review.length) * 100)
+      : 0;
+  }
+
+  /** Kiểm tra câu hiện tại: hiện đúng/sai + giải thích */
+  checkAnswer(): void {
+    const q = this.currentQuiz;
+    if (!q || !this.answers[q.id] || this.quizChecked()) return;
+    this.quizCorrect.set(this.answers[q.id] === q.answer);
+    this.quizChecked.set(true);
+  }
+
+  /** Câu tiếp theo; câu cuối -> submitReview (lưu tiến độ + tổng kết) */
+  nextQuestion(): void {
+    if (!this.quizChecked()) return;
+    if (this.quizIndex() < this.review.length - 1) {
+      this.quizIndex.update(i => i + 1);
+      this.quizChecked.set(false);
+    } else {
+      this.submitReview();
+    }
   }
 
   /** Luyá»‡n nghe: chá»n Ä‘Ã¡p Ã¡n trÆ°á»›c khi ná»™p. */
@@ -239,6 +305,55 @@ export class LessonComponent implements OnInit, OnDestroy {
     this.speakFallbackTimer = setTimeout(finish, Math.max(2000, (text.length * 75) / this.speed + 1200));
   }
 
+  /** Phát từ cho câu hỏi "Nghe và chọn" (không lộ đáp án — phát chính là đáp án) */
+  playListenWord(q: ReviewQuestion): void {
+    this.speakOnce('rv-' + q.id, q.answer);
+  }
+
+  // ===== Phát âm từ bằng micro (SpeechRecognition) =====
+  /** Id từ đang luyện phát âm (null = không ai) */
+  pronState = signal<string | number | null>(null);
+  /** Kết quả lần luyện gần nhất: none | ok | miss */
+  pronResult = signal<'none' | 'ok' | 'miss'>('none');
+  /** Text máy nghe được */
+  pronHeard = signal('');
+  private recognition: any = null;
+
+  /** Mở micro, người dùng đọc từ, app so sánh và xác nhận */
+  startPronounce(v: Vocabulary): void {
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SR) {
+      window.alert('Trình duyệt không hỗ trợ nhận diện giọng nói. Hãy dùng Chrome hoặc Edge.');
+      return;
+    }
+    this.pronResult.set('none');
+    this.pronHeard.set('');
+    this.pronState.set(v.id);
+    if (this.recognition) { try { this.recognition.abort(); } catch { /* ignore */ } }
+
+    const rec = new SR();
+    rec.lang = 'en-US';
+    rec.interimResults = false;
+    rec.maxAlternatives = 3;
+    rec.onresult = (e: any) => {
+      const alts: string[] = Array.from(e.results[0]).map((a: any) =>
+        String(a.transcript || '').toLowerCase().replace(/[^a-z' ]/g, '').trim());
+      this.pronHeard.set(alts[0] || '');
+      const target = v.word.toLowerCase().replace(/[^a-z' ]/g, '').trim();
+      const ok = alts.some(a => a === target || a.includes(target) || target.includes(a));
+      this.pronResult.set(ok ? 'ok' : 'miss');
+      this.pronState.set(null);
+    };
+    rec.onerror = () => {
+      this.pronResult.set('miss');
+      this.pronHeard.set('(không nghe được — hãy thử lại)');
+      this.pronState.set(null);
+    };
+    rec.onend = () => { if (this.pronState() === v.id) this.pronState.set(null); };
+    this.recognition = rec;
+    rec.start();
+  }
+
   submitReview(): void {
     this.submitted = true;
     this.score = this.review.filter(q => this.answers[q.id] === q.answer).length;
@@ -262,6 +377,9 @@ export class LessonComponent implements OnInit, OnDestroy {
     this.answers = {};
     this.submitted = false;
     this.score = 0;
+    this.quizIndex.set(0);
+    this.quizChecked.set(false);
+    this.quizCorrect.set(false);
   }
 }
 

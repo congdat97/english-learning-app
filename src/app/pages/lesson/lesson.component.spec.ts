@@ -58,10 +58,10 @@ describe('LessonComponent', () => {
     expect(component.review.length).toBe(2);
   });
 
-  it('selectAnswer records and blocks after submit', () => {
+  it('selectAnswer records and blocks after checking', () => {
     component.selectAnswer(questions[0], 'a');
     expect(component.answers[1]).toBe('a');
-    component.submitted = true;
+    component.quizChecked.set(true);
     component.selectAnswer(questions[0], 'b');
     expect(component.answers[1]).toBe('a');
   });
