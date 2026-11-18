@@ -181,15 +181,22 @@ export const cacheInterceptor: HttpInterceptorFn = (req, next) => {
 
   // ===== GET =====
 
-  const entry = readEntry(key);
+  const forceRefresh = req.headers.get('X-Force-Refresh') === '1';
 
-  // 1) Có cache: dùng ngay, KHÔNG gọi API
-  if (entry) {
-    return of(toResponse(req, entry.body));
+  // 1) Có cache: dùng ngay, KHÔNG gọi API (trừ khi force refresh)
+  if (!forceRefresh) {
+    const entry = readEntry(key);
+    if (entry) {
+      return of(toResponse(req, entry.body));
+    }
   }
 
-  // 2) Chưa có cache: gọi API và lưu lại
-  return next(req).pipe(
+  const outgoing = forceRefresh
+    ? req.clone({ headers: req.headers.delete('X-Force-Refresh') })
+    : req;
+
+  // 2) Chưa có cache (hoặc force refresh): gọi API và lưu lại
+  return next(outgoing).pipe(
     tap((event: HttpEvent<unknown>) => {
 
       if (

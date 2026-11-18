@@ -25,9 +25,11 @@ export class LearningService {
 
   constructor(private http: HttpClient) {
     try {
-      const version = '2026-11-18';
+      const version = '2026-11-18-v2';
       if (localStorage.getItem('api-cache-version') !== version) {
-        Object.keys(localStorage).filter(k => k.startsWith('api-cache:')).forEach(k => localStorage.removeItem(k));
+        Object.keys(localStorage)
+          .filter(k => k.startsWith('api-cache:') || k.startsWith('http_cache_'))
+          .forEach(k => localStorage.removeItem(k));
         localStorage.setItem('api-cache-version', version);
       }
     } catch {}
@@ -39,20 +41,22 @@ export class LearningService {
     return 'api-cache:' + (uid ? uid + ':' : '') + url;
   }
 
-  private fetchAndCache<T>(url: string): Observable<ApiResult<T>> {
-    const existing = this.inflight.get(url) as Observable<ApiResult<T>> | undefined;
+  private fetchAndCache<T>(url: string, force = false): Observable<ApiResult<T>> {
+    const inflightKey = force ? url + '::force' : url;
+    const existing = this.inflight.get(inflightKey) as Observable<ApiResult<T>> | undefined;
     if (existing) return existing;
 
-    const obs = this.http.get<ApiResult<T>>(url, { headers: this.headers }).pipe(
+    const headers = force ? this.headers.set('X-Force-Refresh', '1') : this.headers;
+    const obs = this.http.get<ApiResult<T>>(url, { headers }).pipe(
       tap({
         next: body => {
           try { localStorage.setItem(this.cacheKey(url), JSON.stringify({ ts: Date.now(), body })); } catch {}
         },
-        finalize: () => this.inflight.delete(url)
+        finalize: () => this.inflight.delete(inflightKey)
       }),
       shareReplay({ bufferSize: 1, refCount: false })
     );
-    this.inflight.set(url, obs as Observable<ApiResult<unknown>>);
+    this.inflight.set(inflightKey, obs as Observable<ApiResult<unknown>>);
     return obs;
   }
 
@@ -63,7 +67,7 @@ export class LearningService {
    * - force=true (nút 🔄 Đồng bộ): bỏ cache, luôn gọi API và ghi đè cache.
    */
   private cachedGet<T>(url: string, force = false): Observable<ApiResult<T>> {
-    if (force) return this.fetchAndCache<T>(url);
+    if (force) return this.fetchAndCache<T>(url, true);
 
     return new Observable<ApiResult<T>>(observer => {
       const key = this.cacheKey(url);
