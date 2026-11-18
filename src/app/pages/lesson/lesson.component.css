@@ -539,3 +539,53 @@ nav button { margin-right: 8px; }
   .quiz-word { font-size: 24px; }
   .quiz-box { padding: 18px 15px; }
 }
+
+/* ===== KẾT QUẢ PHÁT ÂM: điểm % giống + thanh ===== */
+.pron-result {
+  max-width: 420px;
+  margin: 12px auto 0;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: #fff1f1;
+  border: 1px solid rgba(229, 155, 155, .5);
+  font-size: 13px;
+  text-align: center;
+  animation: fadeIn .3s ease both;
+}
+
+.pron-result.ok {
+  background: #eaf8f1;
+  border-color: rgba(85, 184, 141, .5);
+}
+
+.pron-result.mid {
+  background: #fff7e6;
+  border-color: rgba(240, 177, 90, .55);
+}
+
+.pron-bar {
+  height: 7px;
+  border-radius: 20px;
+  background: rgba(15, 23, 42, .07);
+  overflow: hidden;
+  margin-bottom: 7px;
+}
+
+.pron-bar span {
+  height: 100%;
+  display: block;
+  border-radius: 20px;
+  transition: width .5s cubic-bezier(.2, .9, .3, 1.2);
+}
+
+.pron-result.ok .pron-bar span { background: linear-gradient(90deg, #34c48e, #55b88d); }
+.pron-result.mid .pron-bar span { background: linear-gradient(90deg, #f0b15a, #f5c777); }
+.pron-result:not(.ok):not(.mid) .pron-bar span { background: linear-gradient(90deg, #e27b7b, #eda5a5); }
+
+.pron-score-line { font-weight: 600; color: var(--text); }
+.pron-score-line b { font-size: 16px; font-weight: 800; }
+.pron-result.ok .pron-score-line b { color: #15803d; }
+.pron-result.mid .pron-score-line b { color: #b45309; }
+.pron-result:not(.ok):not(.mid) .pron-score-line b { color: #a34b4b; }
+
+.pron-verdict { color: var(--muted); font-weight: 500; }

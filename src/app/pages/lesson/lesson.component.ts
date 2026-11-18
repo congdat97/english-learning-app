@@ -316,16 +316,54 @@ export class LessonComponent implements OnInit, OnDestroy {
     this.speakOnce('rv-' + q.id, q.answer);
   }
 
-  // ===== Phát âm từ bằng micro (SpeechRecognition) =====
+  // ===== Phát âm từ bằng micro (SpeechRecognition) + chấm điểm % giống =====
   /** Id từ đang luyện phát âm (null = không ai) */
   pronState = signal<string | number | null>(null);
-  /** Kết quả lần luyện gần nhất: none | ok | miss */
-  pronResult = signal<'none' | 'ok' | 'miss'>('none');
+  /** Kết quả lần luyện gần nhất: none | ok | mid | miss */
+  pronResult = signal<'none' | 'ok' | 'mid' | 'miss'>('none');
   /** Text máy nghe được */
   pronHeard = signal('');
+  /** Điểm giống (% 0-100) giữa phát âm nghe được và từ cần đọc */
+  pronScore = signal(0);
   private recognition: any = null;
 
-  /** Mở micro, người dùng đọc từ, app so sánh và xác nhận */
+  /** Khoảng cách Levenshtein — dùng để tính % giống phát âm */
+  private levenshtein(a: string, b: string): number {
+    const m = a.length, n = b.length;
+    if (!m) return n;
+    if (!n) return m;
+    let prev = Array.from({ length: n + 1 }, (_, j) => j);
+    for (let i = 1; i <= m; i++) {
+      const cur = [i];
+      for (let j = 1; j <= n; j++) {
+        cur[j] = Math.min(
+          prev[j] + 1,                       // xóa
+          cur[j - 1] + 1,                    // thêm
+          prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1) // thay
+        );
+      }
+      prev = cur;
+    }
+    return prev[n];
+  }
+
+  /** % giống (0-100) tốt nhất giữa từ cần đọc và các phiên bản máy nghe được */
+  private bestSimilarity(target: string, candidates: string[]): number {
+    let best = 0;
+    for (const c of candidates) {
+      if (!c) continue;
+      // Máy nghe được nhiều từ: xét cả chuỗi nguyên và từng từ riêng
+      const parts = [c, ...c.split(/\s+/)];
+      for (const p of parts) {
+        const dist = this.levenshtein(target, p);
+        const sim = Math.round((1 - dist / Math.max(target.length, p.length)) * 100);
+        if (sim > best) best = sim;
+      }
+    }
+    return Math.max(0, Math.min(100, best));
+  }
+
+  /** Mở micro, người dùng đọc từ, app chấm điểm % giống */
   startPronounce(v: Vocabulary): void {
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SR) {
@@ -334,24 +372,28 @@ export class LessonComponent implements OnInit, OnDestroy {
     }
     this.pronResult.set('none');
     this.pronHeard.set('');
+    this.pronScore.set(0);
     this.pronState.set(v.id);
     if (this.recognition) { try { this.recognition.abort(); } catch { /* ignore */ } }
 
     const rec = new SR();
     rec.lang = 'en-US';
     rec.interimResults = false;
-    rec.maxAlternatives = 3;
+    rec.maxAlternatives = 5;
     rec.onresult = (e: any) => {
       const alts: string[] = Array.from(e.results[0]).map((a: any) =>
         String(a.transcript || '').toLowerCase().replace(/[^a-z' ]/g, '').trim());
       this.pronHeard.set(alts[0] || '');
       const target = v.word.toLowerCase().replace(/[^a-z' ]/g, '').trim();
-      const ok = alts.some(a => a === target || a.includes(target) || target.includes(a));
-      this.pronResult.set(ok ? 'ok' : 'miss');
+      const score = this.bestSimilarity(target, alts);
+      this.pronScore.set(score);
+      // Điểm: >=85 chuẩn, 55-84 khá, <55 cần thử lại
+      this.pronResult.set(score >= 85 ? 'ok' : score >= 55 ? 'mid' : 'miss');
       this.pronState.set(null);
     };
     rec.onerror = () => {
       this.pronResult.set('miss');
+      this.pronScore.set(0);
       this.pronHeard.set('(không nghe được — hãy thử lại)');
       this.pronState.set(null);
     };

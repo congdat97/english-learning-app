@@ -47,9 +47,16 @@
         </button>
         <button class="btn-primary" (click)="nextVocab()">{{ vocabIndex() === vocabulary.length - 1 ? 'Học lại từ đầu ↻' : 'Từ tiếp theo →' }}</button>
       </div>
-      <span *ngIf="pronState() !== v.id && pronResult() !== 'none'" class="pron-result" [class.ok]="pronResult() === 'ok'">
-        {{ pronResult() === 'ok' ? '✓ Phát âm chuẩn!' : '⚠️ Nghe được: "' + pronHeard() + '" — thử lại' }}
-      </span>
+      <div *ngIf="pronState() !== v.id && pronResult() !== 'none'" class="pron-result"
+           [class.ok]="pronResult() === 'ok'" [class.mid]="pronResult() === 'mid'">
+        <div class="pron-bar"><span [style.width.%]="pronScore()"></span></div>
+        <div class="pron-score-line">
+          <b>{{ pronScore() }}%</b> giống
+          <span class="pron-verdict">
+            {{ pronResult() === 'ok' ? '— phát âm chuẩn! 🎉' : pronResult() === 'mid' ? '— khá đấy, thử lại cho chuẩn hơn 👍' : '— nghe được: "' + pronHeard() + '" — thử lại nhé' }}
+          </span>
+        </div>
+      </div>
 
       <div class="dots">
         <i *ngFor="let w of vocabulary; let di = index" [class.on]="di === vocabIndex()"></i>
