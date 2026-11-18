@@ -1,8 +1,8 @@
-.vocab { border: 1px solid #eee; padding: 12px; margin: 8px 0; border-radius: 8px; }
+﻿.vocab { border: 1px solid #eee; padding: 12px; margin: 8px 0; border-radius: 8px; }
 button.selected { font-weight: bold; }
 nav button { margin-right: 8px; }
 
-/* ===== Nút phát nằm ngay cạnh từ và cạnh câu ===== */
+/* ===== NÃºt phÃ¡t náº±m ngay cáº¡nh tá»« vÃ  cáº¡nh cÃ¢u ===== */
 .word-head {
   justify-content: flex-start;
   gap: 9px;
@@ -29,7 +29,7 @@ nav button { margin-right: 8px; }
   transform: translateY(-1px);
 }
 
-/* ===== Hàng chọn tốc độ đọc — trượt ngang như subnav, không rơi dòng ===== */
+/* ===== HÃ ng chá»n tá»‘c Ä‘á»™ Ä‘á»c â€” trÆ°á»£t ngang nhÆ° subnav, khÃ´ng rÆ¡i dÃ²ng ===== */
 .speed-row {
   display: flex;
   align-items: center;
@@ -75,7 +75,7 @@ nav button { margin-right: 8px; }
   color: #fff;
 }
 
-/* ===== Nút phát cả đoạn: đổi icon + màu khi đang đọc ===== */
+/* ===== NÃºt phÃ¡t cáº£ Ä‘oáº¡n: Ä‘á»•i icon + mÃ u khi Ä‘ang Ä‘á»c ===== */
 .play {
   transition: .2s ease;
 }
@@ -92,14 +92,14 @@ nav button { margin-right: 8px; }
   50% { box-shadow: 0 0 0 8px transparent; }
 }
 
-/* ===== Nút "Nghe" từng câu: đổi icon + màu khi câu đó đang đọc ===== */
+/* ===== NÃºt "Nghe" tá»«ng cÃ¢u: Ä‘á»•i icon + mÃ u khi cÃ¢u Ä‘Ã³ Ä‘ang Ä‘á»c ===== */
 .tiny-btn.speaking {
   background: #ef4444;
   border-color: #ef4444;
   color: #fff;
 }
 
-/* ===== Nút icon (🔊 / ⏹) thay chữ "Nghe" ===== */
+/* ===== NÃºt icon (ðŸ”Š / â¹) thay chá»¯ "Nghe" ===== */
 .icon-speak,
 .icon-btn {
   min-width: 34px;
@@ -109,7 +109,7 @@ nav button { margin-right: 8px; }
   text-align: center;
 }
 
-/* ===== Dòng hội thoại: nút tròn bên trái, như mockup ===== */
+/* ===== DÃ²ng há»™i thoáº¡i: nÃºt trÃ²n bÃªn trÃ¡i, nhÆ° mockup ===== */
 .line {
   display: flex;
   align-items: center;
@@ -138,7 +138,7 @@ nav button { margin-right: 8px; }
   transform: scale(.94);
 }
 
-/* Chỉ câu đang phát mới là nút cam đặc + ⏸ trắng */
+/* Chá»‰ cÃ¢u Ä‘ang phÃ¡t má»›i lÃ  nÃºt cam Ä‘áº·c + â¸ tráº¯ng */
 .line-speak.speaking {
   background: var(--primary);
   color: var(--on-primary);
@@ -162,7 +162,7 @@ nav button { margin-right: 8px; }
   margin-top: 3px;
 }
 
-/* Nút phát cả đoạn: tròn to hơn theo mockup */
+/* NÃºt phÃ¡t cáº£ Ä‘oáº¡n: trÃ²n to hÆ¡n theo mockup */
 .audio-controls .play {
   width: 62px;
   height: 62px;
@@ -192,7 +192,7 @@ nav button { margin-right: 8px; }
   .play.playing { animation: none; }
 }
 
-/* ===== Câu hỏi ôn tập mới ===== */
+/* ===== CÃ¢u há»i Ã´n táº­p má»›i ===== */
 .q-type {
   display: inline-block;
   font-size: 11px;
@@ -218,14 +218,14 @@ nav button { margin-right: 8px; }
   background: color-mix(in srgb, var(--primary) 5%, transparent);
 }
 
-/* ===== Phát âm bằng mic ===== */
+/* ===== PhÃ¡t Ã¢m báº±ng mic ===== */
 .mic-btn.listening { background: var(--primary-soft); border-color: var(--primary); }
 .pron-result { font-size: 12px; font-weight: 700; color: #b45309; }
 .pron-result.ok { color: #15803d; }
 
-/* ===== TỪ VỰNG CAROUSEL (theo mockup word-card) ===== */
+/* ===== Tá»ª Vá»°NG CAROUSEL (theo mockup word-card) ===== */
 .carousel-card {
-  max-width: 620px;
+  max-width: 100%;
   margin: 0 auto;
   padding: 24px 28px 20px;
   text-align: center;
@@ -307,7 +307,7 @@ nav button { margin-right: 8px; }
 
 .carousel-card .example-row {
   justify-content: center;
-  max-width: 520px;
+  max-width: 100%;
   margin: 6px auto 0;
   text-align: center;
 }
@@ -320,7 +320,7 @@ nav button { margin-right: 8px; }
   flex-wrap: wrap;
 }
 
-/* Nút kiểu mockup */
+/* NÃºt kiá»ƒu mockup */
 .btn-ghost {
   border: 0;
   border-radius: 12px;
@@ -352,7 +352,7 @@ nav button { margin-right: 8px; }
 .btn-primary:hover:not(:disabled) { filter: brightness(1.07); transform: translateY(-1px); }
 .btn-primary:disabled { opacity: .45; cursor: not-allowed; }
 
-/* Dots tiến độ từ */
+/* Dots tiáº¿n Ä‘á»™ tá»« */
 .dots {
   display: flex;
   justify-content: center;
@@ -374,7 +374,7 @@ nav button { margin-right: 8px; }
 }
 
 .vocab-progress {
-  max-width: 620px;
+  max-width: 100%;
   margin: 14px auto 0;
   display: flex;
   align-items: center;
@@ -410,9 +410,9 @@ nav button { margin-right: 8px; }
   margin-top: 16px;
 }
 
-/* ===== ÔN TẬP QUIZ (theo mockup) ===== */
+/* ===== Ã”N Táº¬P QUIZ (theo mockup) ===== */
 .quiz-box {
-  max-width: 640px;
+  max-width: 100%;
   margin: 0 auto;
   background: var(--white);
   border: 1px solid var(--line);
@@ -540,7 +540,7 @@ nav button { margin-right: 8px; }
   .quiz-box { padding: 18px 15px; }
 }
 
-/* ===== KẾT QUẢ PHÁT ÂM: điểm % giống + thanh ===== */
+/* ===== Káº¾T QUáº¢ PHÃT Ã‚M: Ä‘iá»ƒm % giá»‘ng + thanh ===== */
 .pron-result {
   max-width: 420px;
   margin: 12px auto 0;
@@ -590,7 +590,7 @@ nav button { margin-right: 8px; }
 
 .pron-verdict { color: var(--muted); font-weight: 500; }
 
-/* ===== Badge điểm cao nhất kế bên nút Phát âm (xanh lá) ===== */
+/* ===== Badge Ä‘iá»ƒm cao nháº¥t káº¿ bÃªn nÃºt PhÃ¡t Ã¢m (xanh lÃ¡) ===== */
 .pron-best {
   display: inline-flex;
   align-items: center;
@@ -603,3 +603,4 @@ nav button { margin-right: 8px; }
   padding: 5px 10px;
   animation: fadeIn .3s cubic-bezier(.2, .9, .3, 1.2) both;
 }
+
