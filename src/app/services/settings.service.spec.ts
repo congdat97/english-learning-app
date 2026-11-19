@@ -64,5 +64,14 @@ describe('SettingsService', () => {
     expect(service.audioSpeed).toBe(1.5);
     expect(service.showTranslation).toBe(false);
   });
+
+  it('keeps the settings signal in sync after save', () => {
+    service.load();
+    service.save({ dailyMinutes: 20, audioSpeed: 1.75, showTranslation: false, fontSize: 18, voice: 'Alex', theme: 'tim-mong' });
+
+    expect(service.settings()?.showTranslation).toBe(false);
+    expect(service.settings()?.audioSpeed).toBe(1.75);
+    expect(service.showTranslation).toBe(false);
+  });
 });
 

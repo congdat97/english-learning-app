@@ -536,7 +536,7 @@ html[data-theme="mat-ong"] {
 .app-main {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 30px 38px 50px;
+  padding: 30px 38px calc(50px + env(safe-area-inset-bottom, 0px));
   min-width: 0;
   overflow-x: hidden;
   box-sizing: border-box;
@@ -569,6 +569,26 @@ html[data-theme="mat-ong"] {
 .spinner{width:20px;height:20px;border:3px solid var(--primary-soft);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;flex:none}
 @keyframes spin{to{transform:rotate(360deg)}}
 
+/* ---------- SKELETON (hiện khung nội dung thay vì spinner trống) ---------- */
+
+.skeleton-shell{display:grid;gap:12px;padding:18px 0;animation:fadeIn .2s ease both}
+.skeleton{display:flex;gap:8px;overflow:hidden}
+.skeleton > span,.skeleton-line{display:block;background:linear-gradient(90deg,var(--border) 25%,var(--surface-variant) 45%,var(--border) 65%);background-size:200% 100%;border-radius:8px;animation:skeletonShimmer 1.2s ease-in-out infinite}
+.skeleton-tabs > span{height:34px;width:100px;border-radius:10px}
+.skeleton-tabs > span:nth-child(2){width:112px}
+.skeleton-tabs > span:nth-child(3){width:92px}
+.skeleton-speeds > span{height:26px;width:52px;border-radius:20px}
+.skeleton-card{display:grid;gap:11px;background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px}
+.skeleton-card.slim{padding:18px 22px}
+.skeleton-line{height:13px;width:100%}
+.skeleton-line.short{width:28%}
+.skeleton-line.medium{width:62%}
+.skeleton-line.title{height:30px;width:42%}
+@keyframes skeletonShimmer{from{background-position:200% 0}to{background-position:-200% 0}}
+@media (prefers-reduced-motion: reduce){
+  .skeleton > span,.skeleton-line{animation:none}
+}
+
 /* Khối "chưa có dữ liệu" thống nhất mọi trang */
 .empty{border:1px dashed var(--border);border-radius:14px;padding:24px;text-align:center;color:var(--muted);font-size:14px;background:var(--surface);animation:fadeIn .3s ease both}
 
@@ -597,13 +617,13 @@ html[data-theme="mat-ong"] {
 
 /* TABLET */
 @media(max-width:1050px){
-  .app-main{padding:24px 20px 44px}
+  .app-main{padding:24px 20px calc(44px + env(safe-area-inset-bottom, 0px))}
   .course-grid{grid-template-columns:repeat(2,1fr)}
 }
 
 /* MOBILE */
 @media(max-width:850px){
-  .app-main{padding:18px 16px 44px}
+  .app-main{padding:18px 16px calc(44px + env(safe-area-inset-bottom, 0px))}
 
   /* Topbar */
   .topbar{margin-bottom:18px;gap:8px}
@@ -659,7 +679,7 @@ html[data-theme="mat-ong"] {
 
 /* ĐIỆN THOẠI NHỎ */
 @media(max-width:560px){
-  .app-main{padding:14px 12px 40px}
+  .app-main{padding:14px 12px calc(40px + env(safe-area-inset-bottom, 0px))}
   .subnav{margin-left:-12px;margin-right:-12px;padding-left:12px;padding-right:12px}
 
   .topbar h1{font-size:19px}

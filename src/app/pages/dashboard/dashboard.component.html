@@ -13,7 +13,11 @@
   <div class="stat"><div class="stat-icon">🔥</div><div><strong>{{ streakDays }} ngày</strong><small>{{ streakDays > 0 ? 'Duy trì chuỗi học nhé!' : 'Học ngay để bắt đầu chuỗi' }}</small></div></div>
 </div>
 <div class="section-head"><div><h2>Khóa học của bạn</h2><p>Chọn chủ đề phù hợp để bắt đầu</p></div><a class="text-btn" routerLink="/courses">Xem tất cả →</a></div>
-<div *ngIf="loading" class="page-loader"><span class="spinner"></span> Đang tải khóa học...</div>
+<div *ngIf="loading" class="skeleton-shell course-skeleton" aria-busy="true">
+  <div class="skeleton skeleton-course"><span></span><span></span><span></span></div>
+  <div class="skeleton skeleton-course"><span></span><span></span><span></span></div>
+  <div class="skeleton skeleton-course"><span></span><span></span><span></span></div>
+</div>
 <div *ngIf="slowApi && loading" class="slow-hint">⏳ API Render (bản miễn phí) đang khởi động sau khi ngủ — dữ liệu sẽ về trong 30–60 giây. Vui lòng đợi hoặc tải lại trang.</div>
 <div *ngIf="error" class="error">Không tải được dữ liệu. <button (click)="load()">Thử lại</button></div>
 <div class="course-grid" *ngIf="!loading && !error && courses.length">

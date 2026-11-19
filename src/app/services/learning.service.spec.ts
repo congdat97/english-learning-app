@@ -206,6 +206,21 @@ describe('LearningService', () => {
       expect(list[0].score).toBe(3);
     });
 
+    it('getCachedProgress and clearProgressCache roll back optimistic progress', () => {
+      const lessonUrl = `api-cache:${base}/lessons/7/progress`;
+      const allUrl = `api-cache:${base}/lessons/progress/all`;
+      localStorage.setItem(lessonUrl, JSON.stringify({ ts: Date.now(), body: { success: true, data: null } }));
+      localStorage.setItem(allUrl, JSON.stringify({ ts: Date.now(), body: { success: true, data: [] } }));
+
+      const optimistic = { lesson_id: 7, status: 'completed', score: 3 } as any;
+      service.syncProgressCache(7, optimistic);
+      expect(service.getCachedProgress(7)).toEqual(optimistic);
+
+      service.clearProgressCache(7);
+      expect(service.getCachedProgress(7)).toBeNull();
+      expect(JSON.parse(localStorage.getItem(allUrl)!).body.data).toEqual([]);
+    });
+
     it('errors when there is no cache and the API fails', () => {
       let errorCaught = false;
       let completed = false;

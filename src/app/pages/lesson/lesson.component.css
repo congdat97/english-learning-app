@@ -69,6 +69,13 @@ nav button { margin-right: 8px; }
   color: var(--primary);
 }
 
+.speed-chip:active,
+.tiny-btn:active,
+.answer:active,
+.prev-chip:active {
+  transform: scale(.96);
+}
+
 .speed-chip.active {
   background: var(--primary);
   border-color: var(--primary);
@@ -163,10 +170,19 @@ nav button { margin-right: 8px; }
 }
 
 /* Nút phát cả đoạn: tròn to hơn theo mockup */
+.audio-controls {
+  min-height: 62px;
+}
+
 .audio-controls .play {
   width: 62px;
   height: 62px;
   font-size: 25px;
+}
+
+.transcript {
+  min-height: 160px;
+  content-visibility: auto;
 }
 
 @media (max-width: 560px) {
@@ -189,7 +205,14 @@ nav button { margin-right: 8px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .play.playing { animation: none; }
+  .play.playing,
+  .summary-icon { animation: none; }
+  .line-speak:active,
+  .nav-btn:active,
+  .speed-chip:active,
+  .tiny-btn:active,
+  .answer:active,
+  .prev-chip:active { transform: none; }
 }
 
 /* ===== Câu hỏi ôn tập mới ===== */
@@ -253,6 +276,7 @@ nav button { margin-right: 8px; }
   z-index: 2;
 }
 .nav-btn:hover:not(:disabled) { transform: translateY(-50%) scale(1.06); }
+.nav-btn:active:not(:disabled) { transform: translateY(-50%) scale(.96); }
 .nav-btn:disabled { opacity: .35; cursor: not-allowed; }
 .nav-btn.prev { left: 10px; }
 .nav-btn.next { right: 10px; }

@@ -1,17 +1,18 @@
-﻿import { Component, OnDestroy, OnInit, signal } from '@angular/core';
+﻿import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { LearningService } from '../../services/learning.service';
 import { SettingsService } from '../../services/settings.service';
 import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
-import { Lesson, Vocabulary, Listening, ReviewQuestion } from '../../models/learning.model';
+import { Lesson, Vocabulary, Listening, ReviewQuestion, UserProgress } from '../../models/learning.model';
 
 @Component({
   selector: 'app-lesson',
   imports: [CommonModule],
   templateUrl: './lesson.component.html',
-  styleUrl: './lesson.component.css'
+  styleUrl: './lesson.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LessonComponent implements OnInit, OnDestroy {
   lesson: Lesson | null = null;
@@ -36,6 +37,9 @@ export class LessonComponent implements OnInit, OnDestroy {
   /** Id của đoạn hội thoại đang đọc cả nhóm (đổi nút ▶ thành ⏸). */
   playingGroup = signal<string | number | null>(null);
 
+  /** Đọc từ SettingsService qua signal — không đọc localStorage mỗi lần đổi detection. */
+  readonly showTranslation = computed(() => this.settings.settings()?.showTranslation ?? true);
+
   private gapTimer: ReturnType<typeof setTimeout> | null = null;
   private speakToken = 0;
   private touchStartX = 0;
@@ -45,7 +49,14 @@ export class LessonComponent implements OnInit, OnDestroy {
 
   /** Chỉ alert 1 lần mỗi phiên để không spam. */
 
-  constructor(private route: ActivatedRoute, private learning: LearningService, private settings: SettingsService, private auth: AuthService, private toast: ToastService) {}
+  constructor(
+    private route: ActivatedRoute,
+    private learning: LearningService,
+    private settings: SettingsService,
+    private auth: AuthService,
+    private toast: ToastService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.speed = this.settings.audioSpeed;
@@ -59,12 +70,22 @@ export class LessonComponent implements OnInit, OnDestroy {
       next: (r) => {
         this.lesson = r.data;
         if (r.data?.course_id && r.data.sort_order > 1) this.loadPrevLessonVocab(r.data);
+        this.cdr.markForCheck();
       },
-      error: () => this.loading = false
+      error: () => { this.loading = false; this.cdr.markForCheck(); }
     });
-    this.learning.getVocabulary(id).subscribe({ next: (r) => this.vocabulary = r.data, error: () => this.loading = false });
-    this.learning.getListening(id).subscribe({ next: (r) => this.listening = r.data, error: () => this.loading = false });
-    this.learning.getReview(id).subscribe({ next: (r) => { this.review = r.data; this.loading = false; }, error: () => this.loading = false });
+    this.learning.getVocabulary(id).subscribe({
+      next: (r) => { this.vocabulary = r.data; this.cdr.markForCheck(); },
+      error: () => { this.loading = false; this.cdr.markForCheck(); }
+    });
+    this.learning.getListening(id).subscribe({
+      next: (r) => { this.listening = r.data; this.cdr.markForCheck(); },
+      error: () => { this.loading = false; this.cdr.markForCheck(); }
+    });
+    this.learning.getReview(id).subscribe({
+      next: (r) => { this.review = r.data; this.loading = false; this.cdr.markForCheck(); },
+      error: () => { this.loading = false; this.cdr.markForCheck(); }
+    });
   }
 
   // ===== Từ vựng của BÀI TRƯỚC — hiển thị ở tab Luyện nghe để ôn lại =====
@@ -78,7 +99,7 @@ export class LessonComponent implements OnInit, OnDestroy {
         if (!prev) return;
         this.prevLessonTitle = prev.title;
         this.learning.getVocabulary(prev.id).subscribe({
-          next: (vr) => this.prevLessonVocab = vr.data,
+          next: (vr) => { this.prevLessonVocab = vr.data; this.cdr.markForCheck(); },
           error: () => {}
         });
       },
@@ -94,6 +115,14 @@ export class LessonComponent implements OnInit, OnDestroy {
     this.stopSpeaking();
     this.section = s;
   }
+
+  trackBySpeed(_: number, rate: number): number { return rate; }
+  trackByVocabulary(_: number, item: Vocabulary): number { return item.id; }
+  trackByExample(index: number, _: unknown): number { return index; }
+  trackByListening(_: number, item: Listening): number { return item.id; }
+  trackByLine(index: number, _: unknown): number { return index; }
+  trackByQuestion(_: number, item: { id: number }): number { return item.id; }
+  trackByOption(_: number, option: string): string { return option; }
 
   selectAnswer(q: ReviewQuestion, option: string): void {
     if (this.quizChecked()) return;
@@ -251,10 +280,6 @@ export class LessonComponent implements OnInit, OnDestroy {
         this.toast.error('❌ Không lưu được trạng thái từ vựng — thử lại sau.');
       }
     });
-  }
-
-  get showTranslation(): boolean {
-    return this.settings.showTranslation;
   }
 
   /** Đổi tốc độ đọc — áp dụng cho lần phát tiếp theo. */
@@ -481,13 +506,30 @@ export class LessonComponent implements OnInit, OnDestroy {
         this.toast.info(`⚠️ Hoàn thành bài học! Điểm: ${this.score}/${this.review.length}. Đang đăng nhập để lưu tiến độ vào tài khoản.`);
         return;
       }
-      this.learning.saveProgress(this.lesson.id, 'completed', this.score, this.review.length).subscribe({
+      const lessonId = this.lesson.id;
+      const previous = this.learning.getCachedProgress(lessonId);
+      const now = new Date().toISOString();
+      const optimistic: UserProgress = {
+        id: -lessonId,
+        lesson_id: lessonId,
+        status: 'completed',
+        score: this.score,
+        total_questions: this.review.length,
+        completed_at: now,
+        updated_at: now
+      };
+      this.learning.syncProgressCache(lessonId, optimistic);
+
+      this.learning.saveProgress(lessonId, 'completed', this.score, this.review.length).subscribe({
         next: (res) => {
-          // Lưu DB xong -> cập nhật luôn cache tiến độ trong localStorage
-          if (res.data) this.learning.syncProgressCache(this.lesson!.id, res.data);
+          if (res.data) this.learning.syncProgressCache(lessonId, res.data);
           this.toast.success(`🎉 Hoàn thành bài học! Điểm: ${this.score}/${this.review.length} (đã lưu tiến độ).`);
         },
-        error: () => this.toast.error(`❌ Không lưu được tiến độ lên server — điểm ${this.score}/${this.review.length} chỉ hiển thị tạm thời.`)
+        error: () => {
+          if (previous) this.learning.syncProgressCache(lessonId, previous);
+          else this.learning.clearProgressCache(lessonId);
+          this.toast.error(`❌ Không lưu được tiến độ lên server — điểm ${this.score}/${this.review.length} chỉ hiển thị tạm thời.`);
+        }
       });
     }
   }

@@ -243,7 +243,30 @@ export class LearningService {
    */
   syncProgressCache(lessonId: number, row: UserProgress): void {
     this.writeCacheData(`${this.base}/lessons/${lessonId}/progress`, row);
+    this.writeBulkProgressCache(lessonId, row);
+  }
 
+  /** Đọc tiến độ đã cache để có thể hoàn tác khi lưu lên server thất bại. */
+  getCachedProgress(lessonId: number): UserProgress | null {
+    const key = this.cacheKey(`${this.base}/lessons/${lessonId}/progress`);
+    try {
+      const raw = localStorage.getItem(key);
+      const entry = raw ? (JSON.parse(raw) as CacheEntry<UserProgress | null>) : null;
+      return entry?.body?.data ?? null;
+    } catch {
+      return null;
+    }
+  }
+
+  /** Xóa tiến độ optimistic khỏi cache khi API lưu thất bại. */
+  clearProgressCache(lessonId: number): void {
+    try {
+      localStorage.removeItem(this.cacheKey(`${this.base}/lessons/${lessonId}/progress`));
+      this.writeBulkProgressCache(lessonId, null);
+    } catch {}
+  }
+
+  private writeBulkProgressCache(lessonId: number, row: UserProgress | null): void {
     const allUrl = `${this.base}/lessons/progress/all`;
     const key = this.cacheKey(allUrl);
     try {
@@ -252,8 +275,14 @@ export class LearningService {
       const entry = JSON.parse(raw);
       const list: UserProgress[] = entry.body?.data ?? [];
       const idx = list.findIndex(p => p.lesson_id === lessonId);
-      if (idx >= 0) list[idx] = row; else list.push(row);
-      entry.body.data = list;
+      if (!row) {
+        entry.body.data = list.filter(p => p.lesson_id !== lessonId);
+      } else if (idx >= 0) {
+        list[idx] = row;
+        entry.body.data = list;
+      } else {
+        entry.body.data = [...list, row];
+      }
       localStorage.setItem(key, JSON.stringify(entry));
     } catch {}
   }

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { ThemeService } from './theme.service';
 import { LearningService } from './learning.service';
 import { AuthService } from './auth.service';
@@ -23,6 +23,12 @@ const DEFAULTS: LearningSettings = {
 
 @Injectable({ providedIn: 'root' })
 export class SettingsService {
+  private readonly settingsState = signal<LearningSettings | null>(null);
+  private cachedKey = '';
+
+  /** Giá trị cài đặt dùng chung — component đọc signal này thay vì gọi localStorage. */
+  readonly settings = this.settingsState.asReadonly();
+
   constructor(private themeService: ThemeService, private learning: LearningService, private auth: AuthService) {}
 
   /** Mỗi user một bản cài đặt riêng trong localStorage. */
@@ -31,7 +37,7 @@ export class SettingsService {
     return uid ? `learning-settings-${uid}` : 'learning-settings-guest';
   }
 
-  load(): LearningSettings {
+  private readFromStorage(): LearningSettings {
     try {
       const saved = localStorage.getItem(this.keyFor());
       if (saved) return { ...DEFAULTS, ...JSON.parse(saved) };
@@ -39,8 +45,30 @@ export class SettingsService {
     return { ...DEFAULTS };
   }
 
+  private updateCache(settings: LearningSettings): void {
+    this.cachedKey = this.keyFor();
+    this.settingsState.set(settings);
+  }
+
+  private cachedSettings(): LearningSettings {
+    const key = this.keyFor();
+    let current = this.settingsState();
+    if (!current || this.cachedKey !== key) {
+      current = this.readFromStorage();
+      this.updateCache(current);
+    }
+    return current;
+  }
+
+  load(): LearningSettings {
+    const settings = this.readFromStorage();
+    this.updateCache(settings);
+    return settings;
+  }
+
   save(settings: LearningSettings): void {
     localStorage.setItem(this.keyFor(), JSON.stringify(settings));
+    this.updateCache(settings);
     this.applyFontSize(settings.fontSize);
     // CHỈ áp theme khi khác theme đang dùng — tránh đổi tốc độ/font reset mất theme hiện tại
     if (settings.theme && this.themeService.currentTheme?.id !== settings.theme) {
@@ -62,11 +90,11 @@ export class SettingsService {
   }
 
   get audioSpeed(): number {
-    return this.load().audioSpeed;
+    return this.cachedSettings().audioSpeed;
   }
 
   get showTranslation(): boolean {
-    return this.load().showTranslation;
+    return this.cachedSettings().showTranslation;
   }
 
   /** Đổi tốc độ đọc ngay trong bài học và lưu lại localStorage. */

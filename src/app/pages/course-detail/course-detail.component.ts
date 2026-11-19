@@ -36,4 +36,13 @@ export class CourseDetailComponent implements OnInit {
   completedCount(): number {
     return this.lessons.filter(l => this.progressMap.get(l.id)?.status === 'completed').length;
   }
+
+  trackByLesson(_: number, lesson: Lesson): number {
+    return lesson.id;
+  }
+
+  /** Warm 4 API của bài học ngay khi user hover/focus/chạm nút "Học". */
+  prefetch(lessonId: number): void {
+    this.learning.prefetchLesson(lessonId);
+  }
 }

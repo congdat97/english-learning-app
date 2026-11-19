@@ -2,3 +2,29 @@
 .course-progress-line span { color: var(--muted); font-size: 12px; font-weight: 700; white-space: nowrap; }
 .course-progress-line .bar { flex: 1; }
 .status { flex: none; }
+
+.course-skeleton { padding-top: 2px; }
+.course-skeleton .skeleton-progress span { height: 10px; width: 100%; border-radius: 999px; }
+.course-skeleton .skeleton-lesson {
+  display: grid;
+  grid-template-columns: 35px 1fr auto;
+  align-items: center;
+  gap: 13px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.course-skeleton .skeleton-lesson span:first-child { height: 35px; border-radius: 11px; }
+.course-skeleton .skeleton-lesson span:nth-child(2) { height: 13px; width: 70%; }
+.course-skeleton .skeleton-lesson span:last-child { height: 28px; width: 52px; border-radius: 9px; }
+
+.lesson-row {
+  transition: transform .15s ease, background-color .15s ease, box-shadow .15s ease;
+  border-radius: 12px;
+}
+.lesson-row:hover { background: color-mix(in srgb, var(--primary-soft) 55%, transparent); }
+.lesson-row:active { transform: scale(.99); }
+
+@media (prefers-reduced-motion: reduce) {
+  .lesson-row:active { transform: none; }
+}
+a.lesson-row { color: inherit; text-decoration: none; cursor: pointer; }

@@ -10,7 +10,7 @@
 
   <div class="speed-row">
     <span class="speed-label">🎚 Tốc độ đọc</span>
-    <button *ngFor="let r of speeds" type="button" class="speed-chip"
+    <button *ngFor="let r of speeds; trackBy: trackBySpeed" type="button" class="speed-chip"
             [class.active]="speed === r" (click)="setSpeed(r)">{{ r }}x</button>
   </div>
 
@@ -37,8 +37,8 @@
       </div>
       <div class="meaning">{{ v.meaning_vi }}</div>
 
-      <div *ngFor="let e of v.examples; let ei = index" class="example-row">
-        <small>Ví dụ: {{ e.sentence }}<br><ng-container *ngIf="showTranslation">{{ e.translation_vi }}</ng-container></small>
+      <div *ngFor="let e of v.examples; let ei = index; trackBy: trackByExample" class="example-row">
+        <small>Ví dụ: {{ e.sentence }}<br><ng-container *ngIf="showTranslation()">{{ e.translation_vi }}</ng-container></small>
         <button class="tiny-btn icon-speak" [class.speaking]="speakingKey() === v.id + ':' + ei"
                 title="Nghe câu" aria-label="Nghe câu"
                 (click)="speakOnce(v.id + ':' + ei, e.sentence)">{{ speakingKey() === v.id + ':' + ei ? '⏸' : '▶' }}</button>
@@ -63,7 +63,7 @@
       </div>
 
       <div class="dots">
-        <i *ngFor="let w of vocabulary; let di = index" [class.on]="di === vocabIndex()"></i>
+        <i *ngFor="let w of vocabulary; let di = index; trackBy: trackByVocabulary" [class.on]="di === vocabIndex()"></i>
       </div>
     </article>
 
@@ -85,7 +85,7 @@
         <span>{{ prevLessonTitle }}</span>
       </div>
       <div class="prev-review-chips">
-        <button *ngFor="let w of prevLessonVocab" type="button" class="prev-chip"
+        <button *ngFor="let w of prevLessonVocab; trackBy: trackByVocabulary" type="button" class="prev-chip"
                 [class.speaking]="speakingKey() === 'pv-' + w.id"
                 (click)="speakOnce('pv-' + w.id, w.word)">
           <b>{{ w.word }}</b><small>{{ w.meaning_vi }}</small>
@@ -93,7 +93,7 @@
       </div>
     </div>
 
-    <div *ngFor="let l of listening" class="listen-box">
+    <div *ngFor="let l of listening; trackBy: trackByListening" class="listen-box">
       <b>🎧 {{ l.title }}</b>
       <div class="audio-controls">
         <button class="play" [class.playing]="playingGroup() === l.id && speakingKey() !== null"
@@ -102,17 +102,17 @@
         <span class="muted">{{ playingGroup() === l.id ? (speakingKey() !== null ? 'Đang đọc — bấm để dừng' : 'Nghỉ giữa câu...') : 'Sẵn sàng nghe' }}</span>
       </div>
       <div class="transcript">
-        <div *ngFor="let line of l.transcript; let li = index" class="line" [class.reading]="speakingKey() === l.id + ':' + li">
+        <div *ngFor="let line of l.transcript; let li = index; trackBy: trackByLine" class="line" [class.reading]="speakingKey() === l.id + ':' + li">
           <button class="line-speak" [class.speaking]="speakingKey() === l.id + ':' + li" title="Nghe câu này" aria-label="Nghe câu này" (click)="speakFrom(l.id, li, l.transcript.map(x => x.text))">{{ speakingKey() === l.id + ':' + li ? '⏸' : '▶' }}</button>
           <div class="line-body">
             <div class="line-text"><b>{{ line.speaker }}:</b> {{ line.text }}</div>
-            <span class="translation" *ngIf="showTranslation">{{ line.translation_vi }}</span>
+            <span class="translation" *ngIf="showTranslation()">{{ line.translation_vi }}</span>
           </div>
         </div>
       </div>
-      <div *ngFor="let q of l.questions" class="question">
+      <div *ngFor="let q of l.questions; trackBy: trackByQuestion" class="question">
         <b>{{ q.question }}</b>
-        <button *ngFor="let opt of q.options" class="option"
+        <button *ngFor="let opt of q.options; trackBy: trackByOption" class="option"
                 [class.selected]="listeningAnswers[q.id] === opt && !listeningSubmitted"
                 [class.correct]="listeningSubmitted && opt === q.answer"
                 [class.wrong]="listeningSubmitted && listeningAnswers[q.id] === opt && opt !== q.answer"
@@ -155,7 +155,7 @@
 
         <p class="quiz-hint" *ngIf="q.type !== 'listen'">Chọn đáp án đúng nhất:</p>
         <div class="answers">
-          <button *ngFor="let opt of q.options" class="answer"
+          <button *ngFor="let opt of q.options; trackBy: trackByOption" class="answer"
                   [class.selected]="answers[q.id] === opt && !quizChecked()"
                   [class.correct]="quizChecked() && opt === q.answer"
                   [class.wrong]="quizChecked() && answers[q.id] === opt && opt !== q.answer"
@@ -190,4 +190,22 @@
     <div class="tip">💡 Mẹo học: tự nhớ nghĩa của từ trước khi xem đáp án.</div>
   </section>
 </div>
-<ng-template #loadingTpl><div class="page-loader"><span class="spinner"></span> Đang tải bài học...</div></ng-template>
+<ng-template #loadingTpl>
+  <div class="skeleton-shell" aria-label="Đang tải bài học" aria-busy="true">
+    <div class="skeleton skeleton-tabs">
+      <span></span><span></span><span></span>
+    </div>
+    <div class="skeleton skeleton-speeds"><span></span><span></span><span></span><span></span></div>
+    <div class="skeleton skeleton-card">
+      <span class="skeleton-line short"></span>
+      <span class="skeleton-line title"></span>
+      <span class="skeleton-line"></span>
+      <span class="skeleton-line medium"></span>
+      <span class="skeleton-line short"></span>
+    </div>
+    <div class="skeleton skeleton-card slim">
+      <span class="skeleton-line medium"></span>
+      <span class="skeleton-line"></span>
+    </div>
+  </div>
+</ng-template>

@@ -6,20 +6,27 @@
   </div>
   <div class="lesson-emoji">📚</div>
 </div>
-<div class="page-loader" *ngIf="loading"><span class="spinner"></span> Đang tải bài học...</div>
+<div class="skeleton-shell course-skeleton" *ngIf="loading" aria-busy="true">
+  <div class="skeleton skeleton-progress"><span></span></div>
+  <div class="skeleton skeleton-lesson"><span></span><span></span><span></span></div>
+  <div class="skeleton skeleton-lesson"><span></span><span></span><span></span></div>
+  <div class="skeleton skeleton-lesson"><span></span><span></span><span></span></div>
+  <div class="skeleton skeleton-lesson"><span></span><span></span><span></span></div>
+</div>
 <div class="panel" *ngIf="!loading">
   <div class="course-progress-line" *ngIf="lessons.length">
     <span>Hoàn thành {{ completedCount() }}/{{ lessons.length }} bài</span>
     <div class="bar"><span [style.width.%]="lessons.length ? (completedCount() * 100 / lessons.length) : 0"></span></div>
   </div>
-  <div class="lesson-row" *ngFor="let lesson of lessons">
+  <a class="lesson-row" *ngFor="let lesson of lessons; trackBy: trackByLesson" [routerLink]="['/lessons', lesson.id]"
+     (mouseenter)="prefetch(lesson.id)" (focus)="prefetch(lesson.id)" (touchstart)="prefetch(lesson.id)">
     <div class="lesson-number">{{ lesson.sort_order }}</div>
     <div class="lesson-info">
       <strong>{{ lesson.title }}</strong>
       <small>{{ lesson.topic }}</small>
     </div>
     <span class="status" *ngIf="progressMap.get(lesson.id)?.status === 'completed'">✓ Đã học</span>
-    <a class="tiny-btn" [routerLink]="['/lessons', lesson.id]">Học</a>
-  </div>
+    <span class="tiny-btn">Học</span>
+  </a>
 </div>
 <a routerLink="/courses" class="text-btn">← Quay lại</a>
