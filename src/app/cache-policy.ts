@@ -1,5 +1,6 @@
-export const APP_CACHE_VERSION = '2026-11-19-v5';
-export const CACHE_MAX_AGE_MS = 60_000;
+export const APP_CACHE_VERSION = '2026-11-19-v8';
+export const CACHE_MAX_AGE_MS = 15 * 60_000;
+export const DYNAMIC_CACHE_MAX_AGE_MS = 5 * 60_000;
 
 const CACHE_PREFIXES = ['api-cache:', 'http_cache_', 'elf-data.'];
 
