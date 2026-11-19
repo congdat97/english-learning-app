@@ -30,14 +30,7 @@ export class CourseDetailComponent implements OnInit {
         if (row.lesson_id != null) this.progressMap.set(row.lesson_id, row);
       }
       this.loading = false;
-      this.prefetchNextLesson();
     });
-  }
-
-  private prefetchNextLesson(): void {
-    const sorted = [...this.lessons].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
-    const target = sorted.find(l => this.progressMap.get(l.id)?.status !== 'completed') ?? sorted[0];
-    if (target) this.learning.prefetchLesson(target.id);
   }
 
   completedCount(): number {
