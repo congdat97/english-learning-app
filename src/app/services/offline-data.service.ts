@@ -248,8 +248,14 @@ export class OfflineDataService {
    * - Chưa có cache -> tải lần đầu (nền, UI vẫn hiện trạng thái chờ riêng).
    */
   ensureData() {
-    return this.syncAll()
-      .pipe(catchError(() => of(null)));
+    // Neu da co cache (offline storage) -> tra ngay de UI hien thi nhanh,
+    // dong thoi refresh nen (force) de cap nhat du lieu moi ma khong chan UI.
+    if (this.hasData()) {
+      this.syncAll(true).pipe(catchError(() => of(null))).subscribe();
+      return of(null);
+    }
+    // Chua co cache -> tai lan dau (blocking) de co du lieu.
+    return this.syncAll(false).pipe(catchError(() => of(null)));
   }
 
   // =====================================================
