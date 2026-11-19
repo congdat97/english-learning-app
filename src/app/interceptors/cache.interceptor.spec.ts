@@ -51,7 +51,7 @@ describe('CacheInterceptor', () => {
     localStorage.setItem(
       'http_cache_/api/courses',
       JSON.stringify({
-        ts: Date.now() - 120_000,
+        ts: Date.now() - 30 * 24 * 60 * 60 * 1000,
         body: { success: true, data: ['stale'] }
       })
     );

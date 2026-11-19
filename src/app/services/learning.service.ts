@@ -5,7 +5,7 @@ import { finalize, shareReplay, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
 import { Course, LeaderboardRow, Lesson, Listening, ReviewQuestion, UserProgress, Vocabulary } from '../models/learning.model';
-import { CACHE_MAX_AGE_MS, clearAppCaches } from '../cache-policy';
+import { CACHE_MAX_AGE_MS, DYNAMIC_CACHE_MAX_AGE_MS, clearAppCaches } from '../cache-policy';
 
 type ApiResult<T> = { success: boolean; data: T };
 
@@ -54,10 +54,15 @@ export class LearningService {
   }
 
   /**
-   * Cache theo TTL ngắn: còn hạn thì phát ngay, hết hạn thì gọi API.
-   * Nếu API lỗi vẫn dùng cache cũ để giữ chế độ offline.
+   * Cache-first: luôn phát dữ liệu đã có ngay (kể cả đã cũ).
+   * Hết hạn thì làm mới ngầm để lần sau có dữ liệu mới,
+   * không chặn UI khi API Render đang khởi động lại.
    */
-  private cachedGet<T>(url: string, force = false): Observable<ApiResult<T>> {
+  private cachedGet<T>(
+    url: string,
+    force = false,
+    ttlMs = CACHE_MAX_AGE_MS
+  ): Observable<ApiResult<T>> {
     if (force) return this.fetchAndCache<T>(url, true);
 
     return new Observable<ApiResult<T>>(observer => {
@@ -71,23 +76,22 @@ export class LearningService {
         }
       } catch {}
 
-      if (cached && Date.now() - (cached.ts || 0) < CACHE_MAX_AGE_MS) {
+      if (cached) {
+        // Cache-first: luôn phát dữ liệu đã có ngay, kể cả đã cũ.
         observer.next(cached.body);
+
+        if (Date.now() - (cached.ts || 0) >= ttlMs) {
+          // Hết hạn: làm mới ngầm, không chặn UI (stale-while-revalidate).
+          this.fetchAndCache<T>(url).subscribe({ error: () => {} });
+        }
+
         observer.complete();
         return () => {};
       }
 
-      const stale = cached?.body ?? null;
       const sub = this.fetchAndCache<T>(url).subscribe({
         next: body => observer.next(body),
-        error: err => {
-          if (stale) {
-            observer.next(stale);
-            observer.complete();
-            return;
-          }
-          observer.error(err);
-        },
+        error: err => observer.error(err),
         complete: () => observer.complete()
       });
       return () => sub.unsubscribe();
@@ -143,13 +147,20 @@ export class LearningService {
     return this.cachedGet<ReviewQuestion[]>(`${this.base}/lessons/${lessonId}/review`, force);
   }
 
+  prefetchLesson(lessonId: number): void {
+    this.getLesson(lessonId).subscribe({ error: () => {} });
+    this.getVocabulary(lessonId).subscribe({ error: () => {} });
+    this.getListening(lessonId).subscribe({ error: () => {} });
+    this.getReview(lessonId).subscribe({ error: () => {} });
+  }
+
   getProgress(lessonId: number, force = false): Observable<ApiResult<UserProgress | null>> {
-    return this.cachedGet<UserProgress | null>(`${this.base}/lessons/${lessonId}/progress`, force);
+    return this.cachedGet<UserProgress | null>(`${this.base}/lessons/${lessonId}/progress`, force, DYNAMIC_CACHE_MAX_AGE_MS);
   }
 
   /** Lấy tiến độ của TẤT CẢ lesson trong 1 request duy nhất. */
   getAllProgress(force = false): Observable<ApiResult<UserProgress[]>> {
-    return this.cachedGet<UserProgress[]>(`${this.base}/lessons/progress/all`, force);
+    return this.cachedGet<UserProgress[]>(`${this.base}/lessons/progress/all`, force, DYNAMIC_CACHE_MAX_AGE_MS);
   }
 
   /** Xóa cache tiến độ tổng (gọi sau khi lưu tiến độ mới). */
@@ -169,11 +180,11 @@ export class LearningService {
   }
 
   getBookmarks(force = false): Observable<ApiResult<Vocabulary[]>> {
-    return this.cachedGet<Vocabulary[]>(`${this.base}/vocabulary/bookmarks`, force);
+    return this.cachedGet<Vocabulary[]>(`${this.base}/vocabulary/bookmarks`, force, DYNAMIC_CACHE_MAX_AGE_MS);
   }
 
   getSettings(force = false): Observable<ApiResult<any>> {
-    return this.cachedGet<any>(`${this.base}/settings`, force);
+    return this.cachedGet<any>(`${this.base}/settings`, force, DYNAMIC_CACHE_MAX_AGE_MS);
   }
 
   /** Admin: tiến độ học của mọi user (không cache — dữ liệu nhạy). */

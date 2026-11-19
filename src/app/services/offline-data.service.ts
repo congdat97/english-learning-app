@@ -8,12 +8,13 @@ import {
   map,
   merge,
   of,
-  switchMap
+  switchMap,
+  timer
 } from 'rxjs';
 
 import { LearningService } from './learning.service';
 
-import { Course, Lesson, UserProgress, Vocabulary } from '../models/learning.model';
+import { Course, UserProgress, Vocabulary } from '../models/learning.model';
 
 export type OfflineDataKey = 'courses' | 'bookmarks' | 'progress' | 'lessons';
 
@@ -196,7 +197,7 @@ export class OfflineDataService {
 
   /**
    * Tải dữ liệu cần dùng offline vào localStorage:
-   * khóa học + số từ + tiến độ từng + danh sách lesson mở khóa.
+   * khóa học + bookmark + tiến độ học.
    *
    * force=false (mặc định, mở app): cache-first — có cache là xong, không đụng API.
    * force=true (nút "Đồng bộ"): bỏ cache, luôn gọi API và ghi đè cache.
@@ -212,14 +213,7 @@ export class OfflineDataService {
           .pipe(map(r => r.data || []), catchError(() => of([] as Vocabulary[]))),
 
         progress: this.learning.getAllProgress(force)
-          .pipe(map(r => r.data || []), catchError(() => of([] as UserProgress[]))),
-
-        lessons: forkJoin(
-          courses.map(c =>
-            this.learning.getLessons(c.id, force)
-              .pipe(map(r => r.data || []), catchError(() => of([] as Lesson[])))
-          )
-        )
+          .pipe(map(r => r.data || []), catchError(() => of([] as UserProgress[])))
       })),
       map(result => {
 
@@ -228,8 +222,6 @@ export class OfflineDataService {
         this.set('bookmarks', result.bookmarks);
 
         this.set('progress', result.progress);
-
-        this.set('lessons', result.lessons.flat());
 
         this.saveMeta({
           courses: result.courses.length,
@@ -249,13 +241,25 @@ export class OfflineDataService {
    * - Chưa có cache -> tải lần đầu (blocking) để có dữ liệu.
    */
   ensureData() {
-    if (this.hasData()) {
-      return merge(
-        of(null),
-        this.syncAll(true).pipe(catchError(() => of(null)))
-      );
+    if (!this.hasData()) {
+      return this.syncAll(false).pipe(catchError(() => of(null)));
     }
-    return this.syncAll(false).pipe(catchError(() => of(null)));
+
+    const lastSync = this.getMeta().syncedAt;
+    const lastSyncTime = lastSync ? new Date(lastSync).getTime() : 0;
+
+    if (Date.now() - lastSyncTime < 10 * 60_000) {
+      return of(null);
+    }
+
+    // Có cache: trả ngay, đồng bộ nền sau 2s để không tranh băng thông
+    // với request của trang đang mở.
+    return merge(
+      of(null),
+      timer(2000).pipe(
+        switchMap(() => this.syncAll(true).pipe(catchError(() => of(null))))
+      )
+    );
   }
 
   // =====================================================

@@ -2,10 +2,18 @@
 const path = require('path');
 
 const target = path.join('dist', 'english-learning-app', 'browser', 'index.html');
-const buffer = fs.readFileSync(target);
+const buildId = `${Date.now().toString(36)}-${process.env.RENDER_GIT_COMMIT || 'local'}`;
 
-if (!(buffer[0] === 0xEF && buffer[1] === 0xBB && buffer[2] === 0xBF)) {
-  fs.writeFileSync(target, Buffer.concat([Buffer.from([0xEF, 0xBB, 0xBF]), buffer]));
+let text = fs.readFileSync(target, 'utf8');
+const hadBom = text.charCodeAt(0) === 0xfeff;
+if (hadBom) text = text.slice(1);
+
+text = text.replace(/__BUILD_ID__/g, buildId);
+
+if (!text.startsWith('\ufeff')) {
+  text = '\ufeff' + text;
 }
 
-console.log('BOM added');
+fs.writeFileSync(target, text, 'utf8');
+
+console.log('BOM added, build id:', buildId);

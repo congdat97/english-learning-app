@@ -118,8 +118,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
           const completed = new Set(progressRows.filter((p: any) => p?.status === 'completed').map((p: any) => p.lesson_id));
           target = allLessons.find((l: any) => !completed.has(l.id)) || allLessons[allLessons.length - 1];
         }
-        if (target?.id != null) this.router.navigate(['/lessons', target.id]);
-        else this.router.navigate(['/courses']);
+        if (target?.id != null) {
+          this.learning.prefetchLesson(target.id);
+          this.router.navigate(['/lessons', target.id]);
+        } else {
+          this.router.navigate(['/courses']);
+        }
       });
     });
   }

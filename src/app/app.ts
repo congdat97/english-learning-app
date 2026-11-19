@@ -1,6 +1,5 @@
 import { Component, HostListener, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
 import { Subscription } from 'rxjs';
@@ -20,8 +19,6 @@ import { ToastService } from './services/toast.service';
   styleUrl: './app.css'
 })
 export class App implements OnInit, OnDestroy {
-
-  private readonly http = inject(HttpClient);
 
   private offlineDataService =
     inject(OfflineDataService);
@@ -112,9 +109,8 @@ export class App implements OnInit, OnDestroy {
 
   /** Ping nền im lặng — chỉ để API không ngủ. */
   private warmUpApi(): void {
-    this.http
-      .get(`${environment.apiUrl}/courses?warm=${Date.now()}`)
-      .subscribe({ error: () => {} });
+    const base = environment.apiUrl.replace(/\/api\/?$/, '');
+    void fetch(`${base}/health`, { cache: 'no-store' }).catch(() => {});
   }
 
 

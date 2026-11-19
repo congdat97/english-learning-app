@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { catchError, forkJoin, of } from 'rxjs';
 import { LearningService } from '../../services/learning.service';
 import { Course, Lesson, UserProgress } from '../../models/learning.model';
 
@@ -18,17 +19,25 @@ export class CourseDetailComponent implements OnInit {
   constructor(private route: ActivatedRoute, private learning: LearningService) {}
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
-    this.learning.getCourse(id).subscribe({ next: (r) => this.course = r.data, error: () => this.loading = false });
-    this.learning.getLessons(id).subscribe({ next: (r) => { this.lessons = r.data; this.loading = false; }, error: () => this.loading = false });
-    // Tiến độ lấy từ cache (lấy nhanh, không đợi API) để đánh dấu bài đã học
-    this.learning.getAllProgress().subscribe({
-      next: (r) => {
-        for (const row of (r.data || [])) {
-          if (row.lesson_id != null) this.progressMap.set(row.lesson_id, row);
-        }
-      },
-      error: () => {}
+    forkJoin({
+      course: this.learning.getCourse(id).pipe(catchError(() => of(null))),
+      lessons: this.learning.getLessons(id).pipe(catchError(() => of(null))),
+      progress: this.learning.getAllProgress().pipe(catchError(() => of(null)))
+    }).subscribe(({ course, lessons, progress }) => {
+      this.course = course?.data ?? null;
+      this.lessons = lessons?.data ?? [];
+      for (const row of (progress?.data || [])) {
+        if (row.lesson_id != null) this.progressMap.set(row.lesson_id, row);
+      }
+      this.loading = false;
+      this.prefetchNextLesson();
     });
+  }
+
+  private prefetchNextLesson(): void {
+    const sorted = [...this.lessons].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+    const target = sorted.find(l => this.progressMap.get(l.id)?.status !== 'completed') ?? sorted[0];
+    if (target) this.learning.prefetchLesson(target.id);
   }
 
   completedCount(): number {

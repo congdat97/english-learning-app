@@ -58,6 +58,21 @@ describe('LearningService', () => {
     http.expectOne(`${base}/lessons/3/review`).flush({ success: true, data: [] });
   });
 
+  it('prefetchLesson warms all lesson endpoints', () => {
+    service.prefetchLesson(4);
+
+    for (const url of [
+      `${base}/lessons/4`,
+      `${base}/lessons/4/vocabulary`,
+      `${base}/lessons/4/listening`,
+      `${base}/lessons/4/review`
+    ]) {
+      const req = http.expectOne(url);
+      expect(req.request.method).toBe('GET');
+      req.flush({ success: true, data: [] });
+    }
+  });
+
   it('getProgress builds /lessons/:id/progress', () => {
     service.getProgress(3).subscribe();
     http.expectOne(`${base}/lessons/3/progress`).flush({ success: true, data: null });
@@ -204,15 +219,19 @@ describe('LearningService', () => {
       expect(completed).toBe(false);
     });
 
-    it('refreshes expired cache from the API instead of serving it forever', () => {
+    it('serves expired cache immediately then refreshes it in the background', () => {
       const url = `${base}/courses`;
       seedCache(url, { success: true, data: [{ id: 9, title: 'old-but-valid' }] }, Date.now() - 30 * 24 * 60 * 60 * 1000);
       const emissions: any[] = [];
-      service.getCourses().subscribe(e => emissions.push(e));
+      let completed = false;
+      service.getCourses().subscribe({ next: e => emissions.push(e), complete: () => (completed = true) });
+
+      // UI nhận dữ liệu cũ ngay, không phải chờ API
+      expect(emissions[0].data[0].title).toBe('old-but-valid');
+      expect(completed).toBe(true);
 
       http.expectOne(url).flush({ success: true, data: [{ id: 1, title: 'fresh' }] });
 
-      expect(emissions[0].data[0].title).toBe('fresh');
       const saved = JSON.parse(localStorage.getItem(`api-cache:${url}`) || '{}');
       expect(saved.body.data[0].title).toBe('fresh');
     });
