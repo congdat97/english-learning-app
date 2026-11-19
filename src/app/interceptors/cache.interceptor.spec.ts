@@ -47,6 +47,22 @@ describe('CacheInterceptor', () => {
     httpMock.expectNone('/api/courses');
   });
 
+  it('falls back to stale cache when the API fails', () => {
+    localStorage.setItem(
+      'http_cache_/api/courses',
+      JSON.stringify({
+        ts: Date.now() - 120_000,
+        body: { success: true, data: ['stale'] }
+      })
+    );
+
+    let result: unknown;
+    http.get('/api/courses').subscribe(r => (result = r));
+    httpMock.expectOne('/api/courses').flush('boom', { status: 500, statusText: 'Server Error' });
+
+    expect(result).toEqual({ success: true, data: ['stale'] });
+  });
+
   it('caches on first fetch and reuses afterwards', () => {
     let first: unknown;
     http.get('/api/settings').subscribe((r) => (first = r));

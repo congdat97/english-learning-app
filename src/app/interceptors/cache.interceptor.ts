@@ -6,31 +6,34 @@ import {
 
 import { inject } from '@angular/core';
 
-import { of } from 'rxjs';
+import { catchError, of, throwError } from 'rxjs';
 
 import { tap } from 'rxjs/operators';
+
+import { CACHE_MAX_AGE_MS } from '../cache-policy';
 
 import { AuthService } from '../services/auth.service';
 
 /**
- * CACHE-FIRST tuyệt đối:
+ * Cache API ngắn hạn để giảm tải Render:
+ * - Còn hạn -> phát ngay từ localStorage.
+ * - Hết hạn -> gọi API, lưu cache mới; nếu API lỗi thì dùng cache cũ.
+ * - force refresh -> luôn gọi API.
  *
- * GET:
- *  - Có cache -> dùng ngay từ localStorage, KHÔNG gọi API.
- *  - Chưa có cache -> gọi API, thành công thì lưu vào localStorage.
- *  - Cần dữ liệu mới: dùng nút 🔄 Đồng bộ trên header (bỏ cache).
- *
- * Ghi (POST/PUT/DELETE) thành công -> xóa cache cùng nhóm tài nguyên
- * (lớp cache của service sẽ tự cập nhật dữ liệu mới sau khi ghi).
+ * Ghi (POST/PUT/DELETE) thành công -> xóa cache cùng nhóm tài nguyên.
  */
 
 const PREFIX = 'http_cache_';
 
 interface CacheEntry {
+  ts: number;
   body: unknown;
 }
 
-function readEntry(key: string): CacheEntry | null {
+function readEntry(
+  key: string,
+  allowStale = false
+): CacheEntry | null {
 
   try {
 
@@ -42,7 +45,7 @@ function readEntry(key: string): CacheEntry | null {
     }
 
     const parsed =
-      JSON.parse(raw) as CacheEntry;
+      JSON.parse(raw) as Partial<CacheEntry>;
 
     if (
       !parsed ||
@@ -54,7 +57,16 @@ function readEntry(key: string): CacheEntry | null {
       return null;
     }
 
-    return parsed;
+    const ts =
+      typeof parsed.ts === 'number'
+        ? parsed.ts
+        : Date.now();
+
+    if (!allowStale && Date.now() - ts > CACHE_MAX_AGE_MS) {
+      return null;
+    }
+
+    return { ts, body: parsed.body };
 
   } catch {
     return null;
@@ -79,7 +91,7 @@ function writeEntry(
 
     localStorage.setItem(
       PREFIX + key,
-      JSON.stringify({ body })
+      JSON.stringify({ ts: Date.now(), body })
     );
 
   } catch {
@@ -183,7 +195,6 @@ export const cacheInterceptor: HttpInterceptorFn = (req, next) => {
 
   const forceRefresh = req.headers.get('X-Force-Refresh') === '1';
 
-  // 1) Có cache: dùng ngay, KHÔNG gọi API (trừ khi force refresh)
   if (!forceRefresh) {
     const entry = readEntry(key);
     if (entry) {
@@ -195,7 +206,6 @@ export const cacheInterceptor: HttpInterceptorFn = (req, next) => {
     ? req.clone({ headers: req.headers.delete('X-Force-Refresh') })
     : req;
 
-  // 2) Chưa có cache (hoặc force refresh): gọi API và lưu lại
   return next(outgoing).pipe(
     tap((event: HttpEvent<unknown>) => {
 
@@ -207,6 +217,12 @@ export const cacheInterceptor: HttpInterceptorFn = (req, next) => {
         writeEntry(key, event.body);
       }
 
+    }),
+    catchError(err => {
+      const stale = forceRefresh ? null : readEntry(key, true);
+      return stale
+        ? of(toResponse(req, stale.body))
+        : throwError(() => err);
     })
   );
 

@@ -5,6 +5,7 @@ import { finalize, shareReplay, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
 import { Course, LeaderboardRow, Lesson, Listening, ReviewQuestion, UserProgress, Vocabulary } from '../models/learning.model';
+import { CACHE_MAX_AGE_MS, clearAppCaches } from '../cache-policy';
 
 type ApiResult<T> = { success: boolean; data: T };
 
@@ -24,15 +25,7 @@ export class LearningService {
   private auth = inject(AuthService);
 
   constructor(private http: HttpClient) {
-    try {
-      const version = '2026-11-19-v3';
-      if (localStorage.getItem('api-cache-version') !== version) {
-        Object.keys(localStorage)
-          .filter(k => k.startsWith('api-cache:') || k.startsWith('http_cache_'))
-          .forEach(k => localStorage.removeItem(k));
-        localStorage.setItem('api-cache-version', version);
-      }
-    } catch {}
+    clearAppCaches();
   }
 
   /** Cache phân theo user — user A không thấy cache của user B. */
@@ -61,10 +54,8 @@ export class LearningService {
   }
 
   /**
-   * CACHE-FIRST tuyệt đối:
-   * - Có cache (dù cũ bao lâu) -> phát cache ngay, KHÔNG gọi API.
-   * - Chưa có cache -> gọi API, lưu cache rồi mới phát.
-   * - force=true (nút 🔄 Đồng bộ): bỏ cache, luôn gọi API và ghi đè cache.
+   * Cache theo TTL ngắn: còn hạn thì phát ngay, hết hạn thì gọi API.
+   * Nếu API lỗi vẫn dùng cache cũ để giữ chế độ offline.
    */
   private cachedGet<T>(url: string, force = false): Observable<ApiResult<T>> {
     if (force) return this.fetchAndCache<T>(url, true);
@@ -80,15 +71,23 @@ export class LearningService {
         }
       } catch {}
 
-      if (cached) {
+      if (cached && Date.now() - (cached.ts || 0) < CACHE_MAX_AGE_MS) {
         observer.next(cached.body);
         observer.complete();
         return () => {};
       }
 
+      const stale = cached?.body ?? null;
       const sub = this.fetchAndCache<T>(url).subscribe({
         next: body => observer.next(body),
-        error: err => observer.error(err),
+        error: err => {
+          if (stale) {
+            observer.next(stale);
+            observer.complete();
+            return;
+          }
+          observer.error(err);
+        },
         complete: () => observer.complete()
       });
       return () => sub.unsubscribe();

@@ -73,14 +73,14 @@ stages:
               npm test -- --watch=false
             displayName: 'Run tests'
 
-          - script: |
+          - powershell: |
               if (-not (Test-Path "dist/english-learning-app/browser/index.html")) {
                 throw "Build output is missing: dist/english-learning-app/browser/index.html"
               }
             displayName: 'Verify build output'
             condition: succeeded()
 
-          - publish: dist
+          - publish: dist/english-learning-app/browser
             artifact: angular-dist
             displayName: 'Publish build artifact (dist)'
 

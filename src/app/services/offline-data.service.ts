@@ -6,6 +6,7 @@ import {
   catchError,
   forkJoin,
   map,
+  merge,
   of,
   switchMap
 } from 'rxjs';
@@ -194,11 +195,11 @@ export class OfflineDataService {
   // =====================================================
 
   /**
-   * T?i d? li?u c?n d�ng offline v? localStorage:
-   * kh�a h?c + s? t? + ti?n d? t?ng + danh s�ch lesson m?i kh�a.
+   * Tải dữ liệu cần dùng offline vào localStorage:
+   * khóa học + số từ + tiến độ từng + danh sách lesson mở khóa.
    *
-   * force=false (m?c d?nh, m? app): cache-first � c� cache l� xong, kh�ng d?ng API.
-   * force=true (n�t ?? �?ng b?): b? cache, lu�n g?i API v� ghi d� cache.
+   * force=false (mặc định, mở app): cache-first — có cache là xong, không đụng API.
+   * force=true (nút "Đồng bộ"): bỏ cache, luôn gọi API và ghi đè cache.
    */
   syncAll(force = false) {
 
@@ -245,16 +246,15 @@ export class OfflineDataService {
   /**
    * Luôn đồng bộ khi mở app:
    * - Có cache -> trả tức thì + refresh nền (không chặn UI).
-   * - Chưa có cache -> tải lần đầu (nền, UI vẫn hiện trạng thái chờ riêng).
+   * - Chưa có cache -> tải lần đầu (blocking) để có dữ liệu.
    */
   ensureData() {
-    // Neu da co cache (offline storage) -> tra ngay de UI hien thi nhanh,
-    // dong thoi refresh nen (force) de cap nhat du lieu moi ma khong chan UI.
     if (this.hasData()) {
-      this.syncAll(true).pipe(catchError(() => of(null))).subscribe();
-      return of(null);
+      return merge(
+        of(null),
+        this.syncAll(true).pipe(catchError(() => of(null)))
+      );
     }
-    // Chua co cache -> tai lan dau (blocking) de co du lieu.
     return this.syncAll(false).pipe(catchError(() => of(null)));
   }
 

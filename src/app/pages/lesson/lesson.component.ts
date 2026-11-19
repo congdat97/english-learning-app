@@ -33,7 +33,7 @@ export class LessonComponent implements OnInit, OnDestroy {
 
   /** Key của mục đang đọc (đổi icon/màu nút tương ứng). */
   speakingKey = signal<string | number | null>(null);
-  /** Id c?a do?n h?i tho?i dang d?c c? nh�m (d?i n�t ? th�nh ?). */
+  /** Id của đoạn hội thoại đang đọc cả nhóm (đổi nút ▶ thành ⏸). */
   playingGroup = signal<string | number | null>(null);
 
   private gapTimer: ReturnType<typeof setTimeout> | null = null;
@@ -100,7 +100,7 @@ export class LessonComponent implements OnInit, OnDestroy {
     this.answers[q.id] = option;
   }
 
-  // ===== T? v?ng: carousel 1 t? / lu?t (theo mockup) =====
+  // ===== Từ vựng: carousel 1 từ / lượt (theo mockup) =====
   vocabIndex = signal(0);
 
   get currentVocab(): Vocabulary | null {
@@ -114,7 +114,7 @@ export class LessonComponent implements OnInit, OnDestroy {
 
   nextVocab(): void {
     this.stopSpeaking();
-    // T? cu?i -> chuy?n sang ph?n Luy?n nghe (kh?ng quay l?i t? ??u n?a)
+    // Từ cuối -> chuyển sang phần Luyện nghe (không quay lại từ đầu nữa)
     if (this.vocabIndex() >= this.vocabulary.length - 1) {
       this.setSection('listening');
       return;
@@ -132,7 +132,7 @@ export class LessonComponent implements OnInit, OnDestroy {
       : 0;
   }
 
-  // ===== Lu?t t? b?ng tay =====
+  // ===== Lướt từ bằng tay =====
   onTouchStart(event: TouchEvent): void {
     this.touchStartX = event.touches[0]?.pageX ?? 0;
   }
@@ -143,7 +143,7 @@ export class LessonComponent implements OnInit, OnDestroy {
   }
 
   onTouchMove(event: TouchEvent): void {
-    // Ngan ch?n scroll khi di chuy?n ngang
+    // Ngăn chặn scroll khi di chuyển ngang
     const deltaX = event.changedTouches[0].pageX - this.touchStartX;
     if (Math.abs(deltaX) > 10) {
       event.preventDefault();
@@ -154,19 +154,19 @@ export class LessonComponent implements OnInit, OnDestroy {
     const deltaX = this.touchEndX - this.touchStartX;
     const swipeThreshold = 30;
     if (Math.abs(deltaX) < swipeThreshold) return;
-    const goNext = deltaX < 0; // l?t tr?i = ti?n ph?n
+    const goNext = deltaX < 0; // lật trái = tiến phần
 
     if (this.section === 'vocabulary') {
       goNext ? this.nextVocab() : this.prevVocab();
     } else if (this.section === 'listening') {
-      // L?u t?i ph?n Luy?n nghe -> ti?n sang ?n t?p, quay l?i -> t? v?ng
+      // Lùi trong phần Luyện nghe -> tiến sang Ôn tập, quay lại -> Từ vựng
       if (goNext) this.setSection('review');
       else this.setSection('vocabulary');
     } else if (this.section === 'review' && !goNext) {
       this.setSection('listening');
     }
   }
-  // ===== �n t?p: 1 c�u / lu?t + Ki?m tra d�p �n (theo mockup) =====
+  // ===== Ôn tập: 1 câu / lượt + Kiểm tra đáp án (theo mockup) =====
   quizIndex = signal(0);
   quizChecked = signal(false);
   quizCorrect = signal(false);
@@ -185,7 +185,7 @@ export class LessonComponent implements OnInit, OnDestroy {
       : 0;
   }
 
-  /** Ki?m tra c�u hi?n t?i: hi?n d�ng/sai + gi?i th�ch */
+  /** Kiểm tra câu hiện tại: hiện đúng/sai + giải thích */
   checkAnswer(): void {
     const q = this.currentQuiz;
     if (!q || !this.answers[q.id] || this.quizChecked()) return;
@@ -193,7 +193,7 @@ export class LessonComponent implements OnInit, OnDestroy {
     this.quizChecked.set(true);
   }
 
-  /** C�u ti?p theo; c�u cu?i -> submitReview (luu ti?n d? + t?ng k?t) */
+  /** Câu tiếp theo; câu cuối -> submitReview (lưu tiến độ + tổng kết) */
   nextQuestion(): void {
     if (!this.quizChecked()) return;
     if (this.quizIndex() < this.review.length - 1) {
@@ -231,7 +231,7 @@ export class LessonComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Optimistic: d?i icon NGAY khi b?m, d?i API ? n?n; l?i th� ho�n t�c
+    // Optimistic: đổi icon NGAY khi bấm, đợi API ở nền; lỗi thì hoàn tác
     const newState = !v.is_bookmarked;
     const req$ = v.is_bookmarked
       ? this.learning.unbookmark(v.id)
@@ -285,7 +285,7 @@ export class LessonComponent implements OnInit, OnDestroy {
     this.playQueue(groupId, texts, 0);
   }
 
-  /** Ph�t t? 1 c�u trong h?i tho?i v� T? �?NG d?c ti?p c�c c�u sau (n�t chuy?n sang pause) */
+  /** Phát từ 1 câu trong hội thoại và TỰ ĐỘNG đọc tiếp các câu sau (nút chuyển sang pause) */
   speakFrom(groupId: string | number, index: number, texts: string[]): void {
     const key = `${groupId}:${index}`;
     if (this.playingGroup() === groupId && this.speakingKey() === key) {
@@ -307,13 +307,13 @@ export class LessonComponent implements OnInit, OnDestroy {
     this.speakingKey.set(key);
     this.speakText(texts[index], () => {
       if (this.playingGroup() !== groupId) return;
-      // C�u cu?i -> k?t th�c ngay (kh�ng ngh? th�m)
+      // Câu cuối -> kết thúc ngay (không nghỉ thêm)
       if (index >= texts.length - 1) {
         this.playingGroup.set(null);
         this.speakingKey.set(null);
         return;
       }
-      // Kho?ng ngh? gi?a c�c c�u tru?c khi d?c c�u ti?p theo
+      // Khoảng nghỉ giữa các câu trước khi đọc câu tiếp theo
       this.gapTimer = setTimeout(() => this.playQueue(groupId, texts, index + 1), 700);
     });
   }
@@ -350,8 +350,8 @@ export class LessonComponent implements OnInit, OnDestroy {
       if (voice) utterance.voice = voice;
     }
 
-    // finish(): ch?y d�ng 1 l?n � do onend/onerror b?n ho?c timer d? ph�ng b?n.
-    // Callback n�y n?m NGO�I Angular (zoneless) n�n m?i state d�ng signal d? UI c?p nh?t.
+    // finish(): chạy đúng 1 lần — do onend/onerror bắn hoặc timer dự phòng bắn.
+    // Callback này nằm NGOÀI Angular (zoneless) nên mọi state dùng signal để UI cập nhật.
     let finished = false;
     const finish = () => {
       if (finished || token !== this.speakToken) return;
@@ -365,36 +365,36 @@ export class LessonComponent implements OnInit, OnDestroy {
     utterance.onend = finish;
     utterance.onerror = finish;
 
-    // Gi? tham chi?u utterance (tr�nh GC l�m m?t s? ki?n onend tr�n m?t s? tr�nh duy?t)
+    // Giữ tham chiếu utterance (tránh GC làm mất sự kiện onend trên một số trình duyệt)
     this.currentUtterance = utterance;
 
     window.speechSynthesis.cancel();
     window.speechSynthesis.speak(utterance);
 
-    // D? ph�ng: n?u onend kh�ng bao gi? b?n (bug Chrome) -> u?c lu?ng th?i gian d?c r?i tr? icon ?
+    // Dự phòng: nếu onend không bao giờ bắn (bug Chrome) -> ước lượng thời gian đọc rồi trả icon ▶
     if (this.speakFallbackTimer) clearTimeout(this.speakFallbackTimer);
     this.speakFallbackTimer = setTimeout(finish, Math.max(2000, (text.length * 75) / this.speed + 1200));
   }
 
-  /** Ph�t t? cho c�u h?i "Nghe v� ch?n" (kh�ng l? d�p �n � ph�t ch�nh l� d�p �n) */
+  /** Phát từ cho câu hỏi "Nghe và chọn" (không lộ đáp án — phát chính là đáp án) */
   playListenWord(q: ReviewQuestion): void {
     this.speakOnce('rv-' + q.id, q.answer);
   }
 
-  // ===== Ph�t �m t? b?ng micro (SpeechRecognition) + ch?m di?m % gi?ng =====
-  /** Id t? dang luy?n ph�t �m (null = kh�ng ai) */
+  // ===== Phát âm từ bằng micro (SpeechRecognition) + chấm điểm % giống =====
+  /** Id từ đang luyện phát âm (null = không ai) */
   pronState = signal<string | number | null>(null);
-  /** K?t qu? l?n luy?n g?n nh?t: none | ok | mid | miss */
+  /** Kết quả lần luyện gần nhất: none | ok | mid | miss */
   pronResult = signal<'none' | 'ok' | 'mid' | 'miss'>('none');
-  /** Text m�y nghe du?c */
+  /** Text máy nghe được */
   pronHeard = signal('');
-  /** �i?m gi?ng (% 0-100) gi?a ph�t �m nghe du?c v� t? c?n d?c */
+  /** Điểm giống (% 0-100) giữa phát âm nghe được và từ cần đọc */
   pronScore = signal(0);
-  /** �i?m cao nh?t t?ng d?t du?c cho m?i t? (id t? -> %) */
+  /** Điểm cao nhất từng đạt được cho mỗi từ (id từ -> %) */
   pronBest = signal<Record<number, number>>({});
   private recognition: any = null;
 
-  /** Kho?ng c�ch Levenshtein � d�ng d? t�nh % gi?ng ph�t �m */
+  /** Khoảng cách Levenshtein — dùng để tính % giống phát âm */
   private levenshtein(a: string, b: string): number {
     const m = a.length, n = b.length;
     if (!m) return n;
@@ -404,8 +404,8 @@ export class LessonComponent implements OnInit, OnDestroy {
       const cur = [i];
       for (let j = 1; j <= n; j++) {
         cur[j] = Math.min(
-          prev[j] + 1,                       // x�a
-          cur[j - 1] + 1,                    // th�m
+          prev[j] + 1,                       // xóa
+          cur[j - 1] + 1,                    // thêm
           prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1) // thay
         );
       }
@@ -414,12 +414,12 @@ export class LessonComponent implements OnInit, OnDestroy {
     return prev[n];
   }
 
-  /** % gi?ng (0-100) t?t nh?t gi?a t? c?n d?c v� c�c phi�n b?n m�y nghe du?c */
+  /** % giống (0-100) tốt nhất giữa từ cần đọc và các phiên bản máy nghe được */
   private bestSimilarity(target: string, candidates: string[]): number {
     let best = 0;
     for (const c of candidates) {
       if (!c) continue;
-      // M�y nghe du?c nhi?u t?: x�t c? chu?i nguy�n v� t?ng t? ri�ng
+      // Máy nghe được nhiều từ: xét cả chuỗi nguyên và từng từ riêng
       const parts = [c, ...c.split(/\s+/)];
       for (const p of parts) {
         const dist = this.levenshtein(target, p);
@@ -430,7 +430,7 @@ export class LessonComponent implements OnInit, OnDestroy {
     return Math.max(0, Math.min(100, best));
   }
 
-  /** M? micro, ngu?i d�ng d?c t?, app ch?m di?m % gi?ng */
+  /** Mở micro, người dùng đọc từ, app chấm điểm % giống */
   startPronounce(v: Vocabulary): void {
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SR) {
@@ -454,11 +454,11 @@ export class LessonComponent implements OnInit, OnDestroy {
       const target = v.word.toLowerCase().replace(/[^a-z' ]/g, '').trim();
       const score = this.bestSimilarity(target, alts);
       this.pronScore.set(score);
-      // Luu di?m cao nh?t c?a t? n�y d? hi?n badge b�n c?nh n�t Ph�t �m
+      // Lưu điểm cao nhất của từ này để hiện badge bên cạnh nút Phát âm
       if (score > (this.pronBest()[v.id] || 0)) {
         this.pronBest.update(m => ({ ...m, [v.id]: score }));
       }
-      // �i?m: >=85 chu?n, 55-84 kh�, <55 c?n th? l?i
+      // Điểm: >=85 chuẩn, 55-84 khá, <55 cần thử lại
       this.pronResult.set(score >= 85 ? 'ok' : score >= 55 ? 'mid' : 'miss');
       this.pronState.set(null);
     };
@@ -483,7 +483,7 @@ export class LessonComponent implements OnInit, OnDestroy {
       }
       this.learning.saveProgress(this.lesson.id, 'completed', this.score, this.review.length).subscribe({
         next: (res) => {
-          // Luu DB xong -> c?p nh?t lu�n cache ti?n d? trong localStorage
+          // Lưu DB xong -> cập nhật luôn cache tiến độ trong localStorage
           if (res.data) this.learning.syncProgressCache(this.lesson!.id, res.data);
           this.toast.success(`🎉 Hoàn thành bài học! Điểm: ${this.score}/${this.review.length} (đã lưu tiến độ).`);
         },

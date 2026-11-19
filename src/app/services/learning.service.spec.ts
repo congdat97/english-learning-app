@@ -204,14 +204,28 @@ describe('LearningService', () => {
       expect(completed).toBe(false);
     });
 
-    it('serves cache regardless of age — cache persists until updated or cleared', () => {
+    it('refreshes expired cache from the API instead of serving it forever', () => {
       const url = `${base}/courses`;
       seedCache(url, { success: true, data: [{ id: 9, title: 'old-but-valid' }] }, Date.now() - 30 * 24 * 60 * 60 * 1000);
       const emissions: any[] = [];
       service.getCourses().subscribe(e => emissions.push(e));
 
+      http.expectOne(url).flush({ success: true, data: [{ id: 1, title: 'fresh' }] });
+
+      expect(emissions[0].data[0].title).toBe('fresh');
+      const saved = JSON.parse(localStorage.getItem(`api-cache:${url}`) || '{}');
+      expect(saved.body.data[0].title).toBe('fresh');
+    });
+
+    it('falls back to stale cache when the API fails', () => {
+      const url = `${base}/courses`;
+      seedCache(url, { success: true, data: [{ id: 9, title: 'old-but-valid' }] }, Date.now() - 30 * 24 * 60 * 60 * 1000);
+      const emissions: any[] = [];
+      service.getCourses().subscribe(e => emissions.push(e));
+
+      http.expectOne(url).flush('boom', { status: 500, statusText: 'Server Error' });
+
       expect(emissions[0].data[0].title).toBe('old-but-valid');
-      http.expectNone(url);
     });
 
     it('clearCache removes all api-cache entries', () => {

@@ -1,7 +1,7 @@
 {
   "navigationFallback": {
     "rewrite": "/index.html",
-    "exclude": ["/assets/*", "/*.{css,js,ico,png,jpg,jpeg,gif,svg,webp,woff,woff2,json}"]
+    "exclude": ["/assets/*", "/avatars/*", "/*.{css,js,ico,png,jpg,jpeg,gif,svg,webp,woff,woff2,json}"]
   },
   "globalHeaders": {
     "Cache-Control": "no-cache, no-store, must-revalidate"
@@ -20,11 +20,5 @@
         }
       ]
     }
-  ],
-  "responseOverrides": {
-    "404": {
-      "rewrite": "/index.html",
-      "statusCode": 200
-    }
-  }
+  ]
 }

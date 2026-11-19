@@ -1708,8 +1708,8 @@
 .admin-link-btn:active { transform: scale(.94); }
 
 /* =========================================================
-   HEADER v3 � theo ?nh thi?t k? English Step by Step
-   (icon vu�ng l?n + ti�u d? d?m + n�t tr�n tr?ng: sync / avatar / menu)
+   HEADER v3 theo thiết kế English Step by Step
+   (icon vuông lớn + tiêu đề dễ dòm + nút trên cùng: sync / avatar / menu)
    ========================================================= */
 
 .top {
@@ -1757,7 +1757,7 @@
   gap: 14px;
 }
 
-/* --- SYNC: n�t tr�n tr?ng + ch?m tr?ng th�i xanh nh?p nh�y nh? --- */
+/* --- SYNC: nút trên cùng + chấm trạng thái xanh nhấp nháy nhẹ --- */
 
 .sync-button {
   width: 48px;
@@ -1864,7 +1864,7 @@
   color: var(--text);
 }
 
-/* --- MENU 3 G?CH: n�t tr�n tr?ng --- */
+/* --- MENU 3 GÓC: nút trên cùng --- */
 
 .menu-button {
   width: 48px;
