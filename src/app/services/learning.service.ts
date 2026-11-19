@@ -25,7 +25,7 @@ export class LearningService {
 
   constructor(private http: HttpClient) {
     try {
-      const version = '2026-11-19-v2';
+      const version = '2026-11-19-v3';
       if (localStorage.getItem('api-cache-version') !== version) {
         Object.keys(localStorage)
           .filter(k => k.startsWith('api-cache:') || k.startsWith('http_cache_'))
