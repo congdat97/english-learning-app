@@ -166,16 +166,6 @@
 
     </div>
 
-    <!-- ADMIN: nút các form quản lý kề bên nút menu -->
-    <ng-container *ngIf="auth.isLoggedIn() && auth.isAdmin()">
-      <button type="button" routerLink="/admin/users" title="Quản lý tài khoản" class="admin-link-btn">
-        🛡️
-      </button>
-      <button type="button" routerLink="/admin/progress" title="Tiến độ học viên" class="admin-link-btn">
-        📊
-      </button>
-    </ng-container>
-
     <!-- TAI KHOAN: avatar tròn + mũi tên ẩn menu (đăng xuất nằm trong menu) -->
     <ng-container *ngIf="auth.isLoggedIn(); else loginLink">
       <div class="user-area" (click)="$event.stopPropagation()">
