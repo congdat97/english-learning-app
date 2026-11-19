@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { finalize, shareReplay, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
-import { Course, Lesson, Listening, ReviewQuestion, UserProgress, Vocabulary } from '../models/learning.model';
+import { Course, LeaderboardRow, Lesson, Listening, ReviewQuestion, UserProgress, Vocabulary } from '../models/learning.model';
 
 type ApiResult<T> = { success: boolean; data: T };
 
@@ -25,7 +25,7 @@ export class LearningService {
 
   constructor(private http: HttpClient) {
     try {
-      const version = '2026-11-18-v2';
+      const version = '2026-11-19-v1';
       if (localStorage.getItem('api-cache-version') !== version) {
         Object.keys(localStorage)
           .filter(k => k.startsWith('api-cache:') || k.startsWith('http_cache_'))
@@ -180,6 +180,12 @@ export class LearningService {
   /** Admin: tiến độ học của mọi user (không cache — dữ liệu nhạy). */
   getAdminUserProgress(): Observable<ApiResult<any[]>> {
     return this.http.get<ApiResult<any[]>>(`${this.base}/auth/users/progress`, { headers: this.headers });
+  }
+
+  getLeaderboard(): Observable<ApiResult<LeaderboardRow[]>> {
+    return this.http.get<ApiResult<LeaderboardRow[]>>(`${this.base}/leaderboard`, {
+      headers: this.headers.set('X-Force-Refresh', '1')
+    });
   }
 
   saveSettings(settings: any): Observable<ApiResult<any>> {

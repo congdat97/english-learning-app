@@ -1,0 +1,84 @@
+<div class="page">
+  <header class="section-head">
+    <div>
+      <h2>🏆 Xếp hạng học viên</h2>
+      <p>Bảng xếp hạng cập nhật theo tiến độ học thực tế.</p>
+    </div>
+    <a routerLink="/progress" class="text-btn">← Quay lại tiến độ</a>
+  </header>
+
+  <div class="panel filter-bar">
+    <label>
+      <span>Tìm học viên</span>
+      <input type="search" name="search" [(ngModel)]="search" (ngModelChange)="applyFilters()" placeholder="Nhập tên học viên..." />
+    </label>
+
+    <label>
+      <span>Xếp theo</span>
+      <select name="rankBy" [(ngModel)]="rankBy" (ngModelChange)="applyFilters()">
+        <option value="completed">Bài hoàn thành</option>
+        <option value="avg_score">Điểm trung bình</option>
+        <option value="last_activity">Hoạt động gần nhất</option>
+      </select>
+    </label>
+
+    <label>
+      <span>Hiển thị</span>
+      <select name="limit" [(ngModel)]="limit" (ngModelChange)="applyFilters()">
+        <option [ngValue]="10">Top 10</option>
+        <option [ngValue]="20">Top 20</option>
+        <option [ngValue]="50">Top 50</option>
+        <option [ngValue]="100">Tất cả</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="page-loader" *ngIf="loading"><span class="spinner"></span> Đang tải bảng xếp hạng...</div>
+  <p class="slow-hint" *ngIf="slowHint && loading">API đang khởi động, vui lòng đợi vài giây...</p>
+
+  <p *ngIf="error && !loading" class="muted">
+    ⚠️ Không tải được bảng xếp hạng.
+    <button type="button" class="text-btn" (click)="load()">Thử lại</button>
+  </p>
+
+  <div class="panel board" *ngIf="!loading && !error">
+    <table class="rank-table">
+      <thead>
+        <tr>
+          <th>Hạng</th>
+          <th>Học viên</th>
+          <th>Hoàn thành</th>
+          <th>Điểm TB</th>
+          <th>Hoạt động gần nhất</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of rankedRows; trackBy: trackBy"
+            [class.is-me]="isCurrent(row.user_id)"
+            [class.is-top]="row.rank <= 3">
+          <td class="rank-cell">
+            <span class="rank-badge" [class.medal]="row.rank <= 3">{{ rankLabel(row.rank) }}</span>
+          </td>
+          <td>
+            <div class="learner">
+              <img *ngIf="row.avatar; else letterAvatar" class="learner-avatar" [src]="row.avatar" [alt]="row.username" />
+              <ng-template #letterAvatar>
+                <span class="learner-avatar letter">{{ row.username.charAt(0).toUpperCase() }}</span>
+              </ng-template>
+              <div>
+                <strong>{{ row.username }}</strong>
+                <small *ngIf="isCurrent(row.user_id)">Bạn</small>
+              </div>
+            </div>
+          </td>
+          <td><strong>{{ row.completed }}</strong> bài</td>
+          <td><span class="score">{{ row.avg_score }}%</span></td>
+          <td>{{ row.last_activity ? (row.last_activity | date:'dd/MM HH:mm') : '—' }}</td>
+        </tr>
+        <tr *ngIf="rankedRows.length === 0">
+          <td colspan="5" class="empty">Không có học viên nào phù hợp.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,4 +1,7 @@
-﻿<div *ngIf="lesson; else loadingTpl">
+﻿<div *ngIf="lesson; else loadingTpl"
+     (touchstart)="onTouchStart($event)"
+     (touchend)="onTouchEnd($event)"
+     (touchmove)="onTouchMove($event)">
   <div class="subnav">
     <button [class.active]="section === 'vocabulary'" (click)="setSection('vocabulary')">📚 Từ vựng</button>
     <button [class.active]="section === 'listening'" (click)="setSection('listening')">💬 Luyện nghe</button>
@@ -14,12 +17,9 @@
   <section *ngIf="section === 'vocabulary'">
     <div class="section-head"><div><h2>📚 Từ vựng trong bài</h2><p>Học từng từ một — nghe phát âm, đọc ví dụ rồi chuyển từ tiếp theo</p></div></div>
 
-     <article *ngIf="currentVocab as v" class="word-card carousel-card"
-   (touchstart)="onTouchStart($event)"
-   (touchend)="onTouchEnd($event)"
-   (touchmove)="onTouchMove($event)">
+     <article *ngIf="currentVocab as v" class="word-card carousel-card">
        <button class="nav-btn prev" title="Từ trước" aria-label="Từ trước" [disabled]="vocabIndex() === 0" (click)="prevVocab()">◀</button>
-       <button class="nav-btn next" title="Từ tiếp theo" aria-label="Từ tiếp theo" (click)="nextVocab()">{{ vocabIndex() === vocabulary.length - 1 ? '↻' : '▶' }}</button>
+        <button class="nav-btn next" [title]="vocabIndex() === vocabulary.length - 1 ? 'Sang Luyện nghe' : 'Từ tiếp theo'" [attr.aria-label]="vocabIndex() === vocabulary.length - 1 ? 'Sang Luyện nghe' : 'Từ tiếp theo'" (click)="nextVocab()">{{ vocabIndex() === vocabulary.length - 1 ? '⏭' : '▶' }}</button>
        <div class="word-top">
         <span class="vocab-tag">Từ vựng</span>
         <span class="counter">{{ vocabCounter }}</span>
@@ -78,6 +78,21 @@
 
   <section *ngIf="section === 'listening'">
     <div class="section-head"><div><h2>Listening</h2><p>Nghe đoạn hội thoại và trả lời</p></div></div>
+
+    <div *ngIf="prevLessonVocab.length > 0" class="prev-review">
+      <div class="prev-review-head">
+        <b>📖 Ôn lại từ bài trước</b>
+        <span>{{ prevLessonTitle }}</span>
+      </div>
+      <div class="prev-review-chips">
+        <button *ngFor="let w of prevLessonVocab" type="button" class="prev-chip"
+                [class.speaking]="speakingKey() === 'pv-' + w.id"
+                (click)="speakOnce('pv-' + w.id, w.word)">
+          <b>{{ w.word }}</b><small>{{ w.meaning_vi }}</small>
+        </button>
+      </div>
+    </div>
+
     <div *ngFor="let l of listening" class="listen-box">
       <b>🎧 {{ l.title }}</b>
       <div class="audio-controls">

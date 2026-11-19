@@ -630,3 +630,65 @@ nav button { margin-right: 8px; }
   animation: fadeIn .3s cubic-bezier(.2, .9, .3, 1.2) both;
 }
 
+
+/* ===== ÔN LẠI TỪ BÀI TRƯỚC (tab Luyện nghe) ===== */
+.prev-review {
+  background: color-mix(in srgb, var(--pale) 55%, var(--white));
+  border: 1px solid color-mix(in srgb, var(--blue) 16%, transparent);
+  border-radius: 18px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+}
+
+.prev-review-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.prev-review-head b { color: var(--text); }
+
+.prev-review-head span {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.prev-review-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.prev-chip {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  padding: 7px 12px;
+  border-radius: 12px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text);
+  transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+
+.prev-chip:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--blue) 40%, transparent);
+  box-shadow: 0 4px 10px rgba(15, 23, 42, .06);
+}
+
+.prev-chip.speaking {
+  border-color: var(--blue);
+  background: color-mix(in srgb, var(--pale) 70%, var(--white));
+}
+
+.prev-chip small {
+  font-size: 11px;
+  color: var(--muted);
+}

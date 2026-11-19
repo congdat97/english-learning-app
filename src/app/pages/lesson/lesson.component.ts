@@ -55,10 +55,35 @@ export class LessonComponent implements OnInit, OnDestroy {
       this.settings.save({ ...this.settings.load(), audioSpeed: 1 });
     }
     const id = Number(this.route.snapshot.paramMap.get('id'));
-    this.learning.getLesson(id).subscribe({ next: (r) => this.lesson = r.data, error: () => this.loading = false });
+    this.learning.getLesson(id).subscribe({
+      next: (r) => {
+        this.lesson = r.data;
+        if (r.data?.course_id && r.data.sort_order > 1) this.loadPrevLessonVocab(r.data);
+      },
+      error: () => this.loading = false
+    });
     this.learning.getVocabulary(id).subscribe({ next: (r) => this.vocabulary = r.data, error: () => this.loading = false });
     this.learning.getListening(id).subscribe({ next: (r) => this.listening = r.data, error: () => this.loading = false });
     this.learning.getReview(id).subscribe({ next: (r) => { this.review = r.data; this.loading = false; }, error: () => this.loading = false });
+  }
+
+  // ===== Từ vựng của BÀI TRƯỚC — hiển thị ở tab Luyện nghe để ôn lại =====
+  prevLessonTitle = '';
+  prevLessonVocab: Vocabulary[] = [];
+
+  private loadPrevLessonVocab(lesson: Lesson): void {
+    this.learning.getLessons(lesson.course_id).subscribe({
+      next: (res) => {
+        const prev = res.data.find(l => l.sort_order === lesson.sort_order - 1);
+        if (!prev) return;
+        this.prevLessonTitle = prev.title;
+        this.learning.getVocabulary(prev.id).subscribe({
+          next: (vr) => this.prevLessonVocab = vr.data,
+          error: () => {}
+        });
+      },
+      error: () => {}
+    });
   }
 
   ngOnDestroy(): void {
@@ -89,8 +114,12 @@ export class LessonComponent implements OnInit, OnDestroy {
 
   nextVocab(): void {
     this.stopSpeaking();
-    // T? cu?i -> quay l?i t? d?u (gi?ng mockup "H?c l?i t? d?u")
-    this.vocabIndex.update(i => (i + 1) % Math.max(1, this.vocabulary.length));
+    // T? cu?i -> chuy?n sang ph?n Luy?n nghe (kh?ng quay l?i t? ??u n?a)
+    if (this.vocabIndex() >= this.vocabulary.length - 1) {
+      this.setSection('listening');
+      return;
+    }
+    this.vocabIndex.update(i => i + 1);
   }
 
   get vocabCounter(): string {
@@ -125,11 +154,16 @@ export class LessonComponent implements OnInit, OnDestroy {
     const deltaX = this.touchEndX - this.touchStartX;
     const swipeThreshold = 30;
     if (Math.abs(deltaX) < swipeThreshold) return;
+    const goNext = deltaX < 0; // l?t tr?i = ti?n ph?n
 
-    if (deltaX > 0) {
-      this.prevVocab();
-    } else {
-      this.nextVocab();
+    if (this.section === 'vocabulary') {
+      goNext ? this.nextVocab() : this.prevVocab();
+    } else if (this.section === 'listening') {
+      // L?u t?i ph?n Luy?n nghe -> ti?n sang ?n t?p, quay l?i -> t? v?ng
+      if (goNext) this.setSection('review');
+      else this.setSection('vocabulary');
+    } else if (this.section === 'review' && !goNext) {
+      this.setSection('listening');
     }
   }
   // ===== �n t?p: 1 c�u / lu?t + Ki?m tra d�p �n (theo mockup) =====

@@ -77,6 +77,14 @@ describe('LearningService', () => {
     req.flush({ success: true, data: [] });
   });
 
+  it('getLeaderboard builds /leaderboard and bypasses cache', () => {
+    service.getLeaderboard().subscribe();
+    const req = http.expectOne(`${base}/leaderboard`);
+    expect(req.request.method).toBe('GET');
+    expect(req.request.headers.get('X-Force-Refresh')).toBe('1');
+    req.flush({ success: true, data: [] });
+  });
+
   it('invalidateProgressCache removes the bulk progress cache', () => {
     localStorage.setItem('api-cache:' + `${base}/lessons/progress/all`, JSON.stringify({ ts: Date.now(), body: { success: true, data: [] } }));
     service.invalidateProgressCache();

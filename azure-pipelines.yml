@@ -73,6 +73,13 @@ stages:
               npm test -- --watch=false
             displayName: 'Run tests'
 
+          - script: |
+              if (-not (Test-Path "dist/english-learning-app/browser/index.html")) {
+                throw "Build output is missing: dist/english-learning-app/browser/index.html"
+              }
+            displayName: 'Verify build output'
+            condition: succeeded()
+
           - publish: dist
             artifact: angular-dist
             displayName: 'Publish build artifact (dist)'
@@ -144,7 +151,7 @@ stages:
 
               Write-Host "Pushing Azure DevOps -> GitHub $(githubBranch)..."
 
-              git push github "HEAD:refs/heads/$(githubBranch)" --force
+              git push github "HEAD:refs/heads/$(githubBranch)"
 
               if ($LASTEXITCODE -ne 0) {
                   throw "Git push to GitHub failed."
@@ -155,4 +162,3 @@ stages:
               Write-Host " Push to GitHub SUCCESS"
               Write-Host "========================================"
             displayName: 'Mirror repository to GitHub'
-            continueOnError: true

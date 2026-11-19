@@ -18,15 +18,12 @@
   <a routerLink="/dashboard" class="brand">
 
     <div class="brand-icon">
-      <!-- Logo: bậc thang học nâng dần + mũi tên đi lên + ngôi sao nhỏ -->
+      <!-- Logo: sách mở + ngôi sao -->
       <svg viewBox="0 0 48 48" width="28" height="28" aria-hidden="true">
-        <g fill="currentColor">
-          <rect x="11" y="29" width="7" height="8" rx="2.2"/>
-          <rect x="20.5" y="23" width="7" height="14" rx="2.2"/>
-          <rect x="30" y="17" width="7" height="20" rx="2.2"/>
-          <path d="M30.5 12.5l6-5 6 5-2.4 0 0 2.2a1.4 1.4 0 0 1-2.8 0l0-2.2z"/>
-          <path d="M9.5 8.5l1.35 3.15L14 13l-3.15 1.35L9.5 17.5l-1.35-3.15L5 13l3.15-1.35z"/>
-        </g>
+        <path fill="#FBBF24" d="M24 3.5l2.7 5.6 6.1.8-4.5 4.3 1.2 6.1L24 17.4l-5.5 2.9 1.2-6.1-4.5-4.3 6.1-.8z"/>
+        <path fill="currentColor" d="M6.5 19.5c5.8-2.6 11.9-2.3 17.5 1.1v20.2c-5.6-3.4-11.7-3.7-17.5-1.1z"/>
+        <path fill="currentColor" opacity=".72" d="M41.5 19.5c-5.8-2.6-11.9-2.3-17.5 1.1v20.2c5.6-3.4 11.7-3.7 17.5-1.1z"/>
+        <path fill="currentColor" d="M22.6 22.2c.9.4 1.9.4 2.8 0v-1.6c-.9-.4-1.9-.4-2.8 0z" opacity=".45"/>
       </svg>
     </div>
 
@@ -81,6 +78,15 @@
       </span>
     </a>
 
+    <a routerLink="/ranking" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-item"
+      (click)="closeMobileMenu()">
+      <span class="nav-icon">🏆</span>
+
+      <span class="nav-text">
+        Xếp hạng
+      </span>
+    </a>
+
 
     <a routerLink="/settings" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-item"
       (click)="closeMobileMenu()">
@@ -88,6 +94,24 @@
 
       <span class="nav-text">
         Cài đặt
+      </span>
+    </a>
+
+    <a *ngIf="auth.isAdmin()" routerLink="/admin/users" routerLinkActive="active" class="nav-item"
+      (click)="closeMobileMenu()">
+      <span class="nav-icon">🛡️</span>
+
+      <span class="nav-text">
+        Quản lý tài khoản
+      </span>
+    </a>
+
+    <a *ngIf="auth.isAdmin()" routerLink="/admin/progress" routerLinkActive="active" class="nav-item"
+      (click)="closeMobileMenu()">
+      <span class="nav-icon">📊</span>
+
+      <span class="nav-text">
+        Tiến độ học viên
       </span>
     </a>
 
@@ -142,6 +166,16 @@
 
     </div>
 
+    <!-- ADMIN: nút các form quản lý kề bên nút menu -->
+    <ng-container *ngIf="auth.isLoggedIn() && auth.isAdmin()">
+      <button type="button" routerLink="/admin/users" title="Quản lý tài khoản" class="admin-link-btn">
+        🛡️
+      </button>
+      <button type="button" routerLink="/admin/progress" title="Tiến độ học viên" class="admin-link-btn">
+        📊
+      </button>
+    </ng-container>
+
     <!-- TAI KHOAN: avatar tròn + mũi tên ẩn menu (đăng xuất nằm trong menu) -->
     <ng-container *ngIf="auth.isLoggedIn(); else loginLink">
       <div class="user-area" (click)="$event.stopPropagation()">
@@ -165,6 +199,14 @@
             <button type="button" class="user-menu-item" (click)="openAvatarPicker()">
               🎨 Đổi avatar
             </button>
+
+            <a *ngIf="auth.isAdmin()" routerLink="/admin/users" class="user-menu-item" (click)="closeUserMenu()">
+              🛡️ Quản lý tài khoản
+            </a>
+
+            <a *ngIf="auth.isAdmin()" routerLink="/admin/progress" class="user-menu-item" (click)="closeUserMenu()">
+              📊 Tiến độ học viên
+            </a>
 
             <button type="button" class="user-menu-item logout" (click)="logout()">
               ⏻ Đăng xuất

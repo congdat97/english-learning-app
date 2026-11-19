@@ -87,3 +87,12 @@ export interface UserProgress {
   created_at?: string;
   updated_at?: string;
 }
+
+export interface LeaderboardRow {
+  user_id: number;
+  username: string;
+  avatar: string | null;
+  completed: number;
+  avg_score: number;
+  last_activity: string | null;
+}
