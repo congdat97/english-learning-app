@@ -64,7 +64,7 @@
             <strong>{{ stage.title }}</strong>
             <small>{{ stage.topic || 'Từ vựng · nghe · phát âm' }}</small>
             <div class="stage-footer">
-              <span class="stage-stars" [class.has-star]="stage.bestStars > 0" [attr.aria-label]="stage.bestStars + ' sao'">{{ starsLabel(stage.bestStars) }}</span>
+              <span class="stage-stars" [class.has-star]="stage.bestStars > 0" [attr.aria-label]="stage.bestStars + ' sao'"><span *ngFor="let slot of starSlots; let i = index" class="star-slot" [class.filled]="i < stage.bestStars">★</span></span>
               <span class="stage-state" [class.done]="stage.played">{{ stage.played ? stage.bestAccuracy + '%' : 'Chơi ngay' }}</span>
             </div>
           </div>

@@ -31,6 +31,7 @@ export class GameComponent implements OnInit {
   totalPlayed = 0;
   totalStages = 0;
   starBreakdown = 'Chưa có sao — hoàn thành một màn để ăn sao';
+  readonly starSlots = [0, 1, 2];
 
   constructor(private learning: LearningService, private game: GameService) {}
 
@@ -84,10 +85,6 @@ export class GameComponent implements OnInit {
         )
       }))
       .filter(group => group.stages.length > 0);
-  }
-
-  starsLabel(stars: number): string {
-    return '★★★☆☆'.slice(3 - Math.max(0, Math.min(3, stars)), 6 - Math.max(0, Math.min(3, stars)));
   }
 
   trackGroup(_: number, group: CourseGroup): number {

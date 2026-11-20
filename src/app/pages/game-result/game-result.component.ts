@@ -18,16 +18,13 @@ export class GameResultComponent implements OnInit {
 
   stageId = '';
   result: GameResult | null = null;
+  readonly starSlots = [0, 1, 2];
 
   ngOnInit(): void {
     this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       this.stageId = params.get('stageId') || '';
       this.result = this.game.lastResultFor(this.stageId);
     });
-  }
-
-  starsLabel(stars: number): string {
-    return '★★★☆☆'.slice(3 - stars, 6 - stars);
   }
 
   title(): string {

@@ -144,8 +144,10 @@
 .stage-body strong { font-size: 13px; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .stage-body small { color: var(--muted); font-size: 10.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .stage-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 4px; }
-.stage-stars { color: var(--muted); font-size: 13px; letter-spacing: 1px; }
+.stage-stars { display: inline-flex; gap: 2px; color: var(--muted); font-size: 13px; line-height: 1; }
 .stage-stars.has-star { color: #f59e0b; }
+.star-slot { opacity: .22; }
+.star-slot.filled { opacity: 1; }
 .stage-state { padding: 3px 7px; border-radius: 999px; background: var(--surface-variant, var(--primary-soft)); color: var(--muted); font-size: 9.5px; font-weight: 800; }
 .stage-state.done { background: rgba(31, 157, 107, .12); color: #1f9d6b; }
 
