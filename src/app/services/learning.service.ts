@@ -28,22 +28,39 @@ export class LearningService {
     clearAppCaches();
   }
 
+  private get currentUid(): number | null {
+    return this.auth.currentUser()?.id ?? null;
+  }
+
   /** Cache phân theo user — user A không thấy cache của user B. */
   private cacheKey(url: string): string {
-    const uid = this.auth.currentUser()?.id;
+    const uid = this.currentUid;
     return 'api-cache:' + (uid ? uid + ':' : '') + url;
   }
 
+  /** Chỉ thao tác trên key cache của user hiện tại. */
+  private isCurrentUserCacheKey(key: string): boolean {
+    const uid = this.currentUid;
+    if (uid) {
+      return key.startsWith(`api-cache:${uid}:`) || key.startsWith(`http_cache_${uid}:`);
+    }
+    const guestApi = key.startsWith('api-cache:') && !/^api-cache:\d+:/.test(key);
+    const guestHttp = key.startsWith('http_cache_') && !/^http_cache_\d+:/.test(key);
+    return guestApi || guestHttp;
+  }
+
   private fetchAndCache<T>(url: string, force = false): Observable<ApiResult<T>> {
-    const inflightKey = force ? url + '::force' : url;
+    const scope = this.currentUid ?? 'guest';
+    const inflightKey = `${scope}|${force ? url + '::force' : url}`;
     const existing = this.inflight.get(inflightKey) as Observable<ApiResult<T>> | undefined;
     if (existing) return existing;
 
+    const storageKey = this.cacheKey(url);
     const headers = force ? this.headers.set('X-Force-Refresh', '1') : this.headers;
     const obs = this.http.get<ApiResult<T>>(url, { headers }).pipe(
       tap({
         next: body => {
-          try { localStorage.setItem(this.cacheKey(url), JSON.stringify({ ts: Date.now(), body })); } catch {}
+          try { localStorage.setItem(storageKey, JSON.stringify({ ts: Date.now(), body })); } catch {}
         },
         finalize: () => this.inflight.delete(inflightKey)
       }),
@@ -82,7 +99,7 @@ export class LearningService {
 
         if (Date.now() - (cached.ts || 0) >= ttlMs) {
           // Hết hạn: làm mới ngầm, không chặn UI (stale-while-revalidate).
-          this.fetchAndCache<T>(url).subscribe({ error: () => {} });
+          this.fetchAndCache<T>(url, true).subscribe({ error: () => {} });
         }
 
         observer.complete();
@@ -106,8 +123,50 @@ export class LearningService {
       if (!raw) return;
       const entry = JSON.parse(raw);
       entry.body = { success: true, data };
+      entry.ts = Date.now();
       localStorage.setItem(key, JSON.stringify(entry));
     } catch {}
+  }
+
+  /** Đọc data của 1 cache (dùng để đồng bộ bảng xếp hạng sau khi lưu tiến độ). */
+  private readCacheData<T>(url: string): T | null {
+    const key = this.cacheKey(url);
+    try {
+      const raw = localStorage.getItem(key);
+      const entry = raw ? (JSON.parse(raw) as CacheEntry<T>) : null;
+      return entry?.body?.data ?? null;
+    } catch {
+      return null;
+    }
+  }
+
+  /** Interceptor cũng cache GET — phải đọc/sửa cả bản đó để không trả dữ liệu cũ. */
+  private readHttpCacheData<T>(url: string): T | null {
+    const key = this.httpCacheKey(url);
+    try {
+      const raw = localStorage.getItem(key);
+      const entry = raw ? (JSON.parse(raw) as { ts: number; body: ApiResult<T> }) : null;
+      return entry?.body?.data ?? null;
+    } catch {
+      return null;
+    }
+  }
+
+  private writeHttpCacheData(url: string, data: unknown): void {
+    const key = this.httpCacheKey(url);
+    try {
+      const raw = localStorage.getItem(key);
+      if (!raw) return;
+      const entry = JSON.parse(raw);
+      entry.ts = Date.now();
+      entry.body = { success: true, data };
+      localStorage.setItem(key, JSON.stringify(entry));
+    } catch {}
+  }
+
+  private httpCacheKey(url: string): string {
+    const uid = this.auth.currentUser()?.id;
+    return 'http_cache_' + (uid ? uid + ':' : '') + url;
   }
 
   /** Xóa toàn bộ cache API (dùng khi muốn ép load mới). */
@@ -189,17 +248,116 @@ export class LearningService {
 
   /** Admin: tiến độ học của mọi user (không cache — dữ liệu nhạy). */
   getAdminUserProgress(): Observable<ApiResult<any[]>> {
-    return this.http.get<ApiResult<any[]>>(`${this.base}/auth/users/progress`, { headers: this.headers });
+    const headers = this.headers.set('X-No-Cache', '1');
+    return this.http.get<ApiResult<any[]>>(`${this.base}/auth/users/progress`, { headers });
   }
 
-  getLeaderboard(): Observable<ApiResult<LeaderboardRow[]>> {
-    return this.http.get<ApiResult<LeaderboardRow[]>>(`${this.base}/leaderboard`, {
-      headers: this.headers.set('X-Force-Refresh', '1')
-    });
+  /** Bảng xếp hạng dùng cache ngắn hạn (5 phút) + stale-while-revalidate. */
+  getLeaderboard(force = false): Observable<ApiResult<LeaderboardRow[]>> {
+    return this.cachedGet<LeaderboardRow[]>(`${this.base}/leaderboard`, force, DYNAMIC_CACHE_MAX_AGE_MS);
+  }
+
+  /** Xóa cả 2 lớp cache (service + interceptor) khi cần lấy lại từ server. */
+  clearLeaderboardCache(): void {
+    try {
+      Object.keys(localStorage)
+        .filter(key =>
+          this.isCurrentUserCacheKey(key) &&
+          key.includes(`${this.base}/leaderboard`)
+        )
+        .forEach(key => localStorage.removeItem(key));
+    } catch {}
+  }
+
+  /**
+   * Cập nhật ngay bảng xếp hạng trong cache sau khi lưu tiến độ.
+   * previous = tiến độ cũ (null nếu bài này chưa từng học),
+   * next = tiến độ vừa lưu (có thể là bản optimistic).
+   */
+  syncLeaderboardAfterProgress(previous: UserProgress | null, next: UserProgress | null): void {
+    const uid = this.auth.currentUser()?.id;
+    if (!uid) return;
+
+    const url = `${this.base}/leaderboard`;
+    const rows =
+      this.readCacheData<LeaderboardRow[]>(url) ??
+      this.readHttpCacheData<LeaderboardRow[]>(url);
+    if (!Array.isArray(rows)) return;
+
+    const index = rows.findIndex(row => row.user_id === uid);
+    if (index < 0) return;
+
+    const allProgress = this.readCacheData<UserProgress[]>(`${this.base}/lessons/progress/all`);
+    const completedRows = Array.isArray(allProgress) ? allProgress.filter(p => p.status === 'completed') : [];
+    const useAllProgress = completedRows.length > 0 || rows[index].completed === 0;
+
+    const completed = useAllProgress
+      ? completedRows.length
+      : Math.max(0, rows[index].completed + this.progressDelta(previous, next));
+    const avgScore = useAllProgress
+      ? this.averageScore(completedRows)
+      : this.weightedAverage(rows[index], previous, next, completed);
+    const lastActivity =
+      next?.updated_at || next?.created_at ||
+      completedRows.map(p => p.updated_at || p.created_at || '').filter(Boolean).sort().pop() ||
+      rows[index].last_activity;
+
+    const updated = rows
+      .map((row, i) => i === index
+        ? { ...row, completed, avg_score: avgScore, last_activity: lastActivity || null }
+        : row)
+      .sort((a, b) =>
+        b.completed - a.completed ||
+        b.avg_score - a.avg_score ||
+        (b.last_activity || '').localeCompare(a.last_activity || '') ||
+        a.username.localeCompare(b.username)
+      );
+
+    this.writeCacheData(url, updated);
+    this.writeHttpCacheData(url, updated);
+  }
+
+  private progressDelta(previous: UserProgress | null, next: UserProgress | null): number {
+    return (next?.status === 'completed' ? 1 : 0) - (previous?.status === 'completed' ? 1 : 0);
+  }
+
+  private scorePercent(row: UserProgress | null): number {
+    if (!row || !row.total_questions) return 0;
+    return Math.round((row.score / row.total_questions) * 100);
+  }
+
+  private averageScore(rows: UserProgress[]): number {
+    if (!rows.length) return 0;
+    return Math.round(rows.reduce((sum, row) => sum + this.scorePercent(row), 0) / rows.length);
+  }
+
+  private weightedAverage(
+    row: LeaderboardRow,
+    previous: UserProgress | null,
+    next: UserProgress | null,
+    completed: number
+  ): number {
+    if (!completed) return 0;
+    const wasDone = previous?.status === 'completed';
+    const isDone = next?.status === 'completed';
+    const oldAvg = row.avg_score || 0;
+
+    if (isDone && !wasDone) {
+      return Math.round((oldAvg * (completed - 1) + this.scorePercent(next)) / completed);
+    }
+    if (isDone && wasDone) {
+      return Math.round((oldAvg * completed - this.scorePercent(previous) + this.scorePercent(next)) / completed);
+    }
+    if (!isDone && wasDone) {
+      return Math.round((oldAvg * (completed + 1) - this.scorePercent(previous)) / completed);
+    }
+    return oldAvg;
   }
 
   saveSettings(settings: any): Observable<ApiResult<any>> {
-    return this.http.put<ApiResult<any>>(`${this.base}/settings`, settings);
+    return this.http.put<ApiResult<any>>(`${this.base}/settings`, settings).pipe(
+      tap(res => this.syncSettingsCache(res?.data ?? settings))
+    );
   }
 
   toggleFavorite(vocabularyId: number): Observable<ApiResult<Vocabulary>> {
@@ -248,14 +406,11 @@ export class LearningService {
 
   /** Đọc tiến độ đã cache để có thể hoàn tác khi lưu lên server thất bại. */
   getCachedProgress(lessonId: number): UserProgress | null {
-    const key = this.cacheKey(`${this.base}/lessons/${lessonId}/progress`);
-    try {
-      const raw = localStorage.getItem(key);
-      const entry = raw ? (JSON.parse(raw) as CacheEntry<UserProgress | null>) : null;
-      return entry?.body?.data ?? null;
-    } catch {
-      return null;
-    }
+    const direct = this.readCacheData<UserProgress>(`${this.base}/lessons/${lessonId}/progress`);
+    if (direct) return direct;
+
+    const all = this.readCacheData<UserProgress[]>(`${this.base}/lessons/progress/all`);
+    return all?.find(p => p.lesson_id === lessonId) ?? null;
   }
 
   /** Xóa tiến độ optimistic khỏi cache khi API lưu thất bại. */
@@ -294,7 +449,7 @@ export class LearningService {
         const key = localStorage.key(i);
         if (
           !key ||
-          !key.startsWith('api-cache:') ||
+          !this.isCurrentUserCacheKey(key) ||
           !key.includes(`${this.base}/lessons/`) ||
           !key.includes('/vocabulary')
         ) continue;

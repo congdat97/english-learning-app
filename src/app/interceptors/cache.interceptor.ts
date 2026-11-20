@@ -194,22 +194,27 @@ export const cacheInterceptor: HttpInterceptorFn = (req, next) => {
   // ===== GET =====
 
   const forceRefresh = req.headers.get('X-Force-Refresh') === '1';
+  const noCache = req.headers.get('X-No-Cache') === '1';
+  if (noCache) {
+    try { localStorage.removeItem(PREFIX + key); } catch {}
+  }
 
-  if (!forceRefresh) {
+  if (!forceRefresh && !noCache) {
     const entry = readEntry(key);
     if (entry) {
       return of(toResponse(req, entry.body));
     }
   }
 
-  const outgoing = forceRefresh
-    ? req.clone({ headers: req.headers.delete('X-Force-Refresh') })
-    : req;
+  let outgoing = req;
+  if (forceRefresh) outgoing = outgoing.clone({ headers: outgoing.headers.delete('X-Force-Refresh') });
+  if (noCache) outgoing = outgoing.clone({ headers: outgoing.headers.delete('X-No-Cache') });
 
   return next(outgoing).pipe(
     tap((event: HttpEvent<unknown>) => {
 
       if (
+        !noCache &&
         event instanceof HttpResponse &&
         event.ok &&
         (event.body as { success?: boolean } | null)?.success !== false
@@ -219,7 +224,7 @@ export const cacheInterceptor: HttpInterceptorFn = (req, next) => {
 
     }),
     catchError(err => {
-      const stale = forceRefresh ? null : readEntry(key, true);
+      const stale = forceRefresh || noCache ? null : readEntry(key, true);
       return stale
         ? of(toResponse(req, stale.body))
         : throwError(() => err);

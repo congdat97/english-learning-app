@@ -1,7 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { vi } from 'vitest';
 import { environment } from '../../environments/environment';
+import { AuthService } from './auth.service';
 import { LearningService } from './learning.service';
 
 describe('LearningService', () => {
@@ -10,15 +12,18 @@ describe('LearningService', () => {
   const base = environment.apiUrl;
 
   beforeEach(() => {
+    localStorage.clear();
     TestBed.configureTestingModule({
       providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
     });
     service = TestBed.inject(LearningService);
     http = TestBed.inject(HttpTestingController);
-    localStorage.clear();
   });
 
-  afterEach(() => http.verify());
+  afterEach(() => {
+    vi.restoreAllMocks();
+    http.verify();
+  });
 
   it('getCourses fetches from the correct URL', () => {
     service.getCourses().subscribe();
@@ -85,17 +90,28 @@ describe('LearningService', () => {
     req.flush({ success: true, data: [] });
   });
 
-  it('getAdminUserProgress builds /auth/users/progress', () => {
+  it('getAdminUserProgress builds /auth/users/progress without caching', () => {
     service.getAdminUserProgress().subscribe();
     const req = http.expectOne(`${base}/auth/users/progress`);
     expect(req.request.method).toBe('GET');
+    expect(req.request.headers.get('X-No-Cache')).toBe('1');
     req.flush({ success: true, data: [] });
   });
 
-  it('getLeaderboard builds /leaderboard and bypasses cache', () => {
+  it('getLeaderboard uses the short-lived cache by default', () => {
     service.getLeaderboard().subscribe();
     const req = http.expectOne(`${base}/leaderboard`);
     expect(req.request.method).toBe('GET');
+    expect(req.request.headers.get('X-Force-Refresh')).toBeNull();
+    req.flush({ success: true, data: [] });
+
+    service.getLeaderboard().subscribe();
+    http.expectNone(`${base}/leaderboard`);
+  });
+
+  it('getLeaderboard(true) always refreshes from the server', () => {
+    service.getLeaderboard(true).subscribe();
+    const req = http.expectOne(`${base}/leaderboard`);
     expect(req.request.headers.get('X-Force-Refresh')).toBe('1');
     req.flush({ success: true, data: [] });
   });
@@ -221,6 +237,73 @@ describe('LearningService', () => {
       expect(JSON.parse(localStorage.getItem(allUrl)!).body.data).toEqual([]);
     });
 
+    it('getCachedProgress falls back to the bulk progress cache', () => {
+      const allUrl = `api-cache:${base}/lessons/progress/all`;
+      const row = { lesson_id: 7, status: 'completed', score: 4 } as any;
+      localStorage.setItem(allUrl, JSON.stringify({ ts: Date.now(), body: { success: true, data: [row] } }));
+
+      expect(service.getCachedProgress(7)).toEqual(row);
+    });
+
+    it('saveSettings refreshes the cached settings response', () => {
+      const key = `api-cache:${base}/settings`;
+      localStorage.setItem(key, JSON.stringify({ ts: Date.now(), body: { success: true, data: { theme: 'mac-dinh' } } }));
+
+      service.saveSettings({ theme: 'tim-mong' }).subscribe();
+      http.expectOne(`${base}/settings`).flush({ success: true, data: { theme: 'tim-mong' } });
+
+      expect(JSON.parse(localStorage.getItem(key)!).body.data.theme).toBe('tim-mong');
+    });
+
+    it('syncVocabularyBookmarkCache only touches the current user cache', () => {
+      vi.spyOn(TestBed.inject(AuthService), 'currentUser').mockReturnValue({ id: 9, username: 'me', role: 'user' });
+      const mine = `api-cache:9:${base}/lessons/1/vocabulary`;
+      const other = `api-cache:2:${base}/lessons/1/vocabulary`;
+      localStorage.setItem(mine, JSON.stringify({ ts: Date.now(), body: { success: true, data: [{ id: 5, is_bookmarked: false }] } }));
+      localStorage.setItem(other, JSON.stringify({ ts: Date.now(), body: { success: true, data: [{ id: 5, is_bookmarked: false }] } }));
+
+      service.syncVocabularyBookmarkCache(5, true);
+
+      expect(JSON.parse(localStorage.getItem(mine)!).body.data[0].is_bookmarked).toBe(true);
+      expect(JSON.parse(localStorage.getItem(other)!).body.data[0].is_bookmarked).toBe(false);
+    });
+
+    it('syncLeaderboardAfterProgress updates both cache layers', () => {
+      vi.spyOn(TestBed.inject(AuthService), 'currentUser').mockReturnValue({ id: 9, username: 'me', role: 'user' });
+      const url = `${base}/leaderboard`;
+      const apiKey = `api-cache:9:${url}`;
+      const httpKey = `http_cache_9:${url}`;
+      const initial = [
+        { user_id: 9, username: 'me', avatar: null, completed: 2, avg_score: 80, last_activity: '2026-11-18T01:00:00Z' },
+        { user_id: 2, username: 'bin', avatar: null, completed: 5, avg_score: 60, last_activity: '2026-11-19T01:00:00Z' }
+      ];
+      localStorage.setItem(apiKey, JSON.stringify({ ts: Date.now(), body: { success: true, data: initial } }));
+      localStorage.setItem(httpKey, JSON.stringify({ ts: Date.now(), body: { success: true, data: initial } }));
+
+      const next = { id: -7, lesson_id: 7, status: 'completed', score: 4, total_questions: 4, updated_at: '2026-11-20T01:00:00Z' } as any;
+      service.syncLeaderboardAfterProgress(null, next);
+
+      const apiRows = JSON.parse(localStorage.getItem(apiKey)!).body.data;
+      const httpRows = JSON.parse(localStorage.getItem(httpKey)!).body.data;
+      expect(apiRows).toEqual(httpRows);
+      expect(apiRows.find((r: any) => r.user_id === 9).completed).toBe(3);
+      expect(apiRows.find((r: any) => r.user_id === 9).avg_score).toBe(87);
+      expect(apiRows.find((r: any) => r.user_id === 9).last_activity).toBe('2026-11-20T01:00:00Z');
+      expect(apiRows[0].user_id).toBe(2);
+    });
+
+    it('clearLeaderboardCache removes both cache layers', () => {
+      vi.spyOn(TestBed.inject(AuthService), 'currentUser').mockReturnValue({ id: 9, username: 'me', role: 'user' });
+      const url = `${base}/leaderboard`;
+      localStorage.setItem(`api-cache:9:${url}`, JSON.stringify({ ts: Date.now(), body: { success: true, data: [] } }));
+      localStorage.setItem(`http_cache_9:${url}`, JSON.stringify({ ts: Date.now(), body: { success: true, data: [] } }));
+
+      service.clearLeaderboardCache();
+
+      expect(localStorage.getItem(`api-cache:9:${url}`)).toBeNull();
+      expect(localStorage.getItem(`http_cache_9:${url}`)).toBeNull();
+    });
+
     it('errors when there is no cache and the API fails', () => {
       let errorCaught = false;
       let completed = false;
@@ -245,7 +328,9 @@ describe('LearningService', () => {
       expect(emissions[0].data[0].title).toBe('old-but-valid');
       expect(completed).toBe(true);
 
-      http.expectOne(url).flush({ success: true, data: [{ id: 1, title: 'fresh' }] });
+      const req = http.expectOne(url);
+      expect(req.request.headers.get('X-Force-Refresh')).toBe('1');
+      req.flush({ success: true, data: [{ id: 1, title: 'fresh' }] });
 
       const saved = JSON.parse(localStorage.getItem(`api-cache:${url}`) || '{}');
       expect(saved.body.data[0].title).toBe('fresh');

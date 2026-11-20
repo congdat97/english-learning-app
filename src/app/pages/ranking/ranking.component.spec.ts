@@ -67,6 +67,16 @@ describe('RankingComponent', () => {
     expect(component.rankedRows[0].username).toBe('bin');
   });
 
+  it('load(true) refetches the leaderboard even when a cache exists', () => {
+    fixture.detectChanges();
+    http.expectOne(`${base}/leaderboard`).flush({ success: true, data: [] });
+
+    component.load(true);
+
+    http.expectOne(`${base}/leaderboard`).flush({ success: true, data: [] });
+    expect(component.loading).toBe(false);
+  });
+
   it('shows error state when leaderboard API fails', () => {
     fixture.detectChanges();
     http.expectOne(`${base}/leaderboard`).flush('boom', { status: 500, statusText: 'Server Error' });

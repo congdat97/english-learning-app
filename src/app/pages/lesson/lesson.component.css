@@ -581,6 +581,38 @@ nav button { margin-right: 8px; }
 
 .summary-box h3 { margin: 10px 0 4px; }
 
+.summary-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.section-next {
+  display: flex;
+  justify-content: flex-end;
+  margin: 16px 0 4px;
+}
+
+.next-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 999px;
+  padding: 11px 20px;
+  background: var(--blue);
+  color: #fff;
+  font-weight: 800;
+  font-size: 13px;
+  cursor: pointer;
+  transition: transform .15s ease, filter .15s ease;
+}
+
+.next-btn:hover { filter: brightness(1.07); transform: translateY(-1px); }
+.next-btn:active { transform: scale(.97); }
+
 @media (max-width: 560px) {
   .carousel-card { padding: 20px 16px; }
   .word-title { font-size: 32px; }
@@ -715,4 +747,37 @@ nav button { margin-right: 8px; }
 .prev-chip small {
   font-size: 11px;
   color: var(--muted);
+}
+
+.carousel-card { touch-action: pan-y; }
+.dots button {
+  width: 18px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.dots button::before {
+  content: '';
+  display: block;
+  width: 18px;
+  height: 6px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--line) 80%, var(--ink) 4%);
+  transition: width .2s ease, background .2s ease;
+}
+.dots button.on::before { width: 28px; background: var(--blue); }
+.dots button:active::before { transform: scaleY(.8); }
+.lesson-error {
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+  padding: 36px 18px;
+}
+.lesson-error .primary-btn { min-height: 44px; padding: 10px 20px; }
+@media (pointer: coarse) {
+  .dots button { min-width: 44px; }
 }

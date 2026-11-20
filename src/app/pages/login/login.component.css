@@ -212,3 +212,13 @@
 .auth-back:hover {
   color: var(--primary);
 }
+@media (max-width: 560px) {
+  .auth-wrap {
+    min-height: 100dvh;
+    place-items: safe center;
+    overflow: visible;
+    padding: calc(24px + env(safe-area-inset-top, 0px)) 12px calc(24px + env(safe-area-inset-bottom, 0px));
+  }
+  .auth-tabs button { min-height: 44px; }
+  .auth-submit { min-height: 48px; }
+}

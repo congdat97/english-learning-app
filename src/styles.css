@@ -1004,3 +1004,38 @@ html[data-theme="neon-dem"] .option.wrong { background: rgba(229, 155, 155, .14)
   .transcript .line:nth-child(even) { margin-left: 18px; }
 }
 
+:root { --font-scale: 1; }
+html, body { min-height: 100dvh; }
+.app-main, .page { scroll-margin-top: 90px; }
+.subnav, .speed-row, .carousel-card, .ap-scroll {
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.subnav::-webkit-scrollbar, .speed-row::-webkit-scrollbar, .ap-scroll::-webkit-scrollbar { display: none; }
+@media (max-width: 850px) {
+  body { background-attachment: scroll; }
+  .hero-art, .logo-glow, .bar-shine, .dot-pulse { animation: none; }
+  .subnav { width: auto; margin-inline: -16px; padding-inline: 16px; }
+  .speed-row { margin-inline: -16px; padding-inline: 16px; }
+}
+@media (max-width: 560px) {
+  .subnav { margin-inline: -12px; padding-inline: 12px; }
+  .speed-row { margin-inline: -12px; padding-inline: 12px; }
+  .stat small, .filter-bar span, .learner small { font-size: 12px; }
+  .level, .status { font-size: 11px; }
+}
+@media (pointer: coarse) {
+  button, select, [role='button'] { min-height: 44px; }
+  .tiny-btn, .speed-chip, .text-btn, .auth-tabs button, .filter-bar input, .filter-bar select { min-height: 40px; }
+  .icon-speak, .nav-btn, .toast-close, .settings-close, .modal-close { min-width: 44px; min-height: 44px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+

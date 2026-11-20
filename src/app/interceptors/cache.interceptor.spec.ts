@@ -88,6 +88,22 @@ describe('CacheInterceptor', () => {
     expect(localStorage.getItem('http_cache_/api/lessons/1/progress')).toBeNull();
   });
 
+  it('X-No-Cache bypasses and removes cached admin data', () => {
+    localStorage.setItem(
+      'http_cache_/api/auth/users/progress',
+      JSON.stringify({ body: { success: true, data: ['old'] } })
+    );
+
+    let result: unknown;
+    http.get('/api/auth/users/progress', { headers: { 'X-No-Cache': '1' } }).subscribe(r => (result = r));
+    const req = httpMock.expectOne('/api/auth/users/progress');
+    expect(req.request.headers.get('X-No-Cache')).toBeNull();
+    req.flush({ success: true, data: ['fresh'] });
+
+    expect(result).toEqual({ success: true, data: ['fresh'] });
+    expect(localStorage.getItem('http_cache_/api/auth/users/progress')).toBeNull();
+  });
+
   it('keeps other family caches when posting to another family', () => {
     localStorage.setItem(
       'http_cache_/api/courses',

@@ -43,10 +43,10 @@ export class RankingComponent implements OnInit, OnDestroy {
     if (this.slowTimer) clearTimeout(this.slowTimer);
   }
 
-  load(): void {
+  load(force = false): void {
     this.loading = true;
     this.error = false;
-    this.learning.getLeaderboard().subscribe({
+    this.learning.getLeaderboard(force).subscribe({
       next: res => {
         this.rows = Array.isArray(res.data) ? res.data : [];
         this.applyFilters();

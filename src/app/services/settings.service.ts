@@ -82,11 +82,10 @@ export class SettingsService {
   }
 
   applyFontSize(size: number): void {
-    // Styles dùng px nên đổi font-size gốc là vô hiệu —
-    // zoom toàn trang theo tỷ lệ size/16 để cỡ chữ nhìn thấy được.
     const scale = size / 16;
     document.documentElement.style.fontSize = `${size}px`;
-    (document.body.style as CSSStyleDeclaration & { zoom: string }).zoom = String(scale);
+    document.documentElement.style.setProperty('--font-scale', String(scale));
+    document.body.style.zoom = '';
   }
 
   get audioSpeed(): number {

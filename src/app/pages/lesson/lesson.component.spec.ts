@@ -2,7 +2,8 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, convertToParamMap } from '@angular/router';
+import { of } from 'rxjs';
 import { vi } from 'vitest';
 import { environment } from '../../../environments/environment';
 import { AuthService } from '../../services/auth.service';
@@ -28,7 +29,7 @@ describe('LessonComponent', () => {
         provideRouter([]),
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
-        { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => '1' } } } }
+        { provide: ActivatedRoute, useValue: { paramMap: of(convertToParamMap({ id: '1' })) } }
       ]
     }).compileComponents();
 

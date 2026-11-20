@@ -1,6 +1,7 @@
 ﻿import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { LearningService } from '../../services/learning.service';
 import { SettingsService } from '../../services/settings.service';
 import { AuthService } from '../../services/auth.service';
@@ -20,6 +21,7 @@ export class LessonComponent implements OnInit, OnDestroy {
   listening: Listening[] = [];
   review: ReviewQuestion[] = [];
   loading = true;
+  loadError = false;
   section: 'vocabulary' | 'listening' | 'review' = 'vocabulary';
   answers: Record<number, string> = {};
   submitted = false;
@@ -42,15 +44,18 @@ export class LessonComponent implements OnInit, OnDestroy {
 
   private gapTimer: ReturnType<typeof setTimeout> | null = null;
   private speakToken = 0;
-  private touchStartX = 0;
-  private touchEndX = 0;
   private currentUtterance: SpeechSynthesisUtterance | null = null;
   private speakFallbackTimer: ReturnType<typeof setTimeout> | null = null;
+  private routeSub?: Subscription;
+  private loadSeq = 0;
+  private touchX = 0;
+  private touchY = 0;
 
   /** Chỉ alert 1 lần mỗi phiên để không spam. */
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private learning: LearningService,
     private settings: SettingsService,
     private auth: AuthService,
@@ -65,55 +70,153 @@ export class LessonComponent implements OnInit, OnDestroy {
       this.speed = 1;
       this.settings.save({ ...this.settings.load(), audioSpeed: 1 });
     }
-    const id = Number(this.route.snapshot.paramMap.get('id'));
+    // Theo dõi paramMap để chuyển bài bằng nút Next không bị reuse component.
+    this.routeSub = this.route.paramMap.subscribe(params => {
+      const id = Number(params.get('id'));
+      if (!id) {
+        this.loading = false;
+        this.cdr.markForCheck();
+        return;
+      }
+      this.loadLesson(id);
+    });
+  }
+
+  private loadLesson(id: number): void {
+    const seq = ++this.loadSeq;
+    this.stopSpeaking();
+    this.loading = true;
+    this.loadError = false;
+    this.lesson = null;
+    this.vocabulary = [];
+    this.listening = [];
+    this.review = [];
+    this.section = 'vocabulary';
+    this.vocabIndex.set(0);
+    this.answers = {};
+    this.submitted = false;
+    this.score = 0;
+    this.listeningAnswers = {};
+    this.listeningSubmitted = false;
+    this.listeningScore = 0;
+    this.quizIndex.set(0);
+    this.quizChecked.set(false);
+    this.quizCorrect.set(false);
+    this.prevLessonTitle = '';
+    this.prevLessonVocab = [];
+    this.nextLessonId = null;
+    this.nextLessonTitle = '';
+    this.pronState.set(null);
+    this.pronResult.set('none');
+    this.pronHeard.set('');
+    this.pronScore.set(0);
+    this.cdr.markForCheck();
+
     this.learning.getLesson(id).subscribe({
       next: (r) => {
+        if (seq !== this.loadSeq) return;
         this.lesson = r.data;
-        if (r.data?.course_id && r.data.sort_order > 1) this.loadPrevLessonVocab(r.data);
+        if (r.data?.course_id) this.loadLessonNeighbors(r.data, seq);
         this.cdr.markForCheck();
       },
-      error: () => { this.loading = false; this.cdr.markForCheck(); }
+      error: () => {
+        if (seq !== this.loadSeq) return;
+        this.loading = false;
+        this.loadError = true;
+        this.cdr.markForCheck();
+      }
     });
     this.learning.getVocabulary(id).subscribe({
-      next: (r) => { this.vocabulary = r.data; this.cdr.markForCheck(); },
-      error: () => { this.loading = false; this.cdr.markForCheck(); }
+      next: (r) => {
+        if (seq !== this.loadSeq) return;
+        this.vocabulary = r.data;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        if (seq !== this.loadSeq) return;
+        this.loading = false;
+        this.loadError = true;
+        this.cdr.markForCheck();
+      }
     });
     this.learning.getListening(id).subscribe({
-      next: (r) => { this.listening = r.data; this.cdr.markForCheck(); },
-      error: () => { this.loading = false; this.cdr.markForCheck(); }
+      next: (r) => {
+        if (seq !== this.loadSeq) return;
+        this.listening = r.data;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        if (seq !== this.loadSeq) return;
+        this.loading = false;
+        this.loadError = true;
+        this.cdr.markForCheck();
+      }
     });
     this.learning.getReview(id).subscribe({
-      next: (r) => { this.review = r.data; this.loading = false; this.cdr.markForCheck(); },
-      error: () => { this.loading = false; this.cdr.markForCheck(); }
+      next: (r) => {
+        if (seq !== this.loadSeq) return;
+        this.review = r.data;
+        this.loading = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        if (seq !== this.loadSeq) return;
+        this.loading = false;
+        this.loadError = true;
+        this.cdr.markForCheck();
+      }
     });
   }
 
   // ===== Từ vựng của BÀI TRƯỚC — hiển thị ở tab Luyện nghe để ôn lại =====
   prevLessonTitle = '';
   prevLessonVocab: Vocabulary[] = [];
+  nextLessonId: number | null = null;
+  nextLessonTitle = '';
 
-  private loadPrevLessonVocab(lesson: Lesson): void {
+  private loadLessonNeighbors(lesson: Lesson, seq = this.loadSeq): void {
     this.learning.getLessons(lesson.course_id).subscribe({
       next: (res) => {
-        const prev = res.data.find(l => l.sort_order === lesson.sort_order - 1);
-        if (!prev) return;
-        this.prevLessonTitle = prev.title;
-        this.learning.getVocabulary(prev.id).subscribe({
-          next: (vr) => { this.prevLessonVocab = vr.data; this.cdr.markForCheck(); },
-          error: () => {}
-        });
+        if (seq !== this.loadSeq) return;
+        const sorted = [...(res.data || [])].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+        const index = sorted.findIndex(l => l.id === lesson.id);
+        const prev = index > 0 ? sorted[index - 1] : null;
+        const next = index >= 0 && index < sorted.length - 1 ? sorted[index + 1] : null;
+
+        this.nextLessonId = next?.id ?? null;
+        this.nextLessonTitle = next?.title ?? '';
+
+        if (prev) {
+          this.prevLessonTitle = prev.title;
+          this.learning.getVocabulary(prev.id).subscribe({
+            next: (vr) => {
+              if (seq !== this.loadSeq) return;
+              this.prevLessonVocab = vr.data;
+              this.cdr.markForCheck();
+            },
+            error: () => {}
+          });
+        }
+
+        this.cdr.markForCheck();
       },
       error: () => {}
     });
   }
 
   ngOnDestroy(): void {
+    this.routeSub?.unsubscribe();
     this.stopSpeaking();
   }
 
   setSection(s: 'vocabulary' | 'listening' | 'review'): void {
     this.stopSpeaking();
     this.section = s;
+  }
+
+  retryLoad(): void {
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+    if (id) this.loadLesson(id);
   }
 
   trackBySpeed(_: number, rate: number): number { return rate; }
@@ -143,12 +246,44 @@ export class LessonComponent implements OnInit, OnDestroy {
 
   nextVocab(): void {
     this.stopSpeaking();
-    // Từ cuối -> chuyển sang phần Luyện nghe (không quay lại từ đầu nữa)
-    if (this.vocabIndex() >= this.vocabulary.length - 1) {
-      this.setSection('listening');
+    if (this.vocabIndex() < this.vocabulary.length - 1) {
+      this.vocabIndex.update(i => i + 1);
+    }
+  }
+
+  goVocab(index: number): void {
+    this.stopSpeaking();
+    this.vocabIndex.set(Math.max(0, Math.min(index, this.vocabulary.length - 1)));
+  }
+
+  onVocabTouchStart(event: TouchEvent): void {
+    const touch = event.changedTouches[0];
+    if (!touch) return;
+    this.touchX = touch.clientX;
+    this.touchY = touch.clientY;
+  }
+
+  onVocabTouchEnd(event: TouchEvent): void {
+    const touch = event.changedTouches[0];
+    if (!touch) return;
+    const dx = touch.clientX - this.touchX;
+    const dy = touch.clientY - this.touchY;
+    if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy) * 1.3) return;
+    if (dx < 0) this.nextVocab();
+    else this.prevVocab();
+  }
+
+  goNextLesson(): void {
+    this.stopSpeaking();
+    if (this.nextLessonId != null) {
+      this.router.navigate(['/lessons', this.nextLessonId]);
       return;
     }
-    this.vocabIndex.update(i => i + 1);
+    if (this.lesson?.course_id) {
+      this.router.navigate(['/courses', this.lesson.course_id]);
+      return;
+    }
+    this.router.navigate(['/courses']);
   }
 
   get vocabCounter(): string {
@@ -161,40 +296,6 @@ export class LessonComponent implements OnInit, OnDestroy {
       : 0;
   }
 
-  // ===== Lướt từ bằng tay =====
-  onTouchStart(event: TouchEvent): void {
-    this.touchStartX = event.touches[0]?.pageX ?? 0;
-  }
-
-  onTouchEnd(event: TouchEvent): void {
-    this.touchEndX = event.changedTouches[0].pageX;
-    this.handleSwipe();
-  }
-
-  onTouchMove(event: TouchEvent): void {
-    // Ngăn chặn scroll khi di chuyển ngang
-    const deltaX = event.changedTouches[0].pageX - this.touchStartX;
-    if (Math.abs(deltaX) > 10) {
-      event.preventDefault();
-    }
-  }
-
-  private handleSwipe(): void {
-    const deltaX = this.touchEndX - this.touchStartX;
-    const swipeThreshold = 30;
-    if (Math.abs(deltaX) < swipeThreshold) return;
-    const goNext = deltaX < 0; // lật trái = tiến phần
-
-    if (this.section === 'vocabulary') {
-      goNext ? this.nextVocab() : this.prevVocab();
-    } else if (this.section === 'listening') {
-      // Lùi trong phần Luyện nghe -> tiến sang Ôn tập, quay lại -> Từ vựng
-      if (goNext) this.setSection('review');
-      else this.setSection('vocabulary');
-    } else if (this.section === 'review' && !goNext) {
-      this.setSection('listening');
-    }
-  }
   // ===== Ôn tập: 1 câu / lượt + Kiểm tra đáp án (theo mockup) =====
   quizIndex = signal(0);
   quizChecked = signal(false);
@@ -277,6 +378,7 @@ export class LessonComponent implements OnInit, OnDestroy {
         v.is_favorite = v.is_bookmarked;
         this.learning.syncBookmarkCache(v, v.is_bookmarked);
         this.learning.syncVocabularyBookmarkCache(v.id, v.is_bookmarked);
+        this.cdr.markForCheck();
         this.toast.error('❌ Không lưu được trạng thái từ vựng — thử lại sau.');
       }
     });
@@ -519,15 +621,24 @@ export class LessonComponent implements OnInit, OnDestroy {
         updated_at: now
       };
       this.learning.syncProgressCache(lessonId, optimistic);
+      this.learning.syncLeaderboardAfterProgress(previous, optimistic);
 
       this.learning.saveProgress(lessonId, 'completed', this.score, this.review.length).subscribe({
         next: (res) => {
-          if (res.data) this.learning.syncProgressCache(lessonId, res.data);
+          if (res.data) {
+            this.learning.syncProgressCache(lessonId, res.data);
+            this.learning.syncLeaderboardAfterProgress(optimistic, res.data);
+          } else {
+            this.learning.clearLeaderboardCache();
+          }
+          this.cdr.markForCheck();
           this.toast.success(`🎉 Hoàn thành bài học! Điểm: ${this.score}/${this.review.length} (đã lưu tiến độ).`);
         },
         error: () => {
           if (previous) this.learning.syncProgressCache(lessonId, previous);
           else this.learning.clearProgressCache(lessonId);
+          this.learning.clearLeaderboardCache();
+          this.cdr.markForCheck();
           this.toast.error(`❌ Không lưu được tiến độ lên server — điểm ${this.score}/${this.review.length} chỉ hiển thị tạm thời.`);
         }
       });

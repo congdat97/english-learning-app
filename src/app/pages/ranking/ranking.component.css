@@ -2,6 +2,8 @@
 .section-head { display: flex; justify-content: space-between; align-items: end; gap: 12px; flex-wrap: wrap; }
 .section-head h2 { margin: 0; }
 .section-head p { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
+.head-actions { display: flex; align-items: center; gap: 14px; }
+.head-actions .text-btn { background: none; }
 
 .filter-bar {
   padding: 12px 14px;
@@ -78,4 +80,38 @@
   .rank-table th,
   .rank-table td { padding: 9px 8px; }
   .rank-cell { width: 54px; }
+}
+@media (max-width: 560px) {
+  .board { overflow: visible; padding: 12px; }
+  .rank-table, .rank-table tbody { display: block; width: 100%; }
+  .rank-table thead { display: none; }
+  .rank-table tr {
+    display: grid;
+    grid-template-columns: 48px 1fr auto;
+    grid-template-areas:
+      'rank learner score'
+      'rank completed activity';
+    gap: 2px 10px;
+    margin-bottom: 10px;
+    padding: 12px;
+    border: 1px solid var(--line, var(--border));
+    border-radius: 14px;
+    background: var(--surface, #fff);
+  }
+  .rank-table tr.is-me { border-color: var(--primary, #5568fe); }
+  .rank-table td { display: block; padding: 0; border: 0; }
+  .rank-table td:nth-child(1) { grid-area: rank; align-self: center; }
+  .rank-table td:nth-child(2) { grid-area: learner; min-width: 0; }
+  .rank-table td:nth-child(3) { grid-area: completed; color: var(--muted); font-size: 12px; }
+  .rank-table td:nth-child(4) { grid-area: score; text-align: right; }
+  .rank-table td:nth-child(5) {
+    grid-area: activity;
+    display: block;
+    text-align: right;
+    color: var(--muted);
+    font-size: 11px;
+  }
+  .rank-cell { width: 48px; }
+  .filter-bar span { font-size: 12px; }
+  .filter-bar input, .filter-bar select { min-height: 44px; }
 }

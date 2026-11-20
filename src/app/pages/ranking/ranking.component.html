@@ -4,7 +4,10 @@
       <h2>🏆 Xếp hạng học viên</h2>
       <p>Bảng xếp hạng cập nhật theo tiến độ học thực tế.</p>
     </div>
-    <a routerLink="/progress" class="text-btn">← Quay lại tiến độ</a>
+    <div class="head-actions">
+      <button type="button" class="text-btn" (click)="load(true)">↻ Làm mới</button>
+      <a routerLink="/progress" class="text-btn">← Quay lại tiến độ</a>
+    </div>
   </header>
 
   <div class="panel filter-bar">
@@ -38,7 +41,7 @@
 
   <p *ngIf="error && !loading" class="muted">
     ⚠️ Không tải được bảng xếp hạng.
-    <button type="button" class="text-btn" (click)="load()">Thử lại</button>
+    <button type="button" class="text-btn" (click)="load(true)">Thử lại</button>
   </p>
 
   <div class="panel board" *ngIf="!loading && !error">

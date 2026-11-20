@@ -21,6 +21,7 @@ interface CourseProgress {
 export class ProgressComponent implements OnInit, OnDestroy {
   items: CourseProgress[] = [];
   loading = true;
+  error = false;
   slowApi = false;
   private slowTimer?: ReturnType<typeof setTimeout>;
   private destroy$ = new Subject<void>();
@@ -57,7 +58,16 @@ export class ProgressComponent implements OnInit, OnDestroy {
           const byLesson = new Map<number, UserProgress>();
           (progress.data ?? []).forEach(p => byLesson.set(p.lesson_id, p));
 
-          const jobs = (courses.data ?? []).map(course =>
+          const list = courses.data ?? [];
+          if (!list.length) {
+            this.items = [];
+            this.totalCompleted = 0;
+            this.totalLessons = 0;
+            this.loading = false;
+            return;
+          }
+
+          const jobs = list.map(course =>
             this.learning.getLessons(course.id).pipe(takeUntil(this.destroy$))
           );
           forkJoin(jobs)
@@ -72,16 +82,16 @@ export class ProgressComponent implements OnInit, OnDestroy {
                     progressMap[lesson.id] = byLesson.get(lesson.id) ?? null;
                     if (progressMap[lesson.id]?.status === 'completed') completed++;
                   }
-                  return { course: courses.data![i], lessons, progress: progressMap, completed };
+                  return { course: list[i], lessons, progress: progressMap, completed };
                 });
                 this.totalLessons = this.items.reduce((s, it) => s + it.lessons.length, 0);
                 this.totalCompleted = this.items.reduce((s, it) => s + it.completed, 0);
                 this.loading = false;
               },
-              error: () => { this.loading = false; }
+              error: () => { this.loading = false; this.error = true; }
             });
         },
-        error: () => { this.loading = false; }
+        error: () => { this.loading = false; this.error = true; }
       });
   }
 

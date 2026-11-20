@@ -119,9 +119,17 @@ export class AuthService {
 
   private restore(): AuthUser | null {
     try {
+      if (!localStorage.getItem(TOKEN_KEY)) {
+        localStorage.removeItem(USER_KEY);
+        return null;
+      }
       const raw = localStorage.getItem(USER_KEY);
-      return raw ? (JSON.parse(raw) as AuthUser) : null;
+      if (!raw) return null;
+      const user = JSON.parse(raw) as AuthUser;
+      if (!user?.id || !user?.username) throw new Error('Invalid saved user');
+      return user;
     } catch {
+      try { localStorage.removeItem(USER_KEY); } catch {}
       return null;
     }
   }
