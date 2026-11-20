@@ -1,9 +1,9 @@
 .page { display: grid; gap: 14px; }
-.section-head { display: flex; justify-content: space-between; align-items: end; gap: 12px; flex-wrap: wrap; }
+.section-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
 .section-head h2 { margin: 0; }
 .section-head p { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
-.head-actions { display: flex; align-items: center; gap: 14px; }
-.head-actions .text-btn { background: none; }
+.head-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.head-actions .text-btn { background: none; min-height: 36px; padding: 6px 10px; display: inline-flex; align-items: center; }
 
 .my-rank {
   display: flex;
