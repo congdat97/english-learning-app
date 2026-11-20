@@ -567,6 +567,7 @@ export class LessonComponent implements OnInit, OnDestroy {
   pronScore = signal(0);
   /** Điểm cao nhất từng đạt được cho mỗi từ (id từ -> %) */
   pronBest = signal<Record<number, number>>({});
+  lessonCompleted = signal(false);
   private recognition: any = null;
 
   /** Khoảng cách Levenshtein — dùng để tính % giống phát âm */
@@ -671,7 +672,7 @@ export class LessonComponent implements OnInit, OnDestroy {
       this.learning.syncProgressCache(lessonId, optimistic);
       this.learning.syncLeaderboardAfterProgress(previous, optimistic);
 
-      this.learning.saveProgress(lessonId, 'completed', this.score, this.review.length).subscribe({
+this.learning.saveProgress(lessonId, 'completed', this.score, this.review.length).subscribe({
         next: (res) => {
           if (res.data) {
             this.learning.syncProgressCache(lessonId, res.data);
@@ -679,14 +680,16 @@ export class LessonComponent implements OnInit, OnDestroy {
           } else {
             this.learning.clearLeaderboardCache();
           }
+          this.lessonCompleted.set(true);
           this.cdr.markForCheck();
           this.toast.success(`🎉 Hoàn thành bài học! Điểm: ${this.score}/${this.review.length} (đã lưu tiến độ).`);
+          // Tự động reset sau 2s
+          setTimeout(() => this.lessonCompleted.set(false), 2000);
         },
         error: () => {
           if (previous) this.learning.syncProgressCache(lessonId, previous);
           else this.learning.clearProgressCache(lessonId);
           this.learning.clearLeaderboardCache();
-          this.cdr.markForCheck();
           this.toast.error(`❌ Không lưu được tiến độ lên server — điểm ${this.score}/${this.review.length} chỉ hiển thị tạm thời.`);
         }
       });
