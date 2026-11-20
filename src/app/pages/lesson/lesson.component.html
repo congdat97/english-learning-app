@@ -29,7 +29,7 @@
       </div>
  
       <div class="word-title-row">
-        <h2 class="word-title">{{ v.word }}</h2>
+        <h2 class="word-title" (click)="speakOnce(v.id + '-w', v.word)">{{ v.word }}</h2>
         <button class="tiny-btn icon-speak" [class.speaking]="speakingKey() === v.id + '-w'"
                 title="Nghe từ" aria-label="Nghe từ"
                 (click)="speakOnce(v.id + '-w', v.word)">{{ speakingKey() === v.id + '-w' ? '⏸' : '▶' }}</button>
