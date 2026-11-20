@@ -73,11 +73,6 @@
       </div>
     </article>
 
-    <div class="vocab-progress">
-      <div class="progress-track"><span [style.width.%]="vocabPercent"></span></div>
-      <span class="percent">{{ vocabPercent }}%</span>
-    </div>
-
     <div *ngIf="vocabulary.length > 0 && vocabIndex() === vocabulary.length - 1" class="section-actions">
       <button *ngIf="nextLessonId" class="primary" (click)="goNextLesson()">
         Bài tiếp theo <span aria-hidden="true">→</span>

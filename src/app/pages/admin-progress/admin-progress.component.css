@@ -1,5 +1,5 @@
 .page { display: grid; gap: 14px; }
-.section-head { display: flex; justify-content: space-between; align-items: end; }
+.section-head { display: flex; justify-content: space-between; align-items: end; flex-wrap: wrap; gap: 10px; }
 .section-head h2 { margin: 0; }
 .section-head p { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
 

@@ -219,6 +219,6 @@
     overflow: visible;
     padding: calc(24px + env(safe-area-inset-top, 0px)) 12px calc(24px + env(safe-area-inset-bottom, 0px));
   }
-  .auth-tabs button { min-height: 44px; }
-  .auth-submit { min-height: 48px; }
+  .auth-tabs button { min-height: 36px; }
+  .auth-submit { min-height: 38px; }
 }

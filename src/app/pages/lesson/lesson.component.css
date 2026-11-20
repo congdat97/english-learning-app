@@ -99,11 +99,11 @@ nav button { margin-right: 8px; }
 
 /* ===== Nút phát cả đoạn: đổi icon + màu khi đang đọc ===== */
 .play {
-  width: 62px;
-  height: 62px;
+  width: 44px;
+  height: 44px;
   border: 0;
   border-radius: 50%;
-  font-size: 25px;
+  font-size: 18px;
   background: var(--surface);
   color: var(--muted);
   cursor: pointer;
@@ -144,8 +144,8 @@ nav button { margin-right: 8px; }
 
 /* Nút prev/next vocab carousel */
 .nav-btn {
-  width: 44px;
-  height: 44px;
+  width: 36px;
+  height: 36px;
   font-size: 18px;
   box-shadow: 0 2px 8px rgba(36, 59, 99, .08);
 }
@@ -165,9 +165,9 @@ nav button { margin-right: 8px; }
 }
 
 .line-speak {
-  width: 54px;
-  height: 54px;
-  flex: 0 0 54px;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
   border: 0;
   border-radius: 50%;
   background: var(--primary-soft);
@@ -210,13 +210,13 @@ nav button { margin-right: 8px; }
 
 /* Nút phát cả đoạn: tròn to hơn theo mockup */
 .audio-controls {
-  min-height: 62px;
+  min-height: 48px;
 }
 
 .audio-controls .play {
-  width: 62px;
-  height: 62px;
-  font-size: 25px;
+  width: 44px;
+  height: 44px;
+  font-size: 18px;
 }
 
 .transcript {
@@ -226,15 +226,15 @@ nav button { margin-right: 8px; }
 
 @media (max-width: 560px) {
   .line-speak {
-    width: 46px;
-    height: 46px;
-    flex: 0 0 46px;
-    font-size: 17px;
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
+    font-size: 15px;
   }
   .audio-controls .play {
-    width: 54px;
-    height: 54px;
-    font-size: 22px;
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
   }
 }
 
@@ -499,6 +499,7 @@ nav button { margin-right: 8px; }
   display: flex;
   justify-content: center;
   gap: 6px;
+  flex-wrap: wrap;
   margin-top: 18px;
 }
 
@@ -883,7 +884,7 @@ nav button { margin-right: 8px; }
   justify-items: center;
   padding: 36px 18px;
 }
-.lesson-error .primary-btn { min-height: 44px; padding: 10px 20px; }
+.lesson-error .primary-btn { min-height: 36px; padding: 7px 14px; }
 @media (pointer: coarse) {
-  .dots button { min-width: 44px; }
+  .dots button { min-width: 36px; }
 }

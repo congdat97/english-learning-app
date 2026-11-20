@@ -23,7 +23,7 @@
 .primary-btn {
   display: inline-grid;
   place-items: center;
-  min-height: 48px;
+  min-height: 38px;
   padding: 0 16px;
   border: 0;
   border-radius: 14px;

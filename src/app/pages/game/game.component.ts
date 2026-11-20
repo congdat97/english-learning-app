@@ -29,6 +29,8 @@ export class GameComponent implements OnInit {
   visibleGroups: CourseGroup[] = [];
   totalStars = 0;
   totalPlayed = 0;
+  totalStages = 0;
+  starBreakdown = 'Chưa có sao — hoàn thành một màn để ăn sao';
 
   constructor(private learning: LearningService, private game: GameService) {}
 
@@ -98,8 +100,18 @@ export class GameComponent implements OnInit {
 
   private buildGroups(courses: Course[], lessonGroups: Lesson[][]): void {
     const results = this.game.getAllResults();
-    this.totalStars = results.reduce((sum, result) => sum + Math.max(0, result.stars), 0);
+    this.totalStars = results.reduce((sum, result) => sum + this.clampStars(result.stars), 0);
     this.totalPlayed = results.length;
+
+    const counts = [0, 0, 0, 0];
+    results.forEach(result => {
+      const stars = this.clampStars(result.stars);
+      if (stars > 0) counts[stars]++;
+    });
+    this.starBreakdown = counts
+      .map((count, stars) => (count && stars ? `${stars}★ ×${count}` : ''))
+      .filter(Boolean)
+      .join(' · ') || 'Chưa có sao — hoàn thành một màn để ăn sao';
 
     this.groups = courses.map((course, index) => ({
       courseId: course.id,
@@ -115,13 +127,18 @@ export class GameComponent implements OnInit {
           title: lesson.title,
           topic: lesson.topic,
           order: lesson.sort_order,
-          bestStars: result?.stars ?? 0,
+          bestStars: result ? this.clampStars(result.stars) : 0,
           bestAccuracy: result?.accuracy ?? 0,
           played: result ? 1 : 0
         };
       })
     })).filter(group => group.stages.length > 0);
 
+    this.totalStages = this.groups.reduce((sum, group) => sum + group.stages.length, 0);
     this.applyFilters();
+  }
+
+  private clampStars(stars: number): number {
+    return Math.max(0, Math.min(3, Number(stars) || 0));
   }
 }

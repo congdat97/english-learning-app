@@ -104,6 +104,24 @@ describe('CacheInterceptor', () => {
     expect(localStorage.getItem('http_cache_/api/auth/users/progress')).toBeNull();
   });
 
+  it('forwards X-Force-Refresh to the API and refreshes cache', () => {
+    localStorage.setItem(
+      'http_cache_/api/leaderboard',
+      JSON.stringify({ body: { success: true, data: ['old'] } })
+    );
+
+    let result: unknown;
+    http
+      .get('/api/leaderboard', { headers: { 'X-Force-Refresh': '1' } })
+      .subscribe((r) => (result = r));
+    const req = httpMock.expectOne('/api/leaderboard');
+    expect(req.request.headers.get('X-Force-Refresh')).toBe('1');
+    req.flush({ success: true, data: ['fresh'] });
+
+    expect(result).toEqual({ success: true, data: ['fresh'] });
+    expect(JSON.parse(localStorage.getItem('http_cache_/api/leaderboard')!).body.data).toEqual(['fresh']);
+  });
+
   it('keeps other family caches when posting to another family', () => {
     localStorage.setItem(
       'http_cache_/api/courses',

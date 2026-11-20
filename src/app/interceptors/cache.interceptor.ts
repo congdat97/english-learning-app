@@ -207,7 +207,6 @@ export const cacheInterceptor: HttpInterceptorFn = (req, next) => {
   }
 
   let outgoing = req;
-  if (forceRefresh) outgoing = outgoing.clone({ headers: outgoing.headers.delete('X-Force-Refresh') });
   if (noCache) outgoing = outgoing.clone({ headers: outgoing.headers.delete('X-No-Cache') });
 
   return next(outgoing).pipe(

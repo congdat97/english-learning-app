@@ -1,49 +1,73 @@
 <div class="page game-page">
   <header class="section-head">
     <div>
-      <h2>🎮 Trò chơi học tập</h2>
-      <p>Chọn một màn chơi để luyện từ vựng, nghe và phát âm.</p>
+      <span class="page-kicker">LUYỆN TẬP</span>
+      <h2>🎮 Chọn màn chơi</h2>
+      <p>Mỗi màn 8–10 câu. Đạt 100% và phát âm ≥ 90% để ăn 3 sao.</p>
     </div>
     <div class="head-actions">
-      <a routerLink="/star-ranking" class="text-btn">🌟 Xếp hạng sao</a>
-      <button type="button" class="text-btn" (click)="load(true)">↻ Làm mới</button>
+      <a routerLink="/star-ranking" class="pill-link">🌟 Xếp hạng sao</a>
+      <button type="button" class="icon-action" (click)="load(true)" aria-label="Làm mới danh sách">↻</button>
     </div>
   </header>
 
-  <div class="summary panel" *ngIf="!loading && !error">
-    <div><span>★</span><strong>{{ totalStars }}</strong><small>tổng sao</small></div>
-    <div><span>🎯</span><strong>{{ totalPlayed }}</strong><small>màn đã chơi</small></div>
-    <a routerLink="/star-ranking" class="summary-link">Xem bảng xếp hạng →</a>
-  </div>
+  <section class="summary panel" *ngIf="!loading && !error">
+    <div class="summary-block">
+      <span class="summary-icon star">★</span>
+      <div>
+        <small>Tổng sao</small>
+        <strong>{{ totalStars }}</strong>
+        <span class="summary-note">{{ starBreakdown }}</span>
+      </div>
+    </div>
+    <div class="summary-divider"></div>
+    <div class="summary-block">
+      <span class="summary-icon">🎯</span>
+      <div>
+        <small>Màn đã chơi</small>
+        <strong>{{ totalPlayed }}<em>/{{ totalStages }}</em></strong>
+        <span class="summary-note">Sao tốt nhất của mỗi màn được lưu lại.</span>
+      </div>
+    </div>
+    <a routerLink="/star-ranking" class="summary-link">Bảng xếp hạng →</a>
+  </section>
 
-  <div class="panel filter-bar">
-    <label>
-      <span>Tìm màn chơi</span>
-      <input type="search" name="search" [(ngModel)]="search" (ngModelChange)="applyFilters()" placeholder="Tên bài học hoặc chủ đề..." />
-    </label>
+  <div class="filter-bar panel">
+    <span class="filter-icon" aria-hidden="true">⌕</span>
+    <input type="search" name="search" [(ngModel)]="search" (ngModelChange)="applyFilters()" placeholder="Tìm bài học hoặc chủ đề..." />
+    <button *ngIf="search" type="button" class="filter-clear" (click)="search = ''; applyFilters()" aria-label="Xóa tìm kiếm">✕</button>
   </div>
 
   <div class="page-loader" *ngIf="loading"><span class="spinner"></span> Đang chuẩn bị các màn chơi...</div>
 
-  <p *ngIf="error && !loading" class="muted">
+  <p *ngIf="error && !loading" class="muted error-box">
     ⚠️ Không tải được danh sách bài học.
     <button type="button" class="text-btn" (click)="load(true)">Thử lại</button>
   </p>
 
   <ng-container *ngIf="!loading && !error">
     <section class="course-group" *ngFor="let group of visibleGroups; trackBy: trackGroup">
-      <h3>{{ group.courseTitle }}</h3>
+      <div class="group-head">
+        <h3>{{ group.courseTitle }}</h3>
+        <span>{{ group.stages.length }} màn</span>
+      </div>
       <div class="stage-grid">
-        <a class="stage-card panel" *ngFor="let stage of group.stages; trackBy: trackStage"
+        <a class="stage-card" *ngFor="let stage of group.stages; trackBy: trackStage"
+           [class.played]="stage.played"
            [routerLink]="['/game/play', stage.id]">
-          <div class="stage-top">
-            <span class="stage-number">#{{ stage.order }}</span>
-            <span class="stage-stars" [class.has-star]="stage.bestStars > 0">{{ starsLabel(stage.bestStars) }}</span>
+          <div class="stage-art">
+            <span class="stage-index">{{ stage.order }}</span>
+            <span class="stage-play">▶</span>
           </div>
-          <strong>{{ stage.title }}</strong>
-          <small *ngIf="stage.topic">{{ stage.topic }}</small>
-          <span class="stage-meta" *ngIf="stage.played">Độ đúng tốt nhất {{ stage.bestAccuracy }}%</span>
-          <span class="stage-meta" *ngIf="!stage.played">Chưa chơi</span>
+          <div class="stage-body">
+            <span class="stage-kicker">MÀN {{ stage.order }}</span>
+            <strong>{{ stage.title }}</strong>
+            <small>{{ stage.topic || 'Từ vựng · nghe · phát âm' }}</small>
+            <div class="stage-footer">
+              <span class="stage-stars" [class.has-star]="stage.bestStars > 0" [attr.aria-label]="stage.bestStars + ' sao'">{{ starsLabel(stage.bestStars) }}</span>
+              <span class="stage-state" [class.done]="stage.played">{{ stage.played ? stage.bestAccuracy + '%' : 'Chơi ngay' }}</span>
+            </div>
+          </div>
         </a>
       </div>
     </section>
