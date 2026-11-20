@@ -214,6 +214,7 @@ export class LessonComponent implements OnInit, OnDestroy {
   setSection(s: 'vocabulary' | 'listening' | 'review'): void {
     this.stopSpeaking();
     this.section = s;
+    setTimeout(() => window.scrollTo(0, 0), 150);
   }
 
   toggleLisTranslation(): void {
