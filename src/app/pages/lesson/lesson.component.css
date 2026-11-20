@@ -246,6 +246,35 @@ nav button { margin-right: 8px; }
 .pron-result { font-size: 12px; font-weight: 700; color: #b45309; }
 .pron-result.ok { color: #15803d; }
 
+/* ===== Thanh tiến độ lesson ===== */
+.lesson-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+.lesson-progress .label {
+  min-width: 40px;
+  font-weight: 700;
+  color: var(--primary);
+}
+.lesson-progress .bar {
+  flex: 1;
+  height: 8px;
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--line) 60%, var(--white));
+  overflow: hidden;
+}
+.lesson-progress .bar span {
+  height: 100%;
+  display: block;
+  background: linear-gradient(90deg, var(--blue), var(--blue2));
+  border-radius: 20px;
+  transition: width .35s cubic-bezier(.2, .9, .3, 1);
+}
+
 /* ===== TỪ VỰNG CAROUSEL (theo mockup word-card) ===== */
 .carousel-card {
   max-width: 100%;

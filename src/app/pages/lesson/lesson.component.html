@@ -5,6 +5,11 @@
     <button [class.active]="section === 'review'" (click)="setSection('review')">📝 Ôn tập</button>
   </div>
 
+  <div class="lesson-progress">
+    <span class="label">Tiến độ</span>
+    <span class="bar"><span [style.width.%]="vocabPercent"></span> {{ vocabPercent }}%</span>
+  </div>
+
   <div class="speed-row">
     <span class="speed-label">🎚 Tốc độ đọc</span>
     <button *ngFor="let r of speeds; trackBy: trackBySpeed" type="button" class="speed-chip"
