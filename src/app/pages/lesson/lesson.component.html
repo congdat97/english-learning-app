@@ -1,7 +1,4 @@
-﻿<div *ngIf="lesson; else loadingTpl"
-     (touchstart)="onTouchStart($event)"
-     (touchend)="onTouchEnd($event)"
-     (touchmove)="onTouchMove($event)">
+﻿<div *ngIf="lesson; else loadingTpl">
   <div class="subnav">
     <button [class.active]="section === 'vocabulary'" (click)="setSection('vocabulary')">📚 Từ vựng</button>
     <button [class.active]="section === 'listening'" (click)="setSection('listening')">💬 Luyện nghe</button>
@@ -19,7 +16,7 @@
 
      <article *ngIf="currentVocab as v" class="word-card carousel-card">
        <button class="nav-btn prev" title="Từ trước" aria-label="Từ trước" [disabled]="vocabIndex() === 0" (click)="prevVocab()">◀</button>
-        <button class="nav-btn next" [title]="vocabIndex() === vocabulary.length - 1 ? 'Sang Luyện nghe' : 'Từ tiếp theo'" [attr.aria-label]="vocabIndex() === vocabulary.length - 1 ? 'Sang Luyện nghe' : 'Từ tiếp theo'" (click)="nextVocab()">{{ vocabIndex() === vocabulary.length - 1 ? '⏭' : '▶' }}</button>
+        <button class="nav-btn next" title="Từ tiếp theo" aria-label="Từ tiếp theo" [disabled]="vocabIndex() >= vocabulary.length - 1" (click)="nextVocab()">▶</button>
        <div class="word-top">
         <span class="vocab-tag">Từ vựng</span>
         <span class="counter">{{ vocabCounter }}</span>
@@ -70,6 +67,15 @@
     <div class="vocab-progress">
       <div class="progress-track"><span [style.width.%]="vocabPercent"></span></div>
       <span class="percent">{{ vocabPercent }}%</span>
+    </div>
+
+    <div *ngIf="vocabulary.length > 0 && vocabIndex() === vocabulary.length - 1" class="section-actions">
+      <button *ngIf="nextLessonId" class="primary" (click)="goNextLesson()">
+        Bài tiếp theo <span aria-hidden="true">→</span>
+      </button>
+      <button *ngIf="!nextLessonId" class="primary" (click)="setSection('listening')">
+        Luyện nghe <span aria-hidden="true">→</span>
+      </button>
     </div>
 
     <div *ngIf="vocabulary.length === 0" class="empty">Bài này chưa có từ vựng.</div>
@@ -127,6 +133,16 @@
       <button class="primary" (click)="resetListening()" *ngIf="listeningSubmitted">Làm lại</button>
       <p *ngIf="listeningSubmitted" class="feedback">Điểm: {{ listeningScore }} / {{ allListeningQuestions.length }}</p>
     </div>
+
+    <div *ngIf="listeningSubmitted || allListeningQuestions.length === 0" class="section-actions">
+      <button *ngIf="nextLessonId" class="primary" (click)="goNextLesson()">
+        Bài tiếp theo <span aria-hidden="true">→</span>
+      </button>
+      <button *ngIf="!nextLessonId" class="primary" (click)="setSection('review')">
+        Ôn tập <span aria-hidden="true">→</span>
+      </button>
+    </div>
+
     <div *ngIf="listening.length === 0" class="empty">Bài này chưa có phần luyện nghe.</div>
   </section>
 
@@ -182,7 +198,12 @@
         <div class="summary-icon">🎉</div>
         <h3>Hoàn thành ôn tập!</h3>
         <p class="muted">Bạn trả lời đúng {{ score }} / {{ review.length }} câu.</p>
-        <button class="btn-primary" (click)="resetReview()">Làm lại bài ôn tập</button>
+        <div class="summary-actions">
+          <button class="btn-ghost" (click)="resetReview()">Làm lại bài ôn tập</button>
+          <button class="btn-primary" (click)="goNextLesson()">
+            {{ nextLessonId ? 'Bài tiếp theo' : 'Về khóa học' }} <span aria-hidden="true">→</span>
+          </button>
+        </div>
       </div>
     </ng-template>
 
