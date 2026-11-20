@@ -24,7 +24,7 @@
 
     <label>
       <span>Xếp theo</span>
-      <select name="rankBy" [(ngModel)]="rankBy" (ngModelChange)="applyFilters()">
+      <select name="rankBy" aria-label="Xếp theo" [(ngModel)]="rankBy" (ngModelChange)="applyFilters()">
         <option value="total_stars">Tổng sao</option>
         <option value="three_stars">Số màn 3 sao</option>
         <option value="avg_score">Độ chính xác</option>
@@ -34,7 +34,7 @@
 
     <label>
       <span>Hiển thị</span>
-      <select name="limit" [(ngModel)]="limit" (ngModelChange)="applyFilters()">
+      <select name="limit" aria-label="Hiển thị" [(ngModel)]="limit" (ngModelChange)="applyFilters()">
         <option [ngValue]="10">Top 10</option>
         <option [ngValue]="20">Top 20</option>
         <option [ngValue]="50">Top 50</option>

@@ -33,12 +33,16 @@ nav button { margin-right: 8px; }
 .speed-row {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 6px;
   flex-wrap: nowrap;
-  overflow-x: auto;
-  scrollbar-width: auto;
-  margin: 12px 0 2px;
-  padding: 2px;
+  margin: 6px 0 2px;
+  padding: 1px;
+  font-size: 12px;
+}
+.speed-row select {
+  min-width: 60px;
+  padding: 3px 6px;
+  font-size: 12px;
 }
 
 .speed-row::-webkit-scrollbar {
