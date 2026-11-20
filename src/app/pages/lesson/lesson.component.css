@@ -366,6 +366,8 @@ nav button { margin-right: 8px; }
   padding: 24px 52px 20px;
   text-align: center;
   position: relative;
+  overflow-x: auto;
+  white-space: nowrap;
 }
 
 .nav-btn {
