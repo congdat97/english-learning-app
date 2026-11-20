@@ -41,6 +41,8 @@ export class LessonComponent implements OnInit, OnDestroy {
 
   /** Đọc từ SettingsService qua signal — không đọc localStorage mỗi lần đổi detection. */
   readonly showTranslation = computed(() => this.settings.settings()?.showTranslation ?? true);
+  /** Hiển thị bản dịch trong section Listening (mặc định false – bấm nút để hiện) */
+  public showLisTranslation = signal(false);
 
   private gapTimer: ReturnType<typeof setTimeout> | null = null;
   private speakToken = 0;
@@ -212,6 +214,10 @@ export class LessonComponent implements OnInit, OnDestroy {
   setSection(s: 'vocabulary' | 'listening' | 'review'): void {
     this.stopSpeaking();
     this.section = s;
+  }
+
+  toggleLisTranslation(): void {
+    this.showLisTranslation.update(v => !v);
   }
 
   retryLoad(): void {

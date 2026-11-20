@@ -622,6 +622,20 @@ nav button { margin-right: 8px; }
   .quiz-box { padding: 18px 15px; }
 }
 
+/* ===== Toggle hiển thị bản dịch Listening ===== */
+.lis-trans-toggle {
+  margin: 8px 0;
+}
+.lis-trans-toggle .tiny-btn {
+  border-radius: 12px;
+  padding: 6px 12px;
+  font-size: 12px;
+  transition: background .15s ease, color .15s ease;
+}
+.lis-trans-toggle .tiny-btn.active {
+  background: var(--primary);
+  color: #fff;
+}
 /* ===== KẾT QUẢ PHÁT ÂM: điểm % giống + thanh ===== */
 .pron-result {
   max-width: 420px;

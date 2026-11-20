@@ -87,6 +87,13 @@
 
   <section *ngIf="section === 'listening'">
     <div class="section-head"><div><h2>Listening</h2><p>Nghe đoạn hội thoại và trả lời</p></div></div>
+    <div class="lis-trans-toggle">
+      <button class="tiny-btn" (click)="toggleLisTranslation()"
+              [class.active]="showLisTranslation()"
+              title="Xem bản dịch" aria-label="Xem bản dịch">
+        {{ showLisTranslation() ? '↓ Ẩn bản dịch' : '👁 Xem bản dịch' }}
+      </button>
+    </div>
 
     <div *ngIf="prevLessonVocab.length > 0" class="prev-review">
       <div class="prev-review-head">
@@ -117,7 +124,7 @@
           <button class="line-speak" [class.speaking]="speakingKey() === l.id + ':' + li" title="Nghe câu này" aria-label="Nghe câu này" (click)="speakFrom(l.id, li, l.transcript.map(x => x.text))">{{ speakingKey() === l.id + ':' + li ? '⏸' : '▶' }}</button>
           <div class="line-body">
             <div class="line-text"><b>{{ line.speaker }}:</b> {{ line.text }}</div>
-            <span class="translation" *ngIf="showTranslation()">{{ line.translation_vi }}</span>
+            <span class="translation" *ngIf="showLisTranslation()">{{ line.translation_vi }}</span>
           </div>
         </div>
       </div>
