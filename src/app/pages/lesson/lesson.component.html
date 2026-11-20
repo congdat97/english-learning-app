@@ -203,6 +203,9 @@
 
         <div class="quiz-controls">
           <button class="btn-primary" [disabled]="!answers[q.id] || quizChecked()" (click)="checkAnswer()">Kiểm tra đáp án</button>
+          <button class="btn-ghost" (click)="skipQuestion()" [disabled]="quizChecked()">
+            Bỏ qua
+          </button>
           <button class="btn-ghost" [disabled]="!quizChecked()" (click)="nextQuestion()">
             {{ quizIndex() === review.length - 1 ? 'Xem kết quả 🎉' : 'Câu tiếp theo →' }}
           </button>

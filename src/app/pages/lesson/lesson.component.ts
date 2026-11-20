@@ -330,6 +330,16 @@ export class LessonComponent implements OnInit, OnDestroy {
     this.quizChecked.set(true);
   }
 
+  /** Bỏ qua câu hiện tại → chuyển sang câu tiếp theo (hoặc submit nếu bài cuối) */
+  skipQuestion(): void {
+    if (this.quizIndex() < this.review.length - 1) {
+      this.quizIndex.update(i => i + 1);
+      this.quizChecked.set(false);
+    } else {
+      this.submitReview();
+    }
+  }
+
   /** Câu tiếp theo; câu cuối -> submitReview (lưu tiến độ + tổng kết) */
   nextQuestion(): void {
     if (!this.quizChecked()) return;
