@@ -1,4 +1,14 @@
 <div class="section-head"><div><h2>Tất cả khóa học</h2><p>Lộ trình từ nền tảng đến giao tiếp tự tin</p></div></div>
+<div class="quick-start" *ngIf="!loading">
+  <div class="qs-icon">🚀</div>
+  <div class="qs-text">
+    <b>Chào bạn!</b> Mỗi khóa học có ~8-10 bài. Mỗi bài gồm 3 bước:<br>
+    <span class="step">1️⃣</span> <b>Từ vựng</b> – học từ mới, nghe phát âm<br>
+    <span class="step">2️⃣</span> <b>Luyện nghe</b> – nghe đoạn hội thoại, chọn đáp án<br>
+    <span class="step">3️⃣</span> <b>Ôn tập</b> – kiểm tra nhanh, nhận điểm<br>
+    Bài nào đã học xong -> bấm <b>Bài tiếp theo</b> để sang bài mới.
+  </div>
+</div>
 <div class="page-loader" *ngIf="loading"><span class="spinner"></span> Đang tải khóa học...</div>
 <div *ngIf="slowApi && loading" class="slow-hint">⏳ API Render (bản miễn phí) đang khởi động sau khi ngủ — dữ liệu sẽ về trong 30–60 giây. Vui lòng đợi hoặc tải lại trang.</div>
 <div class="course-grid" *ngIf="!loading">
