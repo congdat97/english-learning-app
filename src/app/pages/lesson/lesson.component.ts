@@ -72,6 +72,8 @@ export class LessonComponent implements OnInit, OnDestroy {
       this.speed = 1;
       this.settings.save({ ...this.settings.load(), audioSpeed: 1 });
     }
+    // Khôi phục trạng thái bài học đã lưu (nếu có)
+    this.restoreState();
     // Theo dõi paramMap để chuyển bài bằng nút Next không bị reuse component.
     this.routeSub = this.route.paramMap.subscribe(params => {
       const id = Number(params.get('id'));
@@ -209,6 +211,35 @@ export class LessonComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.routeSub?.unsubscribe();
     this.stopSpeaking();
+    this.saveState();
+  }
+
+  private saveState(): void {
+    const state = {
+      section: this.section,
+      vocabIndex: this.vocabIndex(),
+      quizIndex: this.quizIndex(),
+      quizChecked: this.quizChecked(),
+      listeningSubmitted: this.listeningSubmitted,
+      listeningScore: this.listeningScore,
+      answers: this.answers,
+    };
+    localStorage.setItem('lesson-state-' + this.lesson?.id, JSON.stringify(state));
+  }
+
+  private restoreState(): void {
+    if (!this.lesson?.id) return;
+    const state = localStorage.getItem('lesson-state-' + this.lesson.id);
+    if (state) {
+      const parsed = JSON.parse(state);
+      this.section = parsed.section || 'vocabulary';
+      this.vocabIndex.set(parsed.vocabIndex ?? 0);
+      this.quizIndex.set(parsed.quizIndex ?? 0);
+      this.quizChecked.set(parsed.quizChecked ?? false);
+      this.listeningSubmitted = parsed.listeningSubmitted ?? false;
+      this.listeningScore = parsed.listeningScore ?? 0;
+      this.answers = parsed.answers || {};
+    }
   }
 
   setSection(s: 'vocabulary' | 'listening' | 'review'): void {
