@@ -1,0 +1,53 @@
+<div class="page game-page">
+  <header class="section-head">
+    <div>
+      <h2>🎮 Trò chơi học tập</h2>
+      <p>Chọn một màn chơi để luyện từ vựng, nghe và phát âm.</p>
+    </div>
+    <div class="head-actions">
+      <a routerLink="/star-ranking" class="text-btn">🌟 Xếp hạng sao</a>
+      <button type="button" class="text-btn" (click)="load(true)">↻ Làm mới</button>
+    </div>
+  </header>
+
+  <div class="summary panel" *ngIf="!loading && !error">
+    <div><span>★</span><strong>{{ totalStars }}</strong><small>tổng sao</small></div>
+    <div><span>🎯</span><strong>{{ totalPlayed }}</strong><small>màn đã chơi</small></div>
+    <a routerLink="/star-ranking" class="summary-link">Xem bảng xếp hạng →</a>
+  </div>
+
+  <div class="panel filter-bar">
+    <label>
+      <span>Tìm màn chơi</span>
+      <input type="search" name="search" [(ngModel)]="search" (ngModelChange)="applyFilters()" placeholder="Tên bài học hoặc chủ đề..." />
+    </label>
+  </div>
+
+  <div class="page-loader" *ngIf="loading"><span class="spinner"></span> Đang chuẩn bị các màn chơi...</div>
+
+  <p *ngIf="error && !loading" class="muted">
+    ⚠️ Không tải được danh sách bài học.
+    <button type="button" class="text-btn" (click)="load(true)">Thử lại</button>
+  </p>
+
+  <ng-container *ngIf="!loading && !error">
+    <section class="course-group" *ngFor="let group of visibleGroups; trackBy: trackGroup">
+      <h3>{{ group.courseTitle }}</h3>
+      <div class="stage-grid">
+        <a class="stage-card panel" *ngFor="let stage of group.stages; trackBy: trackStage"
+           [routerLink]="['/game/play', stage.id]">
+          <div class="stage-top">
+            <span class="stage-number">#{{ stage.order }}</span>
+            <span class="stage-stars" [class.has-star]="stage.bestStars > 0">{{ starsLabel(stage.bestStars) }}</span>
+          </div>
+          <strong>{{ stage.title }}</strong>
+          <small *ngIf="stage.topic">{{ stage.topic }}</small>
+          <span class="stage-meta" *ngIf="stage.played">Độ đúng tốt nhất {{ stage.bestAccuracy }}%</span>
+          <span class="stage-meta" *ngIf="!stage.played">Chưa chơi</span>
+        </a>
+      </div>
+    </section>
+
+    <p class="empty panel" *ngIf="visibleGroups.length === 0">Không có màn chơi nào phù hợp.</p>
+  </ng-container>
+</div>

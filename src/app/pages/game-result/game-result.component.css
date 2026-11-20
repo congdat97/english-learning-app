@@ -1,0 +1,39 @@
+.page { display: grid; gap: 14px; }
+.result-hero { display: grid; justify-items: center; gap: 8px; padding: 22px 16px; text-align: center; }
+.result-kicker { color: var(--muted); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .6px; }
+.stars { color: #f59e0b; font-size: 40px; letter-spacing: 4px; line-height: 1; }
+.result-hero h2 { margin: 4px 0 8px; font-size: 20px; }
+.result-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 100%; max-width: 480px; }
+.result-stats > div { display: grid; gap: 2px; padding: 10px 6px; border-radius: 12px; background: var(--pale, rgba(0, 0, 0, .03)); }
+.result-stats strong { font-size: 16px; }
+.result-stats span { color: var(--muted); font-size: 10px; }
+
+.answer-list { display: grid; gap: 10px; padding: 14px; }
+.answer-list h3 { margin: 0 0 2px; font-size: 14px; }
+.answer-row { display: flex; gap: 10px; padding: 10px; border-radius: 12px; background: var(--pale, rgba(0, 0, 0, .03)); }
+.answer-row.correct .answer-icon { color: #1f9d6b; }
+.answer-row.wrong .answer-icon { color: #c92a2a; }
+.answer-icon { font-size: 16px; }
+.answer-body { display: grid; gap: 3px; min-width: 0; }
+.answer-body strong { font-size: 12px; line-height: 1.4; }
+.answer-body p { margin: 0; color: var(--muted); font-size: 11px; }
+.answer-body .explanation { font-style: italic; }
+
+.result-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.primary-btn {
+  display: inline-grid;
+  place-items: center;
+  min-height: 48px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--primary, #5568fe), var(--secondary, #8b5cf6));
+  color: #fff;
+  font: inherit;
+  font-weight: 800;
+  text-decoration: none;
+}
+.primary-btn.outline { border: 1px solid var(--primary, #5568fe); background: transparent; color: var(--primary, #5568fe); }
+.empty-box { display: grid; justify-items: center; gap: 10px; padding: 30px 16px; text-align: center; }
+.empty-box h2 { margin: 0; font-size: 18px; }
+.empty-box p { margin: 0; color: var(--muted); font-size: 13px; }

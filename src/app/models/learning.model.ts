@@ -96,3 +96,18 @@ export interface LeaderboardRow {
   avg_score: number;
   last_activity: string | null;
 }
+
+export interface StarLeaderboardRow {
+  user_id: number;
+  username: string;
+  avatar: string | null;
+  three_stars: number;
+  two_stars: number;
+  one_star: number;
+  zero_stars: number;
+  total_stars: number;
+  total_score: number;
+  total_questions: number;
+  avg_score: number;
+  last_activity: string | null;
+}

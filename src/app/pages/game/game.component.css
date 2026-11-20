@@ -1,0 +1,56 @@
+.page { display: grid; gap: 14px; }
+.section-head { display: flex; justify-content: space-between; align-items: end; gap: 12px; flex-wrap: wrap; }
+.section-head h2 { margin: 0; }
+.section-head p { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
+.head-actions { display: flex; align-items: center; gap: 14px; }
+.head-actions .text-btn { background: none; }
+
+.summary { display: flex; align-items: center; gap: 18px; padding: 12px 14px; flex-wrap: wrap; }
+.summary > div { display: flex; align-items: baseline; gap: 6px; }
+.summary span { color: #f59e0b; font-size: 18px; }
+.summary strong { font-size: 20px; }
+.summary small { color: var(--muted); font-size: 11px; }
+.summary-link { margin-left: auto; color: var(--primary, #5568fe); font-size: 12px; font-weight: 700; text-decoration: none; }
+
+.filter-bar { padding: 12px 14px; }
+.filter-bar label { display: grid; gap: 5px; }
+.filter-bar span { color: var(--muted); font-size: 12px; font-weight: 700; }
+.filter-bar input {
+  width: 100%;
+  min-height: 44px;
+  padding: 7px 10px;
+  border: 1px solid var(--border, var(--line));
+  border-radius: 10px;
+  background: var(--surface, #fff);
+  color: var(--text, #172033);
+  font: inherit;
+  font-size: 13px;
+}
+.course-group { display: grid; gap: 10px; }
+.course-group h3 { margin: 6px 0 0; font-size: 14px; }
+.stage-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+.stage-card {
+  display: grid;
+  gap: 5px;
+  padding: 13px;
+  border-radius: 14px;
+  text-decoration: none;
+  color: inherit;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.stage-card:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0, 0, 0, .08); }
+.stage-card:active { transform: scale(.98); }
+.stage-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.stage-number { color: var(--muted); font-size: 11px; font-weight: 700; }
+.stage-stars { color: var(--muted); font-size: 14px; letter-spacing: 1px; }
+.stage-stars.has-star { color: #f59e0b; }
+.stage-card strong { font-size: 13px; line-height: 1.35; }
+.stage-card small { color: var(--muted); font-size: 11px; }
+.stage-meta { color: var(--primary, #5568fe); font-size: 10px; font-weight: 700; }
+.empty { padding: 24px; text-align: center; color: var(--muted); }
+
+@media (min-width: 760px) {
+  .filter-bar { max-width: 420px; }
+  .filter-bar input { min-height: 36px; }
+  .filter-bar span { font-size: 10.5px; text-transform: uppercase; letter-spacing: .5px; }
+}

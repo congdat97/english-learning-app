@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { finalize, shareReplay, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
-import { Course, LeaderboardRow, Lesson, Listening, ReviewQuestion, UserProgress, Vocabulary } from '../models/learning.model';
+import { Course, LeaderboardRow, Lesson, Listening, ReviewQuestion, StarLeaderboardRow, UserProgress, Vocabulary } from '../models/learning.model';
 import { CACHE_MAX_AGE_MS, DYNAMIC_CACHE_MAX_AGE_MS, clearAppCaches } from '../cache-policy';
 
 type ApiResult<T> = { success: boolean; data: T };
@@ -267,6 +267,42 @@ export class LearningService {
         )
         .forEach(key => localStorage.removeItem(key));
     } catch {}
+  }
+
+  getStarLeaderboard(force = false): Observable<ApiResult<StarLeaderboardRow[]>> {
+    return this.cachedGet<StarLeaderboardRow[]>(`${this.base}/game/leaderboard`, force, DYNAMIC_CACHE_MAX_AGE_MS);
+  }
+
+  clearStarLeaderboardCache(): void {
+    try {
+      Object.keys(localStorage)
+        .filter(key =>
+          this.isCurrentUserCacheKey(key) &&
+          key.includes(`${this.base}/game/leaderboard`)
+        )
+        .forEach(key => localStorage.removeItem(key));
+    } catch {}
+  }
+
+  saveGameResult(stageId: string, stars: number, score: number, total: number): Observable<ApiResult<{
+    stage_id: string;
+    stars: number;
+    score: number;
+    total_questions: number;
+    updated_at: string;
+  }>> {
+    return this.http.post<ApiResult<{
+      stage_id: string;
+      stars: number;
+      score: number;
+      total_questions: number;
+      updated_at: string;
+    }>>(`${this.base}/game/result`, {
+      stage_id: stageId,
+      stars,
+      score,
+      total_questions: total
+    }).pipe(tap(() => this.clearStarLeaderboardCache()));
   }
 
   /**

@@ -116,6 +116,40 @@ describe('LearningService', () => {
     req.flush({ success: true, data: [] });
   });
 
+  it('getStarLeaderboard uses the short-lived cache by default', () => {
+    service.getStarLeaderboard().subscribe();
+    const req = http.expectOne(`${base}/game/leaderboard`);
+    expect(req.request.method).toBe('GET');
+    expect(req.request.headers.get('X-Force-Refresh')).toBeNull();
+    req.flush({ success: true, data: [] });
+
+    service.getStarLeaderboard().subscribe();
+    http.expectNone(`${base}/game/leaderboard`);
+  });
+
+  it('getStarLeaderboard(true) always refreshes from the server', () => {
+    service.getStarLeaderboard(true).subscribe();
+    const req = http.expectOne(`${base}/game/leaderboard`);
+    expect(req.request.headers.get('X-Force-Refresh')).toBe('1');
+    req.flush({ success: true, data: [] });
+  });
+
+  it('saveGameResult posts the stage result and clears both star cache layers', () => {
+    const apiKey = 'api-cache:' + `${base}/game/leaderboard`;
+    const httpKey = 'http_cache_' + `${base}/game/leaderboard`;
+    localStorage.setItem(apiKey, JSON.stringify({ ts: Date.now(), body: { success: true, data: [] } }));
+    localStorage.setItem(httpKey, JSON.stringify({ ts: Date.now(), body: { success: true, data: [] } }));
+
+    service.saveGameResult('lesson-1', 3, 9, 10).subscribe();
+    const req = http.expectOne(`${base}/game/result`);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ stage_id: 'lesson-1', stars: 3, score: 9, total_questions: 10 });
+    req.flush({ success: true, data: { stage_id: 'lesson-1', stars: 3, score: 9, total_questions: 10, updated_at: '2026-11-20T00:00:00Z' } });
+
+    expect(localStorage.getItem(apiKey)).toBeNull();
+    expect(localStorage.getItem(httpKey)).toBeNull();
+  });
+
   it('invalidateProgressCache removes the bulk progress cache', () => {
     localStorage.setItem('api-cache:' + `${base}/lessons/progress/all`, JSON.stringify({ ts: Date.now(), body: { success: true, data: [] } }));
     service.invalidateProgressCache();

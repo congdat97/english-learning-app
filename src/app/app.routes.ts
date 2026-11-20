@@ -38,6 +38,21 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/bookmarks/bookmarks.component').then(m => m.BookmarksComponent)
   },
   {
+    path: 'game',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/game/game.component').then(m => m.GameComponent)
+  },
+  {
+    path: 'game/play/:stageId',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/game-play/game-play.component').then(m => m.GamePlayComponent)
+  },
+  {
+    path: 'game/result/:stageId',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/game-result/game-result.component').then(m => m.GameResultComponent)
+  },
+  {
     path: 'progress',
     canActivate: [authGuard],
     loadComponent: () => import('./pages/progress/progress.component').then(m => m.ProgressComponent)
@@ -46,6 +61,11 @@ export const routes: Routes = [
     path: 'ranking',
     canActivate: [authGuard],
     loadComponent: () => import('./pages/ranking/ranking.component').then(m => m.RankingComponent)
+  },
+  {
+    path: 'star-ranking',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/star-ranking/star-ranking.component').then(m => m.StarRankingComponent)
   },
   {
     path: 'settings',

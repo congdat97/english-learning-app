@@ -1,0 +1,88 @@
+<div class="page star-ranking-page">
+  <header class="section-head">
+    <div>
+      <h2>🌟 Tổng hợp xếp hạng sao</h2>
+      <p>Xếp hạng theo tổng sao đạt được ở các màn chơi.</p>
+    </div>
+    <div class="head-actions">
+      <button type="button" class="text-btn" (click)="load(true)">↻ Làm mới</button>
+      <a routerLink="/ranking" class="text-btn">← Xếp hạng học tập</a>
+    </div>
+  </header>
+
+  <div class="my-rank panel" *ngIf="!loading && !error && myRank > 0">
+    <span class="my-rank-label">Vị trí của bạn</span>
+    <strong>#{{ myRank }} <small>/ {{ myTotal }}</small></strong>
+    <span class="my-rank-stars">★ {{ myStars }}</span>
+  </div>
+
+  <div class="panel filter-bar">
+    <label>
+      <span>Tìm học viên</span>
+      <input type="search" name="search" [(ngModel)]="search" (ngModelChange)="applyFilters()" placeholder="Nhập tên học viên..." />
+    </label>
+
+    <label>
+      <span>Xếp theo</span>
+      <select name="rankBy" [(ngModel)]="rankBy" (ngModelChange)="applyFilters()">
+        <option value="total_stars">Tổng sao</option>
+        <option value="three_stars">Số màn 3 sao</option>
+        <option value="avg_score">Độ chính xác</option>
+        <option value="last_activity">Hoạt động gần nhất</option>
+      </select>
+    </label>
+
+    <label>
+      <span>Hiển thị</span>
+      <select name="limit" [(ngModel)]="limit" (ngModelChange)="applyFilters()">
+        <option [ngValue]="10">Top 10</option>
+        <option [ngValue]="20">Top 20</option>
+        <option [ngValue]="50">Top 50</option>
+        <option [ngValue]="100">Tất cả</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="page-loader" *ngIf="loading"><span class="spinner"></span> Đang tải bảng xếp hạng sao...</div>
+  <p class="slow-hint" *ngIf="slowHint && loading">API đang khởi động, vui lòng đợi vài giây...</p>
+
+  <p *ngIf="error && !loading" class="muted">
+    ⚠️ Không tải được bảng xếp hạng sao.
+    <button type="button" class="text-btn" (click)="load(true)">Thử lại</button>
+  </p>
+
+  <div class="panel board" *ngIf="!loading && !error">
+    <div class="rank-card" *ngFor="let row of rankedRows; trackBy: trackBy"
+         [class.is-me]="isCurrent(row.user_id)"
+         [class.is-top]="row.rank <= 3">
+      <div class="rank-main">
+        <span class="rank-badge" [class.medal]="row.rank <= 3">{{ rankLabel(row.rank) }}</span>
+        <img *ngIf="row.avatar; else letterAvatar" class="learner-avatar" [src]="row.avatar" [alt]="row.username" />
+        <ng-template #letterAvatar>
+          <span class="learner-avatar letter">{{ row.username.charAt(0).toUpperCase() }}</span>
+        </ng-template>
+        <div class="learner">
+          <strong>{{ row.username }}</strong>
+          <small *ngIf="isCurrent(row.user_id)">Bạn</small>
+          <span class="activity" *ngIf="row.last_activity">{{ row.last_activity | date:'dd/MM HH:mm' }}</span>
+        </div>
+        <div class="total-star">
+          <span class="star-icon">★</span>
+          <strong>{{ row.total_stars }}</strong>
+          <small>tổng sao</small>
+        </div>
+      </div>
+
+      <div class="stat-row">
+        <div><span>3★</span><strong>{{ row.three_stars }}</strong></div>
+        <div><span>2★</span><strong>{{ row.two_stars }}</strong></div>
+        <div><span>1★</span><strong>{{ row.one_star }}</strong></div>
+        <div><span>0★</span><strong>{{ row.zero_stars }}</strong></div>
+        <div><span>Độ đúng</span><strong class="score">{{ row.avg_score }}%</strong></div>
+        <div><span>Lượt chơi</span><strong>{{ played(row) }}</strong></div>
+      </div>
+    </div>
+
+    <p class="empty" *ngIf="rankedRows.length === 0">Chưa có kết quả chơi nào phù hợp.</p>
+  </div>
+</div>

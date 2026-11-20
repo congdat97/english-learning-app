@@ -1,0 +1,99 @@
+.page { display: grid; gap: 14px; }
+.section-head { display: flex; justify-content: space-between; align-items: end; gap: 12px; flex-wrap: wrap; }
+.section-head h2 { margin: 0; }
+.section-head p { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
+.head-actions { display: flex; align-items: center; gap: 14px; }
+.head-actions .text-btn { background: none; }
+
+.my-rank {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+  background: linear-gradient(135deg, rgba(245, 158, 11, .14), rgba(79, 70, 229, .10));
+  border-color: rgba(245, 158, 11, .35);
+}
+.my-rank-label { color: var(--muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+.my-rank strong { font-size: 22px; }
+.my-rank strong small { color: var(--muted); font-size: 12px; font-weight: 600; }
+.my-rank-stars { color: #f59e0b; font-weight: 800; }
+
+.filter-bar {
+  padding: 12px 14px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  align-items: end;
+}
+.filter-bar label { display: grid; gap: 5px; }
+.filter-bar span { color: var(--muted); font-size: 12px; font-weight: 700; }
+.filter-bar input,
+.filter-bar select {
+  width: 100%;
+  min-height: 44px;
+  padding: 7px 10px;
+  border: 1px solid var(--border, var(--line));
+  border-radius: 10px;
+  background: var(--surface, #fff);
+  color: var(--text, #172033);
+  font: inherit;
+  font-size: 13px;
+}
+
+.board { display: grid; gap: 10px; padding: 12px; }
+.rank-card {
+  padding: 12px;
+  border: 1px solid var(--line, var(--border));
+  border-radius: 14px;
+  background: var(--surface, #fff);
+}
+.rank-card.is-me { border-color: var(--primary, #5568fe); box-shadow: 0 0 0 2px rgba(79, 70, 229, .10); }
+.rank-card.is-top .rank-badge { background: linear-gradient(135deg, rgba(255, 193, 7, .22), rgba(79, 70, 229, .12)); }
+
+.rank-main { display: grid; grid-template-columns: 40px 34px minmax(0, 1fr) 52px; gap: 8px; align-items: center; }
+.rank-badge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 34px;
+  height: 34px;
+  padding: 0 4px;
+  border-radius: 50%;
+  background: var(--pale, rgba(0, 0, 0, .04));
+  color: var(--muted);
+  font-weight: 800;
+  font-size: 12px;
+}
+.rank-badge.medal { font-size: 18px; background: transparent; }
+.learner-avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; flex: 0 0 auto; }
+.learner-avatar.letter {
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, var(--primary, #5568fe), var(--secondary, #8b5cf6));
+  color: #fff;
+  font-weight: 800;
+}
+.learner { min-width: 0; }
+.learner strong { display: block; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.learner small { color: var(--primary, #5568fe); font-size: 10px; font-weight: 700; }
+.activity { display: block; color: var(--muted); font-size: 11px; }
+.total-star { display: grid; justify-items: center; color: #f59e0b; }
+.star-icon { font-size: 18px; line-height: 1; }
+.total-star strong { font-size: 20px; line-height: 1.1; }
+.total-star small { color: var(--muted); font-size: 9px; white-space: nowrap; }
+
+.stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--line, var(--border)); }
+.stat-row > div { display: grid; gap: 2px; padding: 8px; text-align: center; border-radius: 10px; background: var(--pale, rgba(0, 0, 0, .03)); }
+.stat-row span { color: var(--muted); font-size: 10px; }
+.stat-row strong { font-size: 14px; }
+.score { color: #1f9d6b; }
+.empty { padding: 24px !important; text-align: center; color: var(--muted); }
+
+@media (min-width: 760px) {
+  .filter-bar { grid-template-columns: 2fr 1fr 1fr; }
+  .filter-bar span { font-size: 10.5px; text-transform: uppercase; letter-spacing: .5px; }
+  .filter-bar input,
+  .filter-bar select { min-height: 36px; }
+  .rank-main { grid-template-columns: 48px 40px minmax(0, 1fr) 90px; }
+  .stat-row { grid-template-columns: repeat(6, 1fr); }
+}

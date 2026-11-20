@@ -1,0 +1,79 @@
+<div class="page play-page">
+  <header class="play-head">
+    <a routerLink="/game" class="icon-btn" aria-label="Quay lại">←</a>
+    <div class="progress-wrap">
+      <div class="progress-meta">
+        <span>Câu {{ index + 1 }}/{{ total }}</span>
+        <span>{{ progressPercent() }}%</span>
+      </div>
+      <div class="progress-track"><span [style.width.%]="progressPercent()"></span></div>
+    </div>
+    <span class="score-chip">✅ {{ score }}</span>
+  </header>
+
+  <div class="page-loader" *ngIf="loading"><span class="spinner"></span> Đang tạo câu hỏi...</div>
+
+  <div class="panel error-box" *ngIf="!loading && error">
+    <h2>⚠️ Không thể bắt đầu màn chơi</h2>
+    <p *ngIf="!lessonId">Màn chơi không hợp lệ.</p>
+    <p *ngIf="lessonId && !questions.length">Bài học này chưa có câu hỏi.</p>
+    <div class="error-actions">
+      <a routerLink="/game" class="text-btn">← Danh sách màn</a>
+      <button type="button" class="text-btn" (click)="retry()" *ngIf="lessonId">Thử lại</button>
+    </div>
+  </div>
+
+  <article class="question-card panel" *ngIf="!loading && !error && current">
+    <span class="q-type">{{ typeLabel(current.type) }}</span>
+    <h2 class="question-text">{{ current.prompt }}</h2>
+    <p class="translation" *ngIf="current.translation">{{ current.translation }}</p>
+
+    <button type="button" class="speak-btn" *ngIf="current.speakText" (click)="speak()">
+      🔊 Nghe lại
+    </button>
+
+    <div class="options" *ngIf="current.type === 'choice' || current.type === 'fill' || current.type === 'listen'">
+      <button type="button" class="option" *ngFor="let option of current.options; let i = index"
+              [class.selected]="selectedOption === option"
+              [disabled]="!!feedback"
+              (click)="choose(option)">
+        <span class="option-key">{{ i + 1 }}</span>
+        <span>{{ option }}</span>
+      </button>
+    </div>
+
+    <div class="pronounce-box" *ngIf="current.type === 'pronounce'">
+      <strong class="word">{{ current.answer }}</strong>
+      <button type="button" class="mic-btn" [disabled]="checkingPronunciation || !!feedback" (click)="startPronunciation()">
+        {{ checkingPronunciation ? '🎙️ Đang nghe...' : '🎤 Nói' }}
+      </button>
+      <p class="hint" *ngIf="!pronunciationSupported()">Trình duyệt không hỗ trợ nhận diện giọng nói. Bạn có thể bỏ qua câu này.</p>
+      <p class="score-value" *ngIf="pronunciation !== null">Điểm phát âm: <strong>{{ pronunciation }}%</strong></p>
+    </div>
+
+    <div class="order-box" *ngIf="current.type === 'order'">
+      <div class="answer-slots">
+        <button type="button" class="token selected" *ngFor="let token of selectedTokens; let i = index"
+                [disabled]="!!feedback" (click)="removeToken(i)">{{ token }}</button>
+        <span class="slot-placeholder" *ngIf="selectedTokens.length === 0">Chạm vào các từ để xếp câu</span>
+      </div>
+      <div class="token-list">
+        <button type="button" class="token" *ngFor="let token of availableTokens; let i = index"
+                [disabled]="!!feedback" (click)="pickToken(i)">{{ token }}</button>
+      </div>
+    </div>
+
+    <div class="feedback" *ngIf="feedback" [class.correct]="feedback === 'correct'" [class.wrong]="feedback === 'wrong'">
+      <strong>{{ feedback === 'correct' ? '✅ Đúng rồi!' : '❌ Chưa đúng' }}</strong>
+      <span>Đáp án: {{ current.answer }}</span>
+      <p *ngIf="current.explanation">{{ current.explanation }}</p>
+    </div>
+
+    <button type="button" class="primary-btn" *ngIf="!feedback" [disabled]="!canCheck()" (click)="check()">
+      Kiểm tra
+    </button>
+    <button type="button" class="primary-btn" *ngIf="feedback" (click)="next()">
+      {{ index < total - 1 ? 'Câu tiếp' : 'Xem kết quả' }}
+    </button>
+  </article>
+</div>

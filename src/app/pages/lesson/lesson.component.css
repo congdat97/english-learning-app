@@ -36,12 +36,22 @@ nav button { margin-right: 8px; }
   gap: 7px;
   flex-wrap: nowrap;
   overflow-x: auto;
-  scrollbar-width: none;
+  scrollbar-width: auto;
   margin: 12px 0 2px;
   padding: 2px;
 }
 
-.speed-row::-webkit-scrollbar { display: none; }
+.speed-row::-webkit-scrollbar {
+  width: 6px;
+  background: color-mix(in srgb, var(--line) 70%, transparent);
+}
+.speed-row::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--line) 50%, var(--muted));
+  border-radius: 20px;
+}
+.speed-row::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
 
 .speed-label {
   font-size: 12px;
@@ -76,27 +86,40 @@ nav button { margin-right: 8px; }
   transform: scale(.96);
 }
 
-.speed-chip.active {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: #fff;
+.speed-select {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 /* ===== Nút phát cả đoạn: đổi icon + màu khi đang đọc ===== */
 .play {
+  width: 62px;
+  height: 62px;
+  border: 0;
+  border-radius: 50%;
+  font-size: 25px;
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
   transition: .2s ease;
+  box-shadow: 0 2px 8px rgba(36, 59, 99, .08);
 }
 
 .play.playing {
-  background: #ef4444;
-  border-color: #ef4444;
+  background: var(--primary);
   color: #fff;
-  animation: pulse 1.2s ease-in-out infinite;
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--primary) 30%, transparent);
 }
 
 @keyframes pulse {
-  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, #ef4444 45%, transparent); }
-  50% { box-shadow: 0 0 0 8px transparent; }
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 45%, transparent); }
+  50% { box-shadow: 0 0 0 12px transparent; }
 }
 
 /* ===== Nút "Nghe" từng câu: đổi icon + màu khi câu đó đang đọc ===== */
@@ -114,7 +137,23 @@ nav button { margin-right: 8px; }
   font-size: 14px;
   line-height: 1;
   text-align: center;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--pale) 80%, var(--white));
+  border: 1px solid color-mix(in srgb, var(--line) 30%, transparent);
 }
+
+/* Nút prev/next vocab carousel */
+.nav-btn {
+  width: 44px;
+  height: 44px;
+  font-size: 18px;
+  box-shadow: 0 2px 8px rgba(36, 59, 99, .08);
+}
+.nav-btn.prev { left: 8px; }
+.nav-btn.next { right: 8px; }
+.nav-btn:hover:not(:disabled) { transform: translateY(-50%) scale(1.1); }
+.nav-btn:active:not(:disabled) { transform: translateY(-50%) scale(.94); }
+.nav-btn:disabled { opacity: .35; cursor: not-allowed; }
 
 /* ===== Dòng hội thoại: nút tròn bên trái, như mockup ===== */
 .line {
@@ -242,7 +281,30 @@ nav button { margin-right: 8px; }
 }
 
 /* ===== Phát âm bằng mic ===== */
-.mic-btn.listening { background: var(--primary-soft); border-color: var(--primary); }
+.mic-btn {
+  min-width: 40px;
+  padding: 7px 10px;
+  font-size: 15px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--primary) 10%, var(--white));
+  border: 1px solid color-mix(in srgb, var(--primary) 30%, var(--line));
+  box-shadow: 0 2px 6px rgba(36, 59, 99, .06);
+  transition: transform .15s ease, background .15s ease, box-shadow .15s ease;
+}
+.mic-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: color-mix(in srgb, var(--primary) 16%, var(--white));
+  box-shadow: 0 4px 10px rgba(36, 59, 99, .10);
+}
+.mic-btn.listening {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+.mic-btn.listening:hover:not(:disabled) {
+  background: var(--primary);
+  filter: brightness(1.05);
+}
 .pron-result { font-size: 12px; font-weight: 700; color: #b45309; }
 .pron-result.ok { color: #15803d; }
 
@@ -402,33 +464,34 @@ nav button { margin-right: 8px; }
 /* Nút kiểu mockup */
 .btn-ghost {
   border: 0;
-  border-radius: 12px;
-  padding: 11px 16px;
+  border-radius: 20px;
+  padding: 8px 16px;
   font-weight: 700;
-  font-size: 13px;
-  background: color-mix(in srgb, var(--pale) 75%, var(--white));
+  font-size: 12px;
+  background: color-mix(in srgb, var(--pale) 70%, var(--white));
   color: var(--blue);
   cursor: pointer;
-  transition: .2s ease;
+  transition: .15s ease;
+  box-shadow: 0 2px 6px rgba(36, 59, 99, .05);
 }
 
-.btn-ghost:hover:not(:disabled) { filter: brightness(.98); transform: translateY(-1px); }
+.btn-ghost:hover:not(:disabled) { background: color-mix(in srgb, var(--pale) 60%, var(--white)); transform: translateY(-1px); }
 .btn-ghost:disabled { opacity: .45; cursor: not-allowed; }
 
 .btn-primary {
   border: 0;
-  border-radius: 12px;
-  padding: 11px 18px;
+  border-radius: 20px;
+  padding: 10px 20px;
   font-weight: 800;
   font-size: 13px;
   background: var(--blue);
   color: #fff;
   cursor: pointer;
-  box-shadow: 0 7px 16px color-mix(in srgb, var(--blue) 25%, transparent);
-  transition: .2s ease;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--blue) 25%, transparent);
+  transition: .15s ease;
 }
 
-.btn-primary:hover:not(:disabled) { filter: brightness(1.07); transform: translateY(-1px); }
+.btn-primary:hover:not(:disabled) { filter: brightness(1.05); transform: translateY(-1px); }
 .btn-primary:disabled { opacity: .45; cursor: not-allowed; }
 
 /* Dots tiến độ từ */

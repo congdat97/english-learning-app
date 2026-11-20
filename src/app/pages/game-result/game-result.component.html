@@ -1,0 +1,42 @@
+<div class="page result-page">
+  <ng-container *ngIf="result; else noResult">
+    <section class="result-hero panel">
+      <span class="result-kicker">Kết quả màn chơi</span>
+      <div class="stars">{{ starsLabel(result.stars) }}</div>
+      <h2>{{ title() }}</h2>
+      <div class="result-stats">
+        <div><strong>{{ result.score }}/{{ result.total }}</strong><span>câu đúng</span></div>
+        <div><strong>{{ result.accuracy }}%</strong><span>độ chính xác</span></div>
+        <div><strong>{{ result.pronunciation !== null ? result.pronunciation + '%' : '—' }}</strong><span>phát âm</span></div>
+      </div>
+    </section>
+
+    <section class="panel answer-list">
+      <h3>Chi tiết câu trả lời</h3>
+      <div class="answer-row" *ngFor="let answer of result.answers; trackBy: trackBy"
+           [class.correct]="answer.correct" [class.wrong]="!answer.correct">
+        <span class="answer-icon">{{ answer.correct ? '✅' : '❌' }}</span>
+        <div class="answer-body">
+          <strong>{{ answer.prompt }}</strong>
+          <p>Đáp án: <b>{{ answer.answer }}</b></p>
+          <p *ngIf="!answer.correct && answer.selected">Bạn chọn: {{ answer.selected }}</p>
+          <p class="explanation" *ngIf="answer.explanation">{{ answer.explanation }}</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="result-actions">
+      <a routerLink="/game" class="text-btn">← Danh sách màn</a>
+      <a [routerLink]="['/game/play', result.stageId]" class="primary-btn">Chơi lại</a>
+      <a routerLink="/star-ranking" class="primary-btn outline">🌟 Xếp hạng sao</a>
+    </div>
+  </ng-container>
+
+  <ng-template #noResult>
+    <section class="panel empty-box">
+      <h2>Chưa có kết quả</h2>
+      <p>Hãy chơi một màn để xem kết quả tại đây.</p>
+      <a routerLink="/game" class="primary-btn">Về danh sách màn</a>
+    </section>
+  </ng-template>
+</div>

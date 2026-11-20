@@ -12,8 +12,9 @@
 
   <div class="speed-row">
     <span class="speed-label">🎚 Tốc độ đọc</span>
-    <button *ngFor="let r of speeds; trackBy: trackBySpeed" type="button" class="speed-chip"
-            [class.active]="speed === r" (click)="setSpeed(r)">{{ r }}x</button>
+    <select class="speed-select" [value]="speed" (change)="setSpeed(+$any($event.target).value)">
+      <option *ngFor="let r of speeds; trackBy: trackBySpeed" [value]="r">{{ r }}x</option>
+    </select>
   </div>
 
   <section *ngIf="section === 'vocabulary'">
@@ -32,7 +33,7 @@
         <h2 class="word-title" (click)="speakOnce(v.id + '-w', v.word)">{{ v.word }}</h2>
         <button class="tiny-btn icon-speak" [class.speaking]="speakingKey() === v.id + '-w'"
                 title="Nghe từ" aria-label="Nghe từ"
-                (click)="speakOnce(v.id + '-w', v.word)">{{ speakingKey() === v.id + '-w' ? '⏸' : '▶' }}</button>
+                (click)="speakOnce(v.id + '-w', v.word)">{{ speakingKey() === v.id + '-w' ? '⏸' : '🔊' }}</button>
       </div>
       <div class="pronounce" *ngIf="v.ipa">
         <span class="ipa-chip">{{ v.ipa }}</span>
@@ -44,7 +45,7 @@
         <small>Ví dụ: {{ e.sentence }}<br><ng-container *ngIf="showTranslation()">{{ e.translation_vi }}</ng-container></small>
         <button class="tiny-btn icon-speak" [class.speaking]="speakingKey() === v.id + ':' + ei"
                 title="Nghe câu" aria-label="Nghe câu"
-                (click)="speakOnce(v.id + ':' + ei, e.sentence)">{{ speakingKey() === v.id + ':' + ei ? '⏸' : '▶' }}</button>
+                (click)="speakOnce(v.id + ':' + ei, e.sentence)">{{ speakingKey() === v.id + ':' + ei ? '⏸' : '🔊' }}</button>
       </div>
  
        <div class="word-actions">
@@ -121,12 +122,12 @@
         <button class="play" [class.playing]="playingGroup() === l.id && speakingKey() !== null"
                 [attr.aria-label]="playingGroup() === l.id ? 'Dừng đọc' : 'Phát cả đoạn'"
                 [disabled]="speakingKey() !== null"
-                (click)="playGroup(l.id, l.transcript.map(x => x.text))">{{ playingGroup() === l.id && speakingKey() !== null ? '⏸' : '▶' }}</button>
+                (click)="playGroup(l.id, l.transcript.map(x => x.text))">{{ playingGroup() === l.id && speakingKey() !== null ? '⏸' : '🔊' }}</button>
         <span class="muted">{{ playingGroup() === l.id ? (speakingKey() !== null ? 'Đang đọc — bấm để dừng' : 'Nghỉ giữa câu...') : 'Sẵn sàng nghe' }}</span>
       </div>
       <div class="transcript">
         <div *ngFor="let line of l.transcript; let li = index; trackBy: trackByLine" class="line" [class.reading]="speakingKey() === l.id + ':' + li">
-          <button class="line-speak" [class.speaking]="speakingKey() === l.id + ':' + li" title="Nghe câu này" aria-label="Nghe câu này" (click)="speakFrom(l.id, li, l.transcript.map(x => x.text))">{{ speakingKey() === l.id + ':' + li ? '⏸' : '▶' }}</button>
+          <button class="line-speak" [class.speaking]="speakingKey() === l.id + ':' + li" title="Nghe câu này" aria-label="Nghe câu này" (click)="speakFrom(l.id, li, l.transcript.map(x => x.text))">{{ speakingKey() === l.id + ':' + li ? '⏸' : '🔊' }}</button>
           <div class="line-body">
             <div class="line-text"><b>{{ line.speaker }}:</b> {{ line.text }}</div>
             <span class="translation" *ngIf="showLisTranslation()">{{ line.translation_vi }}</span>
@@ -181,7 +182,7 @@
         <div *ngIf="q.type === 'listen'" class="listen-play">
           <button class="tiny-btn icon-speak" [class.speaking]="speakingKey() === 'rv-' + q.id"
                   title="Phát từ" (click)="playListenWord(q)">
-            {{ speakingKey() === 'rv-' + q.id ? '⏸' : '▶' }}
+            {{ speakingKey() === 'rv-' + q.id ? '⏸' : '🔊' }}
           </button>
           <span class="muted">Bấm để nghe, sau đó chọn từ vừa nghe</span>
         </div>
