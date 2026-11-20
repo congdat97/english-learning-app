@@ -16,8 +16,8 @@
 
       <article *ngIf="currentVocab as v" class="word-card carousel-card"
                (touchstart)="onVocabTouchStart($event)" (touchend)="onVocabTouchEnd($event)">
-       <button class="nav-btn prev" title="Từ trước" aria-label="Từ trước" [disabled]="vocabIndex() === 0" (click)="prevVocab()">◀</button>
-        <button class="nav-btn next" title="Từ tiếp theo" aria-label="Từ tiếp theo" [disabled]="vocabIndex() >= vocabulary.length - 1" (click)="nextVocab()">▶</button>
+       <button class="nav-btn prev" title="Từ trước" aria-label="Từ trước" [disabled]="vocabIndex() === 0 || speakingKey() !== null" (click)="prevVocab()">◀</button>
+        <button class="nav-btn next" title="Từ tiếp theo" aria-label="Từ tiếp theo" [disabled]="vocabIndex() >= vocabulary.length - 1 || speakingKey() !== null" (click)="nextVocab()">▶</button>
        <div class="word-top">
         <span class="vocab-tag">Từ vựng</span>
         <span class="counter">{{ vocabCounter }}</span>
@@ -96,6 +96,7 @@
       <div class="prev-review-chips">
         <button *ngFor="let w of prevLessonVocab; trackBy: trackByVocabulary" type="button" class="prev-chip"
                 [class.speaking]="speakingKey() === 'pv-' + w.id"
+                [disabled]="speakingKey() !== null"
                 (click)="speakOnce('pv-' + w.id, w.word)">
           <b>{{ w.word }}</b><small>{{ w.meaning_vi }}</small>
         </button>
@@ -107,6 +108,7 @@
       <div class="audio-controls">
         <button class="play" [class.playing]="playingGroup() === l.id && speakingKey() !== null"
                 [attr.aria-label]="playingGroup() === l.id ? 'Dừng đọc' : 'Phát cả đoạn'"
+                [disabled]="speakingKey() !== null"
                 (click)="playGroup(l.id, l.transcript.map(x => x.text))">{{ playingGroup() === l.id && speakingKey() !== null ? '⏸' : '▶' }}</button>
         <span class="muted">{{ playingGroup() === l.id ? (speakingKey() !== null ? 'Đang đọc — bấm để dừng' : 'Nghỉ giữa câu...') : 'Sẵn sàng nghe' }}</span>
       </div>
